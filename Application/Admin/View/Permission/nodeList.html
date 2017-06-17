@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>无标题文档</title>
+    <link href="{:C('STATIC_URL')}/css/style.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="{:C('STATIC_URL')}/js/jquery.js"></script>
+    <script>
+        $(function () {
+            $('.add_node').click();
+        });
+    </script>
+</head>
+<body>
+
+<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+        <li><a href="#">首页</a></li>
+        <li><a href="#">权限管理</a></li>
+        <li><a href="#">节点管理</a></li>
+    </ul>
+</div>
+
+<div class="rightinfo">
+
+    <div class="tools">
+
+        <ul class="toolbar">
+            <li onclick="location.href='/Permission/addNode'"><span><img src="{:C('STATIC_URL')}/images/t01.png"/></span>添加</li>
+            <li class="click"><span><img src="{:C('STATIC_URL')}/images/t02.png"/></span>修改</li>
+            <li><span><img src="{:C('STATIC_URL')}/images/t03.png"/></span>删除</li>
+            <li><span><img src="{:C('STATIC_URL')}/images/t04.png"/></span>统计</li>
+        </ul>
+
+
+        <ul class="toolbar1">
+            <li><span><img src="{:C('STATIC_URL')}/images/t05.png"/></span>设置</li>
+        </ul>
+
+    </div>
+
+
+    <table class="tablelist">
+        <thead>
+        <tr>
+            <th>描述</th>
+            <th>链接</th>
+            <th>排序</th>
+            <th>是否显示</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr data-id="0" data-pid="0">
+            <td>后台系统</td>
+            <td>/</td>
+            <td>0</td>
+            <td>显示</td>
+            <td><a href="javascript:;" class="tablelink add_node">添加子节点</a> <a href="javascript:;" class="tablelink">查看</a> <a href="javascript:;" class="tablelink"> 删除</a></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!--
+    <div class="tip">
+        <div class="tiptop"><span>提示信息</span><a></a></div>
+
+        <div class="tipinfo">
+            <span><img src="{:C('STATIC_URL')}/images/ticon.png"/></span>
+            <div class="tipright">
+                <p>是否确认对信息的修改 ？</p>
+                <cite>如果是请点击确定按钮 ，否则请点取消。</cite>
+            </div>
+        </div>
+
+        <div class="tipbtn">
+            <input name="" type="button" class="sure" value="确定"/>&nbsp;
+            <input name="" type="button" class="cancel" value="取消"/>
+        </div>
+
+    </div>
+    -->
+
+
+</div>
+</body>
+
+</html>
