@@ -35,6 +35,19 @@
 
 <dl class="leftmenu">
 
+    <volist name="tree" id="vo">
+        <dd>
+            <div class="title"><span><img src="{:C('STATIC_URL')}/images/leftico01.png"/></span>{$vo.title}</div>
+            <if condition="$vo.child">
+                <ul class="menuson">
+                <volist name="vo.child" id="v1">
+                    <li><cite></cite><a href="{$v1.name}" target="rightFrame">{$v1.title}</a><i></i></li>
+                </volist>
+                </ul>
+            </if>
+        </dd>
+    </volist>
+    <!--
     <dd>
         <div class="title">
             <span><img src="{:C('STATIC_URL')}/images/leftico01.png"/></span>管理信息
@@ -87,7 +100,7 @@
         </ul>
 
     </dd>
-
+    -->
 </dl>
 
 </body>

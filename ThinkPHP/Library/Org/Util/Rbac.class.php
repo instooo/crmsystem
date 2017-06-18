@@ -174,7 +174,7 @@ class Rbac {
                     $accessList = $_SESSION['_ACCESS_LIST'];
                 }
                 //判断是否为组件化模式，如果是，验证其全模块名
-                if(!isset($accessList[strtoupper($appName)][strtoupper(CONTROLLER_NAME)][strtoupper(ACTION_NAME)])) {
+                if(!isset($accessList[strtoupper($appName)]['/'.strtoupper(CONTROLLER_NAME).'/'.strtoupper(ACTION_NAME)])) {
                     $_SESSION[$accessGuid]  =   false;
                     return false;
                 }
@@ -259,7 +259,7 @@ class Rbac {
                 }
                 // 和公共模块的操作权限合并
                 $action += $publicAction;
-                $access[strtoupper($appName)][strtoupper($moduleName)]   =  array_change_key_case($action,CASE_UPPER);
+                $access[strtoupper(MODULE_NAME)][strtoupper($moduleName)]   =  array_change_key_case($action,CASE_UPPER);
             }
         }
         return $access;

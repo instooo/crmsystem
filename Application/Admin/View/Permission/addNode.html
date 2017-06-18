@@ -5,7 +5,7 @@
     <title>添加节点</title>
     <link href="{:C('STATIC_URL')}/css/style.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="{:C('STATIC_URL')}/js/jquery.js"></script>
-    <script type="text/javascript" src="{:C('STATIC_URL')}/js/common.js"></script>
+    <script src="{:C('STATIC_URL')}/layer/layer.js" type="text/javascript"></script>
     <style>
         .forminfo i{display: none;}
     </style>
@@ -31,9 +31,13 @@
             <label>上级节点</label>
             <select class="dfinput input_pid">
                 <option value="" data-level="">选择上级节点</option>
-                <option value="0" data-level="1">一级节点</option>
-                <option value="2" data-level="2">｜— 权限管理</option>
-                <option value="3" data-level="3">｜— — 节点列表</option>
+                <option value="0" data-level="0">一级节点</option>
+                <volist name="tree" id="vo">
+                    <option value="{$vo.id}" data-level="{$vo.level}">{$vo.tag_str} {$vo.title}</option>
+                    <volist name="vo.child" id="vv">
+                        <option value="{$vv.id}" data-level="{$vv.level}">{$vv.tag_str} {$vv.title}</option>
+                    </volist>
+                </volist>
             </select>
             <i>标题不能超过30个字符</i>
         </li>
@@ -45,19 +49,6 @@
     </ul>
 </div>
 
-<div class="tip">
-    <div class="tiptop"><span>提示信息</span><a></a></div>
-    <div class="tipinfo">
-        <div class="tipright">
-            <p>是否确认对信息的修改 ？</p>
-            <cite>如果是请点击确定按钮 ，否则请点取消。</cite>
-        </div>
-    </div>
-    <div class="tipbtn">
-        <input name="" type="button" class="sure" value="确定"/>&nbsp;
-        <input name="" type="button" class="cancel" value="取消"/>
-    </div>
-</div>
 
 </body>
 <script>
@@ -67,7 +58,7 @@
             if (!val) return false;
             $('.input_level').attr('value', parseInt(val)+1);
         });
-        $('.btn').live('click', function () {
+        $(document).on('click', '.btn', function () {
             $('.forminfo i').hide();
             var pid = $('.input_pid').val();
             var title = $('.input_title').val();
@@ -91,14 +82,14 @@
                 url:"{:U('Permission/addNode')}",
                 success:function (response) {
                     if (response.code == 1) {
-                        $.crmTips({
-                            msg:'添加成功！',
-                            yes:function () {
-                                location.reload();
-                            }
+                        layer.msg('添加成功', {
+                            icon: 1,
+                            time: 1000
+                        }, function(){
+                            location.reload();
                         });
                     }else {
-                        $.crmTips({msg:response.msg});
+                        layer.msg(response.msg, {icon: 2,time: 1000});
                     }
                 }
             });

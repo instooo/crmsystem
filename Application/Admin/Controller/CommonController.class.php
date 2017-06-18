@@ -13,12 +13,11 @@ use Org\Util\Rbac;
 class CommonController extends Controller {
 
     public function _initialize() {
-        /*
         //rbac 自带的游客验证
         Rbac::checkLogin();
         //如果是Index模块另外判断
         if(strtoupper(CONTROLLER_NAME)=="INDEX"){
-            if(!isset($_SESSION['userid'])){
+            if(!isset($_SESSION[C('USER_AUTH_KEY')])){
                 redirect(PHP_FILE.C('USER_AUTH_GATEWAY'));
             }
         }
@@ -31,12 +30,12 @@ class CommonController extends Controller {
         }
 
         if($_SESSION[C('ADMIN_AUTH_KEY')])
-            $datalist   =   D('Node')->getNodeList();
+            $datalist = D('Node')->getNodeList();
         else
-            $datalist   =   D('Node')->getNodeListByUid($_SESSION[C('USER_AUTH_KEY')]);
-        $tree       =   D('Node')->getChildNode(0,$datalist);
+            $datalist = D('Node')->getNodeListByUid($_SESSION[C('USER_AUTH_KEY')]);
+        $tree = D('Node')->getChildNode(0,$datalist);
         $this->assign("tree",$tree);
-        */
+
     }
 
 }
