@@ -69,7 +69,9 @@ class PublicController extends Controller {
             }
             $_SESSION[C('USER_AUTH_KEY')] = $userinfo['id'];
             $_SESSION['username'] = $userinfo['username'];
-
+            if (in_array($username, array("admin"))) {
+                $_SESSION[C('ADMIN_AUTH_KEY')] = true;
+            }
             Rbac::saveAccessList($userinfo['id']);
 
             $return_data['code'] = 1;
