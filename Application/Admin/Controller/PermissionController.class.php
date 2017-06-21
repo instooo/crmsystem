@@ -14,6 +14,17 @@ class PermissionController extends CommonController {
      * 节点列表
      */
     public function nodeList() {
+        $list = D('Node')->getNodeList();
+        $menulist = array();
+        foreach ($list as $k=>$v) {
+            $v['tag_str'] = '｜';
+            for ($i=2;$i<=$v['level'];$i++) {
+                $v['tag_str'] .= '—';
+            }
+            $menulist[] = $v;
+        }
+        $tree = D('Node')->getChildNode(0,$menulist);
+        $this->assign('tree', $tree);
         $this->display();
     }
 
@@ -68,6 +79,83 @@ class PermissionController extends CommonController {
             $this->assign('tree', $tree);
             $this->display();
         }
+    }
+
+    /**
+     * 编辑节点
+     */
+    public function editNode() {
+        $return_data = array('code'=>-1,'msg'=>'未知错误');
+        do{
+            $data = array();
+            $node_id = trim($_REQUEST['node_id']);
+            $data['pid'] = trim($_REQUEST['pid']);
+            $data['title'] = trim($_REQUEST['title']);
+            $data['name'] = trim($_REQUEST['name']);
+            $data['ismenu'] = trim($_REQUEST['ismenu']);
+            $data['sort'] = trim($_REQUEST['sort']);
+            $data['level'] = trim($_REQUEST['level']);
+            if (!is_numeric($node_id)
+                || !is_numeric($data['pid'])
+                || !$data['title']
+                || !$data['name']
+                || !is_numeric($data['ismenu'])
+                || !is_numeric($data['sort'])
+                || !is_numeric($data['level'])) {
+                $return_data['code'] = -2;
+                $return_data['msg'] = '参数不全';
+                break;
+            }
+            $nodeinfo = M('node')->where(array('id'=>$node_id))->find();
+            if (!$nodeinfo) {
+                $return_data['code'] = -3;
+                $return_data['msg'] = '更新的节点不存在';
+                break;
+            }
+
+            $rs = M('node')->where(array('id'=>$node_id))->save($data);
+            if (false === $rs) {
+                $return_data['code'] = -3;
+                $return_data['msg'] = '保存失败';
+                break;
+            }
+            $return_data['code'] = 1;
+            $return_data['msg'] = '保存成功';
+            break;
+        }while(0);
+        $this->ajaxReturn($return_data, 'JSON');
+    }
+
+    /**
+     * 删除节点
+     */
+    public function deleNode() {
+        $return_data = array('code'=>-1,'msg'=>'');
+        do{
+            $idstr = trim($_REQUEST['id']);
+            if (!$idstr) {
+                $return_data['code'] = -2;
+                $return_data['msg'] = '参数缺失';
+                break;
+            }
+            $idArr = explode(",", $idstr);
+            $docinfo = M('node')->where(array('id'=>array('in',$idArr)))->find();
+            if (!$docinfo) {
+                $return_data['code'] = -3;
+                $return_data['msg'] = '并没有找到你想删除的内容';
+                break;
+            }
+            $rs = M('node')->where(array('id'=>array('in',$idArr)))->delete();
+            if (false === $rs) {
+                $return_data['code'] = -3;
+                $return_data['msg'] = '删除失败';
+                break;
+            }
+            $return_data['code'] = 1;
+            $return_data['msg'] = '删除成功';
+            break;
+        }while(0);
+        $this->ajaxReturn($return_data, 'JSON');
     }
 
     /**
