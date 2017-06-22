@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>无标题文档</title>
+    <link href="{:C('STATIC_URL')}/jquery-ui/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
+    <link href="{:C('STATIC_URL')}/css/style.css" rel="stylesheet" type="text/css"/>
+    <link href="{:C('STATIC_URL')}/css/partner.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="{:C('STATIC_URL')}/js/jquery.js"></script>
+    <script type="text/javascript" src="{:C('STATIC_URL')}/jquery-ui/jquery-ui.min.js"></script>
+    <script src="{:C('STATIC_URL')}/layer/layer.js" type="text/javascript"></script>
+    <script>
+        $(function () {
+            $('.add_node').click();
+        });
+    </script>
+    <style>
+        .toolbar li{text-align: center;padding: 0 !important;width: 50px;}
+        .toolbar li.current{color: #FFFFFF;background: #3EAFE0 !important;}
+        .toolbar1 li{cursor: pointer}
+    </style>
+</head>
+<body>
+
+<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+        <li><a href="#">首页</a></li>
+        <li><a href="#">客户管理</a></li>
+        <li><a href="#">字段管理</a></li>
+    </ul>
+</div>
+
+<div class="rightinfo">
+
+    <div class="tools">
+        <ul class="toolbar">
+            <volist name="fields_type_list" id="vo">
+                <li data-value="{$key}" <if condition="$key eq 'partner'">class="current"</if>>{$vo}</li>
+            </volist>
+        </ul>
+        <ul class="toolbar1">
+            <li class="add_btn"><span><img src="{:C('STATIC_URL')}/images/t01.png"/></span>添加</li>
+        </ul>
+    </div>
+
+
+    <table class="tablelist">
+        <thead>
+        <tr>
+            <th>字段名称</th>
+            <th>字段类型</th>
+            <th>必填</th>
+            <th>状态</th>
+            <th>查重</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <volist name="list" id="vo">
+            <tr>
+                <td>{$vo.id}</td>
+                <td>{$vo.name}</td>
+                <td><a href="{:U('Permission/addAccess')}?id={$vo.id}" class="tablelink">分配权限</a> <a href="javascript:;" class="tablelink">修改</a> <a href="javascript:;" class="tablelink"> 删除</a></td>
+            </tr>
+        </volist>
+        </tbody>
+    </table>
+    
+    <div id="dd_list" style="display: none;">
+        <div class="div_field_name"><dd><span>字段名称</span><input name="field_name" type="text" class="dfinput input_field_name" /></dd></div>
+        <div class="div_not_nul"><dd><span>必填</span><label><input name="not_null" type="checkbox" class="dfcheckbox input_not_null" value="1" />必填</label></dd></div>
+        <div class="div_is_unique"><dd><span>是否查重</span><label><input name="is_unique" type="radio" class="dfradio input_is_unique" value="1" />是</label>&nbsp;&nbsp;<label><input name="is_unique" type="radio" class="dfradio input_is_unique" value="0" />否</label></dd></div>
+        <div class="div_status"><dd><span>状态</span><label><input name="status" type="radio" class="dfradio input_status" value="1" />启用</label>&nbsp;&nbsp;<label><input name="status" type="radio" class="dfradio input_status" value="0" />禁用</label></dd></div>
+        <div class="div_dl_option">
+            <div class="dl_option">
+                <h2>选项信息</h2>
+                <ul class="ui-sortable">
+                    <!--
+                    <li class="">
+                        <label class="sbi-radio-vall" title="a">aaaa</label>
+                        <input data-val="data" type="text" class="sbi-radio-val selected" value="aaaa">
+                        <p><strong></strong><span style="display:none;"></span></p>
+                    </li>
+                    <li class="">
+                        <label class="sbi-radio-vall" title="a">bbb</label>
+                        <input data-val="data" type="text" class="sbi-radio-val selected" value="bbb">
+                        <p><strong></strong><span style="display:none;"></span></p>
+                    </li>
+                    -->
+                </ul>
+                <p class="sbi-radio-p">
+                    <input type="text" class="sbi-radio-write">
+                    <label class="selected sbi-radio-selected"><input class="selected" type="checkbox" value="1">默认</label>
+                    <span class="sbi-radio-btn">添加</span>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div id="add_temp" style="display: none">
+        <div class="add_wrapper">
+            <dl class="dl_left">
+                <dt>选择字段类型</dt>
+                <dd class="on" data-opt="['field_name','not_nul','is_unique','status','dl_option']">文本</dd>
+                <dd data-opt="['field_name','is_unique','status']">文本域</dd>
+                <dd data-opt="['field_name','not_nul','is_unique','status']">数值</dd>
+                <dd data-opt="['field_name','not_nul','status']">日期</dd>
+                <dd data-opt="['field_name','not_nul','is_unique','status','dl_option']">选项</dd>
+            </dl>
+            <dl class="dl_right">
+                <dt>字段详情</dt>
+            </dl>
+
+        </div>
+        <div class="add_wrapper_footer">
+            <div class="ui-dialog-buttonset">
+                <button type="button" class="btn_yes" role="button" aria-disabled="false">
+                    <span class="ui-button-text">保存</span>
+                </button>
+                <button type="button" class="btn_no" role="button" aria-disabled="false">
+                    <span class="ui-button-text">取消</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+</body>
+<script>
+    $(function () {
+        var layer_index;
+        $(document).on('click', '.toolbar li', function () {
+            if ($(this).hasClass('current')) return false;
+            $(this).addClass('current').siblings('li').removeClass('current');
+        });
+        
+        $(document).on('click', '.add_btn', function () {
+            layer_index = layer.open({
+                type: 1,
+                title: '添加字段',
+                skin: 'layui-layer-rim',
+                area: ['800px', '600px'],
+                scrollbar: false,
+                content: $('#add_temp').html()
+            });
+            var layer_con = $('#layui-layer'+layer_index);
+            setFieldsForm(layer_con.find('dl.dl_left dd').eq(0).attr('data-opt'), layer_con);
+            layer_con.find('.btn_no').click(function () {
+                layer.close(layer_index);
+            });
+            layer_con.find('.dl_left dd').click(function () {
+                if ($(this).hasClass('on')) return false;
+                $(this).addClass('on').siblings('dd').removeClass('on');
+                setFieldsForm($(this).attr('data-opt'), layer_con);
+            });
+        });
+        $(document).on('click', '.ui-sortable li strong', function () {
+            $(this).parents('li').remove();
+        });
+        $(document).on('click', '.dl_option .sbi-radio-btn', function () {
+            var opt_name = $(this).siblings('.sbi-radio-write').val();
+            if (!opt_name || opt_name == '') return false;
+            var li_html = '<li class="">' +
+                    '<label class="sbi-radio-vall" title="'+opt_name+'">'+opt_name+'</label>' +
+                    '<input data-val="data" type="text" class="sbi-radio-val selected" value="'+opt_name+'">' +
+                    '<p><strong></strong><span style="display:none;"></span></p>' +
+                    '</li>';
+            $(this).parents('.dl_option').find('.ui-sortable').append(li_html);
+        });
+
+
+        function setFieldsForm(typelist, con) {
+            if (!typelist) return false;
+            con.find('.dl_right dd,.dl_option').remove();
+            var type_array = eval('('+typelist+')');
+            for (var i in type_array) {
+                if (type_array[i] == 'dl_option') {
+                    con.find('.dl_right').after($('#dd_list .div_'+type_array[i]).html());
+                    con.find('.ui-sortable').sortable({
+                        revert: true
+                    });
+                }else {
+                    con.find('.dl_right dt').after($('#dd_list .div_'+type_array[i]).html());
+                }
+            }
+        }
+        
+
+    });
+</script>
+</html>
