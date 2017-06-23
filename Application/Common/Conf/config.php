@@ -7,6 +7,5 @@ $config = array(
         'www.crm.me' =>  'Home',
         'admin.crm.me' =>  'Admin'
     ), // 子域名部署规则
-
 );
 return array_merge($dbconfig, $config);
