@@ -48,12 +48,7 @@
                 url:"{:U('Public/loginout')}",
                 success:function (response) {
                     if (response.code == 1) {
-                        layer.msg('退出成功', {
-                            icon: 1,
-                            time: 1000
-                        }, function(){
-                            parent.location.href = "{:U('Public/login')}";
-                        });
+                        parent.location.href = "{:U('Public/login')}";
                     }else {
                         layer.msg(response.msg, {
                             icon: 2,
