@@ -7,7 +7,7 @@
 namespace Admin\Controller;
 use Think\Controller;
 
-class PartnerController extends CommonController {
+class SystemController extends CommonController {
     public $partnerConfig;
 
     public function _initialize() {

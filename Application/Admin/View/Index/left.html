@@ -41,7 +41,9 @@
             <if condition="$vo.child">
                 <ul class="menuson">
                 <volist name="vo.child" id="v1">
-                    <li><cite></cite><a href="{$v1.name}" target="rightFrame">{$v1.title}</a><i></i></li>
+                    <if condition="$v1.ismenu eq 1">
+                        <li><cite></cite><a href="{$v1.name}" target="rightFrame">{$v1.title}</a><i></i></li>
+                    </if>
                 </volist>
                 </ul>
             </if>
