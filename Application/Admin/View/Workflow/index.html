@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+<link href="{:C('STATIC_URL')}/css/style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="{:C('STATIC_URL')}/js/jquery.js"></script>
+<script src="{:C('STATIC_URL')}/layer/layer.js" type="text/javascript"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $("#clickadd").click(function(){
+		$("#addlc").fadeIn(200);
+  });
+  
+  $(".tiptop a").click(function(){
+	$("#addlc").fadeOut(200);
+});
+
+  $(".sure").click(function(){
+  $("#addlc").fadeOut(100);
+});
+
+  $(".cancel").click(function(){
+  $("#addlc").fadeOut(100);
+});
+
+});
+</script>
+
+
+</head>
+
+
+<body>
+
+	<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+    <li><a href="#">首页</a></li>
+    <li><a href="#">数据表</a></li>
+    <li><a href="#">基本内容</a></li>
+    </ul>
+    </div>
+    
+    <div class="rightinfo">
+    
+    <div class="tools">
+    
+    	<ul class="toolbar">
+        <li class="click" id="clickadd"><span><img src="{:C('STATIC_URL')}/images/t01.png" /></span>添加</li>
+        <li class="click"><span><img src="{:C('STATIC_URL')}/images/t02.png" /></span>修改</li>
+        <li><span><img src="{:C('STATIC_URL')}/images/t03.png" /></span>删除</li>
+        <li><span><img src="{:C('STATIC_URL')}/images/t04.png" /></span>统计</li>
+        </ul>
+        
+        
+        <ul class="toolbar1">
+        <li><span><img src="{:C('STATIC_URL')}/images/t05.png" /></span>设置</li>
+        </ul>
+    
+    </div>
+    
+    
+    <table class="tablelist">
+    	<thead>
+    	<tr>
+        <th><input name="" type="checkbox" value="" checked="checked"/></th>
+        <th>编号<i class="sort"><img src="{:C('STATIC_URL')}/images/px.gif" /></i></th>
+        <th>流程名称</th>
+        <th>添加时间</th>
+        <th>状态</th>
+        <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+		<volist name='result' id="vo">
+        <tr>
+        <td><input name="" type="checkbox" value="" /></td>
+        <td>{$vo.w_id}</td>
+        <td>{$vo.w_name}</td>
+        <td>{$vo.w_createtime}</td>
+        <td>{$vo.status}</td>
+        <td><a href="#" class="tablelink">查看</a>     <a href="#" class="tablelink"> 删除</a></td>
+        </tr> 
+		</volist>
+    </table>
+    
+   
+    <div class="pagin">
+    	<div class="message">共<i class="blue">1256</i>条记录，当前显示第&nbsp;<i class="blue">2&nbsp;</i>页</div>
+        <ul class="paginList">
+        <li class="paginItem"><a href="javascript:;"><span class="pagepre"></span></a></li>
+        <li class="paginItem"><a href="javascript:;">1</a></li>
+        <li class="paginItem current"><a href="javascript:;">2</a></li>
+        <li class="paginItem"><a href="javascript:;">3</a></li>
+        <li class="paginItem"><a href="javascript:;">4</a></li>
+        <li class="paginItem"><a href="javascript:;">5</a></li>
+        <li class="paginItem more"><a href="javascript:;">...</a></li>
+        <li class="paginItem"><a href="javascript:;">10</a></li>
+        <li class="paginItem"><a href="javascript:;"><span class="pagenxt"></span></a></li>
+        </ul>
+    </div>    
+    
+    <div class="tipa" id="addlc">
+       <div class="tiptop"><span>添加流程</span><a></a></div>
+      <div class="tipinfo">
+        <ul class="forminfo">
+		<li><label>流程名称</label><input name="w_name" type="text" class="dfinput"><i>工作流程的名称</i></li>		
+		<li><label>&nbsp;</label><input name="" type="button" class="btn" id="addbtn" value="确认保存"></li>
+		</ul>
+     </div> 
+    </div>
+    
+    
+    
+    </div>
+    
+    <script type="text/javascript">
+	$('.tablelist tbody tr:odd').addClass('odd');
+	$(function(){
+		$('#addbtn').click(function(){
+			var w_name=$("input[name='w_name']").val();
+			if (w_name == '') {
+				layer.msg('流程名称不能为空', {icon:5,time:1000});
+				return false;
+			}
+			$.ajax({
+				type:'post',
+				dataType:'json',
+				data:{w_name:w_name},
+				url:'/workflow/workflow_add',
+				error:function () {
+					layer.msg('未知错误', {icon:5,time:1000});
+				},
+				success:function (data) {
+					if (data.code == 1) {
+						layer.msg('添加成功', {icon:6,time:1000}, function () {location.reload()});
+					}else {
+						layer.msg(data.msg, {icon:5,time:1000});
+					}
+				}
+			});
+		});
+	})
+	
+	
+	</script>
+
+</body>
+
+</html>
