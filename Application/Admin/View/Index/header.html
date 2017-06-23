@@ -37,7 +37,7 @@
         <ul>
             <li><span><img src="{:C('STATIC_URL')}/images/help.png" title="帮助"  class="helpimg"/></span><a href="#">帮助</a></li>
             <li><a href="#">关于</a></li>
-            <li><a href="login.html" target="_parent">退出</a></li>
+            <li><a class="loginout_btn" href="javascript:;">退出</a></li>
         </ul>
         <div class="user">
             <span>admin</span>
@@ -99,6 +99,27 @@
                     dd.siblings('dd').find('ul').slideUp();
                     $(this).addClass('active');
                     dd.siblings('dd').find('ul li').removeClass('active');
+                }
+            });
+        });
+
+        $(document).on('click', '.loginout_btn', function () {
+            $.ajax({
+                type:'post',
+                dataType:'json',
+                data:{},
+                url:"{:U('Public/loginout')}",
+                success:function (response) {
+                    if (response.code == 1) {
+                        layer.msg('退出成功', {icon: 1,time: 1000}, function () {
+                            location.href = "{:U('Public/login')}";
+                        });
+                    }else {
+                        layer.msg(response.msg, {
+                            icon: 2,
+                            time: 1000
+                        });
+                    }
                 }
             });
         });
