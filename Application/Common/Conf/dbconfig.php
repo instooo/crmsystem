@@ -13,5 +13,6 @@ return array(
     'DB_USER'               =>  'crmsystem',      // 用户名
     'DB_PWD'                =>  'crmsystem',          // 密码
     'DB_PORT'               =>  '1036',        // 端口
+	//'DB_PORT'               =>  '3306',        // 端口
     'DB_PREFIX'             =>  'crm_',    // 数据库表前缀
 );
