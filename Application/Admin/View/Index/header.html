@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>信息管理系统界面</title>
+    <link href="{:C('STATIC_URL')}/jquery-ui/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
+    <link href="{:C('STATIC_URL')}/css/style.css" rel="stylesheet" type="text/css" />
+    <link href="{:C('STATIC_URL')}/css/partner.css" rel="stylesheet" type="text/css"/>
+    <script language="JavaScript" src="{:C('STATIC_URL')}/js/jquery.js"></script>
+    <script type="text/javascript" src="{:C('STATIC_URL')}/jquery-ui/jquery-ui.min.js"></script>
+    <script src="{:C('STATIC_URL')}/layer/layer.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function(){
+            //顶部导航切换
+            $(".nav li a").click(function(){
+                $(".nav li a.selected").removeClass("selected")
+                $(this).addClass("selected");
+            })
+        })
+    </script>
+</head>
+<body>
+
+<div id="main_top">
+    <div class="topleft">
+        <a href="main.html" target="_parent"><img src="{:C('STATIC_URL')}/images/logo.png" title="系统首页" /></a>
+    </div>
+    <ul class="nav">
+        <li><a href="default.html" target="rightFrame" class="selected"><img src="{:C('STATIC_URL')}/images/icon01.png" title="工作台" /><h2>工作台</h2></a></li>
+        <li><a href="imgtable.html" target="rightFrame"><img src="{:C('STATIC_URL')}/images/icon02.png" title="模型管理" /><h2>模型管理</h2></a></li>
+        <li><a href="imglist.html"  target="rightFrame"><img src="{:C('STATIC_URL')}/images/icon03.png" title="模块设计" /><h2>模块设计</h2></a></li>
+        <li><a href="tools.html"  target="rightFrame"><img src="{:C('STATIC_URL')}/images/icon04.png" title="常用工具" /><h2>常用工具</h2></a></li>
+        <li><a href="computer.html" target="rightFrame"><img src="{:C('STATIC_URL')}/images/icon05.png" title="文件管理" /><h2>文件管理</h2></a></li>
+        <li><a href="tab.html"  target="rightFrame"><img src="{:C('STATIC_URL')}/images/icon06.png" title="系统设置" /><h2>系统设置</h2></a></li>
+    </ul>
+    <div class="topright">
+        <ul>
+            <li><span><img src="{:C('STATIC_URL')}/images/help.png" title="帮助"  class="helpimg"/></span><a href="#">帮助</a></li>
+            <li><a href="#">关于</a></li>
+            <li><a href="login.html" target="_parent">退出</a></li>
+        </ul>
+        <div class="user">
+            <span>admin</span>
+            <i>消息</i>
+            <b>5</b>
+        </div>
+    </div>
+    <div class="clear"></div>
+</div>
+<div id="main_left" style="background:#f0f9fd; width:187px;float:left;" >
+    <script type="text/javascript">
+        $(function(){
+            //导航切换
+            $(".menuson li").click(function(){
+                $(".menuson li.active").removeClass("active")
+                $(this).addClass("active");
+            });
+
+            $('.title').click(function(){
+                var $ul = $(this).next('ul');
+                $('dd').find('ul').slideUp();
+                if($ul.is(':visible')){
+                    $(this).next('ul').slideUp();
+                }else{
+                    $(this).next('ul').slideDown();
+                }
+            });
+        })
+    </script>
+    <div class="lefttop"><span></span>通讯录</div>
+
+    <dl class="leftmenu">
+
+        <volist name="tree" id="vo">
+            <dd>
+                <div class="title"><span><img src="{:C('STATIC_URL')}/images/leftico01.png"/></span>{$vo.title}</div>
+                <if condition="$vo.child">
+                    <ul class="menuson">
+                        <volist name="vo.child" id="v1">
+                            <if condition="$v1.ismenu eq 1">
+                                <li><cite></cite><a href="{$v1.name}">{$v1.title}</a><i></i></li>
+                            </if>
+                        </volist>
+                    </ul>
+                </if>
+            </dd>
+        </volist>
+    </dl>
+
+</div>
+
+<script>
+    $(function () {
+        $('.leftmenu dd').each(function () {
+            var dd = $(this);
+            dd.find('ul.menuson li').each(function () {
+                if ($(this).find('a').attr('href').toUpperCase().indexOf("{$url_tag}") > 0) {
+                    dd.find('ul').slideDown();
+                    dd.siblings('dd').find('ul').slideUp();
+                    $(this).addClass('active');
+                    dd.siblings('dd').find('ul li').removeClass('active');
+                }
+            });
+        });
+
+    })
+</script>

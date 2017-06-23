@@ -36,6 +36,8 @@ class CommonController extends Controller {
         $tree = D('Node')->getChildNode(0,$datalist);
         $this->assign("tree",$tree);
 
+        $this->assign('url_tag', strtoupper(CONTROLLER_NAME.'/'.ACTION_NAME));
+
     }
 
 }
