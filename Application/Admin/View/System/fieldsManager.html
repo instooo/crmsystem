@@ -53,13 +53,6 @@
         </tr>
         </thead>
         <tbody>
-        <volist name="list" id="vo">
-            <tr>
-                <td>{$vo.id}</td>
-                <td>{$vo.name}</td>
-                <td><a href="{:U('Permission/addAccess')}?id={$vo.id}" class="tablelink">分配权限</a> <a href="javascript:;" class="tablelink">修改</a> <a href="javascript:;" class="tablelink"> 删除</a></td>
-            </tr>
-        </volist>
         </tbody>
     </table>
     
@@ -86,8 +79,9 @@
                     -->
                 </ul>
                 <p class="sbi-radio-p">
+                    <input type="hidden" class="input_option_type" value="">
                     <input type="text" class="sbi-radio-write">
-                    <label class="selected sbi-radio-selected"><input class="selected" type="checkbox" value="1">默认</label>
+                    <!--<label class="selected sbi-radio-selected"><input class="selected" type="checkbox" value="1">默认</label>-->
                     <span class="sbi-radio-btn">添加</span>
                 </p>
             </div>
@@ -99,15 +93,15 @@
             <input type="hidden" class="input_field_type" value="">
             <dl class="dl_left">
                 <dt>选择字段类型</dt>
-                <dd class="on" data-opt="['field_name','not_null','is_unique','status']" data-value="varchar">短文本</dd>
-                <dd data-opt="['field_name','not_null','status']" data-value="text">长文本</dd>
-                <dd data-opt="['field_name','not_null','is_unique','status']" data-value="int">整数</dd>
-                <dd data-opt="['field_name','not_null','is_unique','status']" data-value="double">浮点数</dd>
-                <dd data-opt="['field_name','not_null','status']" data-value="date">日期</dd>
-                <dd data-opt="['field_name','not_null','status']" data-value="time">时间</dd>
-                <dd data-opt="['field_name','not_null','status']" data-value="date_time">日期时间</dd>
-                <dd data-opt="['field_name','not_null','status','dl_option']" data-value="single_option">单选项</dd>
-                <dd data-opt="['field_name','not_null','status','dl_option']" data-value="multi_option">多选项</dd>
+                <dd class="on" data-opt="['field_name','not_null','is_unique','status']" data-value="varchar">{$data_type_list['varchar']}</dd>
+                <dd data-opt="['field_name','not_null','status']" data-value="text">{$data_type_list['text']}</dd>
+                <dd data-opt="['field_name','not_null','is_unique','status']" data-value="int">{$data_type_list['int']}</dd>
+                <dd data-opt="['field_name','not_null','is_unique','status']" data-value="double">{$data_type_list['double']}</dd>
+                <dd data-opt="['field_name','not_null','status']" data-value="date">{$data_type_list['date']}</dd>
+                <dd data-opt="['field_name','not_null','status']" data-value="time">{$data_type_list['time']}</dd>
+                <dd data-opt="['field_name','not_null','status']" data-value="date_time">{$data_type_list['date_time']}</dd>
+                <dd data-opt="['field_name','not_null','status','dl_option']" data-value="single_option">{$data_type_list['single_option']}</dd>
+                <dd data-opt="['field_name','not_null','status','dl_option']" data-value="multi_option">{$data_type_list['multi_option']}</dd>
             </dl>
             <dl class="dl_right">
                 <dt>字段详情</dt>
@@ -131,10 +125,12 @@
 </body>
 <script>
     $(function () {
+        loadFieldsList($('.toolbar li.current').attr('data-value'));
         var layer_index;
         $(document).on('click', '.toolbar li', function () {
             if ($(this).hasClass('current')) return false;
             $(this).addClass('current').siblings('li').removeClass('current');
+            loadFieldsList($(this).attr('data-value'));
         });
         
         $(document).on('click', '.add_btn', function () {
@@ -177,8 +173,10 @@
         
         function initAddFields(con) {
             var param = {};
-            var typelist = eval('('+con.find('.dl_left dd').attr('data-opt')+')');
+            var typelist = eval('('+con.find('.dl_left dd.on').attr('data-opt')+')');
             param.field_type = con.find('.input_field_type').val();
+            param.data_type = con.find('.dl_left dd.on').attr('data-value');
+            var errtag = false;
             for (var i in typelist) {
                 var input = con.find(".dl_right dd input[name='"+typelist[i]+"']");
                 var input_type = input.attr('type');
@@ -188,23 +186,34 @@
                     param[typelist[i]] = input.val();
                 }
                 if (!param[typelist[i]] || param[typelist[i]] == '') {
-                    layer.tips('请填写正确的内容', input, {tips: [1, '#3595CC'],time: 1000});
-                    break;
+                    if ((typelist[i] != 'dl_option')) {
+                        errtag = true;
+                        break;
+                    }
                 }
+            }
+            if (errtag) {
+                layer.msg('参数错误', {icon: 2,time: 1000});
+                return false;
+            }
+            if (con.find('.dl_option').length > 0) {
+                param.field_option = {};
+                con.find('.dl_option .sbi-radio-val').each(function (index) {
+                    param.field_option[index] = $(this).val();
+                });
             }
             $.ajax({
                 type:'post',
                 dataType:'json',
-                data:{},
-                url:"{:U('Public/loginout')}",
+                data:param,
+                url:"{:U('System/addFields')}",
                 success:function (response) {
                     if (response.code == 1) {
-                        parent.location.href = "{:U('Public/login')}";
-                    }else {
-                        layer.msg(response.msg, {
-                            icon: 2,
-                            time: 1000
+                        layer.msg('保存成功', {icon: 1,time: 1000}, function(){
+                            loadFieldsList(param.field_type);
                         });
+                    }else {
+                        layer.msg(response.msg, {icon: 2,time: 1000});
                     }
                 }
             });
@@ -224,6 +233,31 @@
                     con.find('.dl_right dt').after($('#dd_list .div_'+type_array[i]).html());
                 }
             }
+        }
+
+        function loadFieldsList(field_type) {
+            $.ajax({
+                type:'post',
+                dataType:'json',
+                data:{field_type:field_type},
+                url:"{:U('System/fieldsManager')}",
+                success:function (response) {
+                    if (response.code == 1) {
+                        var html = '';
+                        for (var i in response.data) {
+                            html += '<tr>' +
+                                    '<td>'+response.data[i].field_name+'</td>' +
+                                    '<td>'+response.data[i].data_type_name+'</td>' +
+                                    '<td>'+response.data[i].not_null_name+'</td>' +
+                                    '<td>'+response.data[i].status_name+'</td>' +
+                                    '<td>'+response.data[i].is_unique_name+'</td>' +
+                                    '<td><a href="javascript:;" class="tablelink edit">编辑</a> <a href="javascript:;" class="tablelink dele">删除</a></td>' +
+                                    '</tr>';
+                        }
+                        $('.tablelist tbody').html(html);
+                    }
+                }
+            });
         }
         
 
