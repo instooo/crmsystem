@@ -14,7 +14,7 @@ class PublicController extends Controller {
         //$datalist   =   D('Node')->getNodeListByUid($_SESSION[C('USER_AUTH_KEY')]);
         //$tree = D('Node')->getChildNode(0,$datalist);
         //dump($tree);die;
-        dump(Rbac::getAccessList(2));die;
+        //dump(Rbac::getAccessList(2));die;
 
         //$data = array();
         //if ($data) echo 111;
@@ -76,6 +76,23 @@ class PublicController extends Controller {
 
             $return_data['code'] = 1;
             $return_data['msg'] = '登陆成功';
+            break;
+        }while(0);
+        $this->ajaxReturn($return_data,'JSON');
+    }
+
+    /**
+     * 退出登录
+     */
+    public function loginout() {
+        $return_data = array('code'=>-1,'msg'=>'未知错误');
+        do{
+            unset($_SESSION[C('ADMIN_AUTH_KEY')]);
+            unset($_SESSION[C('USER_AUTH_KEY')]);
+            unset($_SESSION['username']);
+            unset($_SESSION['_ACCESS_LIST']);
+            $return_data['code'] = 1;
+            $return_data['msg'] = '退出成功';
             break;
         }while(0);
         $this->ajaxReturn($return_data,'JSON');

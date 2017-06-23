@@ -5,6 +5,7 @@
     <title>无标题文档</title>
     <link href="{:C('STATIC_URL')}/css/style.css" rel="stylesheet" type="text/css" />
     <script language="JavaScript" src="{:C('STATIC_URL')}/js/jquery.js"></script>
+    <script src="{:C('STATIC_URL')}/layer/layer.js" type="text/javascript"></script>
     <script type="text/javascript">
         $(function(){
             //顶部导航切换
@@ -37,7 +38,7 @@
     <ul>
         <li><span><img src="{:C('STATIC_URL')}/images/help.png" title="帮助"  class="helpimg"/></span><a href="#">帮助</a></li>
         <li><a href="#">关于</a></li>
-        <li><a href="login.html" target="_parent">退出</a></li>
+        <li><a class="loginout_btn" href="javascript:;" target="_parent">退出</a></li>
     </ul>
 
     <div class="user">
@@ -49,4 +50,31 @@
 </div>
 
 </body>
+<script>
+    $(function () {
+        $(document).on('click', '.loginout_btn', function () {
+            $.ajax({
+                type:'post',
+                dataType:'json',
+                data:{},
+                url:"{:U('Public/loginout')}",
+                success:function (response) {
+                    if (response.code == 1) {
+                        layer.msg('退出成功', {
+                            icon: 1,
+                            time: 1000
+                        }, function(){
+                            parent.location.href = "{:U('Public/login')}";
+                        });
+                    }else {
+                        layer.msg(response.msg, {
+                            icon: 2,
+                            time: 1000
+                        });
+                    }
+                }
+            });
+        });
+    })
+</script>
 </html>
