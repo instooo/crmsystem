@@ -11,12 +11,31 @@ $(document).ready(function(){
 			content: $('#addlc').html()
 		});
 	}); 
-		$(document).on('click', '.del',function(){
+		$(document).on('click', '.steps ol li .del',function(){			
+			index = $(this).parents('li').next("li").find(".node div").html();			
+			$(this).parents('li').next("li").find(".node div").html(index-1);
 			$(this).parents('li').remove();
 		});
+		$(document).on('click', '.steps ol li .add',function(){
+			var _this= $(this).parents('li');
+			index = $(".steps ol li").index(_this)-2;			
+			var html = " <li>							
+                            <div class="add">
+                                <div class="mini-icon icon-add"></div>
+                            </div>
+                            <div class="arr">
+                            </div>
+                            <div class="standard"></div>
+                            <div class="node">
+                                <div>1</div>
+                            </div>
+                            <div class="set-person">点击设置审批人</div>
+                            <div class="approvers"></div>
+                        </li>";
+			alert(html);
+		});
 		$(document).on('mouseover', '.steps ol li',function(){
-			var len = $(".steps ol li").length;	
-			console.log(len);
+			var len = $(".steps ol li").length;				
 			if(len>5){
 				var html='<span class="del">x</span>';
 				$(this).prepend(html);
