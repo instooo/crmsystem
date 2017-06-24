@@ -54,7 +54,7 @@
                     <equal name="vo.ismenu" value="1">显示</equal>
                     <equal name="vo.ismenu" value="0">不显示</equal>
                 </td>
-                <td><a href="javascript:;" class="tablelink edit">修改</a> <a href="javascript:;" class="tablelink"> 删除</a></td>
+                <td><a href="javascript:;" class="tablelink edit">修改</a> <a href="javascript:;" class="tablelink dele"> 删除</a></td>
             </tr>
             <volist name="vo.child" id="vv">
                 <tr class="c_pid_{$vv.pid}" data-id="{$vv.id}" data-pid="{$vv.pid}" data-level="{$vv.level}">
@@ -231,11 +231,12 @@
         }
         
         $(document).on('click', '.dele', function () {
-            var _this = $(this);
-            layer.confirm('确定要删除该节点吗？', {
+            var node_id = $(this).parents('tr').attr('data-id');
+            var msg = $('.c_pid_'+node_id).length>0?'当前节点下有子节点，将全部删除，确定要删除该节点吗？':'确定要删除该节点吗？';
+            layer.confirm(msg, {
                 btn: ['确定','取消']
             }, function(){
-                var node_id = _this.parents('tr').attr('data-id');
+
                 if (!node_id || node_id == '') {
                     layer.msg('参数错误', {icon: 2,time: 1000});
                     return false;

@@ -138,14 +138,15 @@ class PermissionController extends CommonController {
                 $return_data['msg'] = '参数缺失';
                 break;
             }
-            $idArr = explode(",", $idstr);
-            $docinfo = M('node')->where(array('id'=>array('in',$idArr)))->find();
+            $docinfo = M('node')->where(array('id'=>$idstr))->find();
             if (!$docinfo) {
                 $return_data['code'] = -3;
                 $return_data['msg'] = '并没有找到你想删除的内容';
                 break;
             }
-            $rs = M('node')->where(array('id'=>array('in',$idArr)))->delete();
+
+            $rs = M('node')->where(array('id'=>$idstr))->delete();
+            $rs1 = M('node')->where(array('pid'=>$idstr))->delete();
             if (false === $rs) {
                 $return_data['code'] = -3;
                 $return_data['msg'] = '删除失败';
