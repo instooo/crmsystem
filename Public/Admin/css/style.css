@@ -348,8 +348,7 @@ h2{font-weight:normal;}
 	text-align:center;
 }
 .approval-process .steps>ol {
-    display: inline-block;
-    overflow: hidden;
+    display: inline-block;   
     width: 173px;
 }
 .approval-process .steps>ol>li {
