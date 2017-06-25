@@ -7,7 +7,7 @@ body{font-family:'微软雅黑'; margin:0 auto;min-width:980px;}
 ul{display:block;margin:0;padding:0;list-style:none;}
 li{display:block;margin:0;padding:0;list-style: none;}
 img{border:0;}
-dl,dt,dd,span{margin:0;padding:0;display:block;}
+dl,dt,dd,span{margin:0;padding:0;}
 a,a:focus{text-decoration:none;color:#000;outline:none;blr:expression(this.onFocus=this.blur());}
 a:hover{color:#00a4ac;text-decoration:none;}
 table{border-collapse:collapse;border-spacing: 0;}
@@ -476,6 +476,120 @@ h2{font-weight:normal;}
     z-index: 1;
 }
 
+
+
+.marginB30 {
+    margin-bottom: 30px !important;
+}
+.marginT40 {
+    margin-top: 40px !important;
+}
+.approval-form .form-group {
+    margin-bottom: 15px;
+}
+label {
+	font-size:16px;
+    cursor: default;
+}
+.approval-form{padding:20px;}
+#bumen{display:none; }
+.approval-form .form-group>label, .approval-form .form-group>div {
+    display: inline-block;
+    vertical-align: top;
+    max-width: 76%;
+}
+.approval-form.set-person-template .form-group>label {
+    width: 145px;
+}
+.approval-form .form-group>label:first-child {
+    width: 23%;
+}
+.approval-form .form-group>label>span {
+    color: red;
+}
+.approval-form .form-group>label, .approval-form .form-group>div {
+    display: inline-block;
+    vertical-align: top;
+    max-width: 76%;
+}
+.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
+    font: 14px/24px "Microsoft YaHei","宋体","Arial Narrow",HELVETICA;
+    color: #34495e;
+}
+.pulldown-container {
+    position: relative;
+    display: inline-block;
+}
+.pulldown-container {
+    position: relative;
+}
+.approval-form .pulldown-container {
+    vertical-align: middle;
+}
+.pulldown-input {
+    position: relative;
+    width: 218px;
+    height: 25px;
+    border: 1px solid #bac8d5;
+    padding: 0;
+    margin: 0;
+    border-radius: 3px;
+}
+.approval-style-form .pulldown-input, .approval-form .pulldown-input {
+    line-height: 33px;
+    position: relative;
+    width: 376px;
+    height: 33px;
+    margin: 0;
+    border: 1px solid #bac8d5;
+    border-radius: 3px;
+    background: #fff;
+}
+.field-template .form-control, .set-person-template .pulldown-input, .set-person-template .form-control {
+    width: 275px;
+}
+.pulldown-text {
+    float: left;
+    width: 196px;
+    height: 25px;
+    line-height: 25px;
+    padding-left: 10px;
+    box-sizing: border-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.pulldown-default-show {
+    color: #a9a9a9;
+}
+.approval-form .pulldown-text {
+    line-height: 33px;
+    height: 33px;
+    width: 340px;
+}
+.approval-form.set-person-template .pulldown-text {
+    width: 238px;
+}
+.pulldown-icon {
+    float: right;
+    width: 20px;
+    height: 25px;
+    border-left: 0;
+    border-radius: 3px;
+    background: url(./images/common/ui-icons_228ef1_256x240.png) 193px 228px;
+    cursor: pointer;
+}
+.approval-style-form .pulldown-icon, .approval-form .pulldown-icon {
+    line-height: 33px;
+    width: 35px;
+    height: 33px;
+    border-left: 1px solid #bac8d5;
+    border-radius: 0 3px 3px 0;
+    background-image: url(../images/main.png);
+    background-repeat: no-repeat;
+    background-position: 2px -451px;
+}
 
 
 
