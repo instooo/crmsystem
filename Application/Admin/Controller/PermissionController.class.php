@@ -163,8 +163,17 @@ class PermissionController extends CommonController {
      * 角色列表
      */
     public function roleList() {
-        $list = M('role')->order('id desc')->select();
-        $this->assign('list' ,$list);
+        $list = D('role')->getRoleList();
+        $menulist = array();
+        foreach ($list as $k=>$v) {
+            $v['tag_str'] = '｜';
+            for ($i=2;$i<=$v['level'];$i++) {
+                $v['tag_str'] .= '—';
+            }
+            $menulist[] = $v;
+        }
+        $tree = D('role')->getChildRole(0,$menulist);
+        $this->assign('rolelist', $tree);
         $this->display();
     }
 
@@ -175,7 +184,9 @@ class PermissionController extends CommonController {
         $return_data = array('code'=>-1,'msg'=>'未知错误');
         do{
             $rolename = I('post.rolename', '', 'trim,htmlspecialchars');
-            if (!$rolename) {
+            $pid = I('post.pid', '', 'trim,htmlspecialchars');
+            $level = I('post.level', '', 'trim,htmlspecialchars');
+            if (!$rolename || !is_numeric($pid) || !is_numeric($level)) {
                 $return_data['code'] = -2;
                 $return_data['msg'] = '请输入正确的角色名';
                 break;
@@ -183,6 +194,8 @@ class PermissionController extends CommonController {
 
             $data = array();
             $data['name'] = $rolename;
+            $data['pid'] = $pid;
+            $data['level'] = $level;
             $data['status'] = 1;
             $data['create_time'] = time();
             $data['update_time'] = time();
@@ -198,6 +211,81 @@ class PermissionController extends CommonController {
             break;
         }while(0);
         $this->ajaxReturn($return_data,'JSON');
+    }
+
+    /**
+     * 编辑角色
+     */
+    public function editRole() {
+        $return_data = array('code'=>-1,'msg'=>'未知错误');
+        do{
+            $id = I('post.id', '', 'trim,htmlspecialchars');
+            $rolename = I('post.rolename', '', 'trim,htmlspecialchars');
+            $pid = I('post.pid', '', 'trim,htmlspecialchars');
+            $level = I('post.level', '', 'trim,htmlspecialchars');
+            if (!is_numeric($id) || !$rolename || !is_numeric($pid) || !is_numeric($level)) {
+                $return_data['code'] = -2;
+                $return_data['msg'] = '请输入正确的信息';
+                break;
+            }
+
+            $roleinfo = M('role')->where(array('id'=>$id))->find();
+            if (!$roleinfo) {
+                $return_data['code'] = -3;
+                $return_data['msg'] = '该部门不存在';
+                break;
+            }
+
+            $data = array();
+            $data['name'] = $rolename;
+            $data['pid'] = $pid;
+            $data['level'] = $level;
+            $data['update_time'] = time();
+            $rs = M('role')->where(array('id'=>$id))->save($data);
+            if (false === $rs) {
+                $return_data['code'] = -4;
+                $return_data['msg'] = '保存失败';
+                break;
+            }
+
+            $return_data['code'] = 1;
+            $return_data['msg'] = '保存成功';
+            break;
+        }while(0);
+        $this->ajaxReturn($return_data,'JSON');
+    }
+
+    /**
+     * 删除角色
+     */
+    public function deleRole() {
+        $return_data = array('code'=>-1,'msg'=>'');
+        do{
+            $idstr = trim($_REQUEST['id']);
+            if (!$idstr) {
+                $return_data['code'] = -2;
+                $return_data['msg'] = '参数缺失';
+                break;
+            }
+            $docinfo = M('role')->where(array('id'=>$idstr))->find();
+            if (!$docinfo) {
+                $return_data['code'] = -3;
+                $return_data['msg'] = '并没有找到你想删除的内容';
+                break;
+            }
+
+            $rs = M('role')->where(array('id'=>$idstr))->delete();
+            $rs1 = M('role')->where(array('pid'=>$idstr))->delete();
+            if (false === $rs) {
+                $return_data['code'] = -3;
+                $return_data['msg'] = '删除失败';
+                break;
+            }
+            $return_data['code'] = 1;
+            $return_data['msg'] = '删除成功';
+            break;
+        }while(0);
+        $this->ajaxReturn($return_data, 'JSON');
     }
 
     /**
