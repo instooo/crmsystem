@@ -1,0 +1,95 @@
+<html>
+<head>
+<script language="JavaScript" src="{:C('STATIC_URL')}/js/jquery.js"></script>
+<script type="text/javascript" src="{:C('STATIC_URL')}/ztree/js/jquery.ztree.core.js"></script>
+<script type="text/javascript" src="{:C('STATIC_URL')}/ztree/js/jquery.ztree.excheck.js"></script>
+<link href="{:C('STATIC_URL')}/css/style.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="{:C('STATIC_URL')}/ztree/css/zTreeStyle/zTreeStyle.css" type="text/css">
+</head>
+<body style="overflow-x: hidden;overflow-y: auto;">
+	<div id="bumen" style="width:600px;">
+		<div class="approval-form">
+	    <div class="form-group marginB30">
+                <label>审批人<span>*</span></label>
+                <div>                  
+                    <div class="set-tree pulldown-container">
+                        <div class="pulldown-input"><span class="pulldown-text pulldown-default-show">请选择</span><span class="pulldown-icon"></span></div>
+                    </div>                   
+                </div>
+         </div> 
+		<div id="treeDemo" class="ztree" style="display:none;"></div>	
+		</div>		 
+	</div>	 
+	<script>
+		$(function(){
+			$.fn.zTree.init($("#treeDemo"), setting, zNodes);			
+			$(document).on("mousedown",'.pulldown-input',showMenu);
+		})
+		var setting = {
+			check: {
+				enable: true,
+				chkboxType: {"Y":"", "N":""}
+			},
+			view: {
+				dblClickExpand: true
+			},
+			data: {
+				simpleData: {
+					enable: true
+				}
+			},
+			callback: {
+				beforeClick: beforeClick,
+				onCheck: onCheck
+			}
+		};
+
+		 var zNodes =[
+			{id:1, pId:0, name:"北京"},
+			{id:4, pId:0, name:"河北省", open:true, nocheck:true},
+			{id:41, pId:4, name:"石家庄"},
+			{id:42, pId:4, name:"保定"},
+			{id:5, pId:0, name:"广东省", open:true, nocheck:true},
+			{id:51, pId:5, name:"广州"},
+			{id:52, pId:5, name:"深圳"},
+			{id:6, pId:0, name:"福建省", open:true, nocheck:true},
+			{id:61, pId:6, name:"福州"},
+			{id:62, pId:6, name:"厦门"},
+			{id:61, pId:6, name:"福州"},
+			{id:62, pId:6, name:"厦门"},
+			{id:61, pId:6, name:"福州"},
+			{id:62, pId:6, name:"厦门"},
+			{id:61, pId:6, name:"福州"},
+			{id:62, pId:6, name:"厦门"},
+			{id:61, pId:6, name:"福州"},
+			{id:62, pId:6, name:"厦门"},
+		 ];
+
+		function beforeClick(treeId, treeNode) {			
+			var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+			zTree.checkNode(treeNode, !treeNode.checked, null, true);
+			return false;
+		}
+		
+		function onCheck(e, treeId, treeNode) {		
+			var zTree = $.fn.zTree.getZTreeObj("treeDemo"),
+			nodes = zTree.getCheckedNodes(true),
+			v = "";
+			for (var i=0, l=nodes.length; i<l; i++) {
+				v += nodes[i].name + ",";
+			}
+			if (v.length > 0 ) v = v.substring(0, v.length-1);
+			var cityObj = $("#citySel");
+			cityObj.attr("value", v);	
+		}
+
+		
+		function showMenu() {		
+			$(".ztree").slideDown("fast");
+		}
+		function hideMenu() {
+			$(".ztree").fadeOut("fast");			
+		}	
+	</script>
+</body>
+</html>

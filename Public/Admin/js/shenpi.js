@@ -88,76 +88,16 @@ $(document).ready(function(){
 			});
 		});
 		$(document).on('click', '.set-person',function(){
+			var html = $('#bumen').html();			
 			layer_index = layer.open({
-				type: 1,
+				type: 2,
 				title: '设置审批人',
 				skin: 'layui-layer-rim', //加上边框
 				area: ['600px', '400px'], //宽高
 				shade: 0.5,
-				content: $('#bumen').html()
-			});
-			
+				content: '/role/',
+			});			
 		});
-		$.fn.zTree.init($("#treeDemo"), setting, zNodes);
-		$(document).on("mousedown",'.pulldown-input',showMenu);
+		
 });
 
-		var setting = {
-			check: {
-				enable: true,
-				chkboxType: {"Y":"", "N":""}
-			},
-			view: {
-				dblClickExpand: true
-			},
-			data: {
-				simpleData: {
-					enable: true
-				}
-			},
-			callback: {
-				beforeClick: beforeClick,
-				onCheck: onCheck
-			}
-		};
-
-		 var zNodes =[
-			{id:1, pId:0, name:"北京"},
-			{id:4, pId:0, name:"河北省", open:true, nocheck:true},
-			{id:41, pId:4, name:"石家庄"},
-			{id:42, pId:4, name:"保定"},
-			{id:5, pId:0, name:"广东省", open:true, nocheck:true},
-			{id:51, pId:5, name:"广州"},
-			{id:52, pId:5, name:"深圳"},
-			{id:6, pId:0, name:"福建省", open:true, nocheck:true},
-			{id:61, pId:6, name:"福州"},
-			{id:62, pId:6, name:"厦门"},
-		 ];
-
-		function beforeClick(treeId, treeNode) {
-			alert (1);
-			var zTree = $.fn.zTree.getZTreeObj("treeDemo");
-			zTree.checkNode(treeNode, !treeNode.checked, null, true);
-			return false;
-		}
-		
-		function onCheck(e, treeId, treeNode) {
-alert (2);			
-			var zTree = $.fn.zTree.getZTreeObj("treeDemo"),
-			nodes = zTree.getCheckedNodes(true),
-			v = "";
-			for (var i=0, l=nodes.length; i<l; i++) {
-				v += nodes[i].name + ",";
-			}
-			if (v.length > 0 ) v = v.substring(0, v.length-1);
-			var cityObj = $("#citySel");
-			cityObj.attr("value", v);	
-		}
-
-		
-		function showMenu() {		
-			$(".ztree").slideDown("fast");
-		}
-		function hideMenu() {
-			$(".ztree").fadeOut("fast");			
-		}	

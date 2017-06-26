@@ -492,7 +492,6 @@ label {
     cursor: default;
 }
 .approval-form{padding:20px;}
-#bumen{display:none; }
 .approval-form .form-group>label, .approval-form .form-group>div {
     display: inline-block;
     vertical-align: top;
