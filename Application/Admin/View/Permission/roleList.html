@@ -154,6 +154,10 @@
                     layer.msg('参数不全', {icon: 2,time: 1000});
                     return false;
                 }
+                if (param.level > 3) {
+                    layer.msg('最多只允许设置三级部门', {icon: 2,time: 1000});
+                    return false;
+                }
                 $.ajax({
                     type:'post',
                     dataType:'json',
@@ -182,6 +186,10 @@
                 param.level = layer_con.find('.input_level').val();
                 if (param.id == '' || param.pid == '' || param.rolename == '' || param.level == '') {
                     layer.msg('参数不全', {icon: 2,time: 1000});
+                    return false;
+                }
+                if (param.level > 3) {
+                    layer.msg('最多只允许设置三级部门', {icon: 2,time: 1000});
                     return false;
                 }
                 $.ajax({
