@@ -163,24 +163,26 @@
             var typelist = eval('('+con.find('.dl_left dd.on').attr('data-opt')+')');
             param.field_type = con.find('.input_field_type').val();
             param.data_type = con.find('.dl_left dd.on').attr('data-value');
-            var errtag = false;
+            var errtag = '';
             for (var i in typelist) {
                 var input = con.find(".dl_right dd input[name='"+typelist[i]+"']");
                 var input_type = input.attr('type');
-                if (input_type == 'radio' || input_type == 'checkbox') {
+                if (input_type == 'radio') {
                     param[typelist[i]] = con.find(".dl_right dd input[name='"+typelist[i]+"']:checked").val();
+                }else if (input_type == 'checkbox') {
+                    param[typelist[i]] = con.find(".dl_right dd input[name='"+typelist[i]+"']").is(':checked')?1:0;
                 }else {
                     param[typelist[i]] = input.val();
                 }
-                if (!param[typelist[i]] || param[typelist[i]] == '') {
+                if (typeof param[typelist[i]] == 'undefined') {
                     if ((typelist[i] != 'dl_option')) {
-                        errtag = true;
-                        break;
+                        errtag = typelist[i];
                     }
                 }
             }
-            if (errtag) {
-                layer.msg('参数错误', {icon: 2,time: 1000});
+
+            if (errtag != '') {
+                layer.msg('参数错误'+errtag, {icon: 2,time: 1000});
                 return false;
             }
             if (con.find('.dl_option').length > 0) {

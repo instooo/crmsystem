@@ -6,6 +6,7 @@
  */
 namespace Admin\Controller;
 use Think\Controller;
+use Think\Model;
 
 class SystemController extends CommonController {
     public $partnerConfig;
@@ -94,10 +95,79 @@ class SystemController extends CommonController {
                 break;
             }
 
+            //更新或创建表
+            $data['id'] = $rs;
+            $this->alterFields($data);
+
             $return_data['code'] = 1;
             $return_data['msg'] = '保存成功';
             break;
         }while(0);
         $this->ajaxReturn($return_data,'JSON');
+    }
+
+    public function test() {
+        $data = M('fields')->where(array('id'=>2))->find();
+        $this->alterFields($data);
+    }
+
+    private function alterFields($data) {
+        if (!$data['field_type'] || !$data['id']) return false;
+        $createRes = $this->createTable($data['field_type']);
+        switch ($data['data_type']) {
+            case 'varchar':
+                $typeStr = 'varchar(128)';
+                break;
+            case 'text':
+                $typeStr = 'text';
+                break;
+            case 'int':
+                $typeStr = 'int(10)';
+                break;
+            case 'double':
+                $typeStr = 'double(10,2)';
+                break;
+            case 'date':
+                $typeStr = 'int(15)';
+                break;
+            case 'time':
+                $typeStr = 'int(15)';
+                break;
+            case 'date_time':
+                $typeStr = 'int(15)';
+                break;
+            case 'single_option':
+                $typeStr = 'text';
+                break;
+            case 'multi_option':
+                $typeStr = 'text';
+                break;
+            default:
+                $typeStr = '';
+                break;
+        }
+        if (!$typeStr) return false;
+        try{
+            $field_name = 'field_'.$data['id'];
+            $not_null = $data['not_null']?' not null':'';
+            $is_unique = $data['is_unique']?' unique':'';
+            $alterSql = "ALTER TABLE `{$createRes}` ADD `{$field_name}` {$typeStr}{$not_null}{$is_unique}";
+            M('')->execute($alterSql);
+            return true;
+        }catch (\Exception $e){
+            return false;
+        }
+
+    }
+
+    private function createTable($tablename) {
+        $tablename = C('DB_PREFIX').$tablename;
+        $rs1 = M('')->query("SHOW TABLES LIKE '{$tablename}'");
+        if ($rs1) {
+            return $tablename;
+        }
+        $createSql = "CREATE TABLE `{$tablename}` (`id` int(11) unsigned NOT NULL AUTO_INCREMENT,PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+        M('')->execute($createSql);
+        return $tablename;
     }
 }
