@@ -10,7 +10,9 @@ use Think\Controller;
 
 class RoleController extends CommonController {
 
-    public function index(){		
+    public function index(){	
+		$wid=$_GET['wid'];
+		$this->assign('wid',$wid);
 		$this->display();
 	}
 	

@@ -88,14 +88,14 @@ $(document).ready(function(){
 			});
 		});
 		$(document).on('click', '.set-person',function(){
-			var html = $('#bumen').html();			
+			var wid = $(this).parent('li').find('.node div').html();
 			layer_index = layer.open({
 				type: 2,
 				title: '设置审批人',
 				skin: 'layui-layer-rim', //加上边框
 				area: ['600px', '400px'], //宽高
 				shade: 0.5,
-				content: '/role/',
+				content: '/role/index/wid/'+wid,
 			});			
 		});
 		

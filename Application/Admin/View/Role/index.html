@@ -35,11 +35,20 @@
          </div> 
 		<div id="treeDemo" class="ztree" style="display:none;"></div>	
 		</div>		 
-	</div>	 
+	</div>	
+	<div style="position:fixed; bottom:20px;padding: 20px 20px 5px 20px;"><input name="" type="button" class="btn" id="bumenbtn" value="确认保存"></div>	
 	<script>
 		$(function(){
 			$.fn.zTree.init($("#treeDemo"), setting, zNodes);						
 			$(document).on("click",'.pulldown-input',showMenu);
+			$("#bumenbtn").click(function(){
+				var aa = $(".pulldown-default-show").html();	
+				//$('.set-person', window.parent.document).html(aa);
+				var wid ={$wid}+1;				
+				$(parent.document).find('.steps ol li').eq(wid).find('.set-person').html(aa);
+				var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+				parent.layer.close(index);
+			})
 			
 		})
 		var setting = {
@@ -80,8 +89,8 @@
 			var zTree = $.fn.zTree.getZTreeObj("treeDemo"),			
 			nodes = zTree.getCheckedNodes(true),			
 			v = "";
-			for (var i=0, l=nodes.length; i<l; i++) {
-				if(nodes[i].pId!=0){
+			for (var i=0, l=nodes.length; i<l; i++) {							
+				if(nodes[i].pId){					
 					v += nodes[i].name + ",";
 				}
 			}
