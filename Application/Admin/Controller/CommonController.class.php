@@ -40,4 +40,43 @@ class CommonController extends Controller {
 
     }
 
+    /**
+     * 获取字段列表
+     * @param $field_type
+     * @return array
+     */
+    public function getFieldList($field_type) {
+        $fmap = array();
+        $fmap['field_type'] = $field_type;
+        $fmap['status'] = 1;
+        $fieldlist = M('fields')->where($fmap)->order('sort asc')->select();
+        $fieldarr = array();
+        foreach ($fieldlist as $val) {
+            $fieldarr['field_'.$val['id']] = $val;
+        }
+        return $fieldarr;
+    }
+
+    /**
+     * 字段数据格式化
+     * @param $value
+     * @param $fieldlist
+     * @return array
+     */
+    public function dataPaser($value, $fieldlist) {
+        $klist = array_keys($fieldlist);
+        $tmp = array();
+        foreach ($klist as $v) {
+            if ($fieldlist[$v]['data_type'] == 'date_time') {
+                $value[$v] = date('Y-m-d H:i:s', $value[$v]);
+            }elseif ($fieldlist[$v]['data_type'] == 'date') {
+                $value[$v] = date('Y-m-d', $value[$v]);
+            }elseif ($fieldlist[$v]['data_type'] == 'time') {
+                $value[$v] = date('H:i:s', $value[$v]);
+            }
+            $tmp[$v] = $value[$v];
+        }
+        return $tmp;
+    }
+
 }

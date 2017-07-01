@@ -142,6 +142,18 @@ h2{font-weight:normal;}
 .pagepre{background:url(../images/pre.gif) no-repeat center center; width:31px; height:28px;}
 .pagenxt{background:url(../images/next.gif) no-repeat center center; width:31px; height:28px;}
 
+/* TP page分页 */
+.page{position:relative;margin-top:10px;padding:0 12px;}
+.page div{position:absolute;right:12px;top:0;}
+.page div span,.page div a{float:left;width:31px;height:28px;border:1px solid #DDD; text-align:center;line-height:30px;border-left:none;color:#3399d5;border-left:1px solid #DDD;}
+.page div span:first-child,.page div a:first-child{border-left:1px solid #DDD;border-bottom-left-radius:5px;border-top-left-radius:5px;}
+.page div span:last-child,.page div a:last-child{border-bottom-right-radius:5px;border-top-right-radius:5px;}
+.page div .current{background:#f5f5f5; cursor:default;color:#737373;}
+.page div span:hover,.page div a:hover{background:#f5f5f5;}
+.pagepre{background:url(../images/pre.gif) no-repeat center center; width:31px; height:28px;}
+.prev{background:url(../images/pre.gif) no-repeat center center; width:31px; height:28px;}
+.next{background:url(../images/next.gif) no-repeat center center; width:31px; height:28px;}
+
 /*index*/
 .mainindex{padding:20px; overflow:hidden;}
 .welinfo{height:32px; line-height:32px; padding-bottom:8px;}

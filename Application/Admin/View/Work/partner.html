@@ -1,0 +1,63 @@
+<include file="Index/header" />
+<div id="main" >
+    <style>
+        .toolbar li{text-align: center;padding: 0 !important;width: 50px;}
+        .toolbar li.current{color: #FFFFFF;background: #3EAFE0 !important;}
+        .toolbar1 li{cursor: pointer}
+    </style>
+    <div class="place">
+        <span>位置：</span>
+        <ul class="placeul">
+            <li><a href="#">首页</a></li>
+            <li><a href="#">工作管理</a></li>
+            <li><a href="#">客户管理</a></li>
+        </ul>
+    </div>
+
+    <div class="rightinfo">
+        <div class="tools">
+            <ul class="toolbar1">
+                <li class="add_btn"><span><img src="{:C('STATIC_URL')}/images/t01.png"/></span>添加</li>
+            </ul>
+        </div>
+
+        <table class="tablelist">
+            <thead>
+            <tr>
+                <volist name="fieldlist" id="vo">
+                    <th>{$vo.field_name}</th>
+                </volist>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+                <volist name="list" id="vo">
+                    <tr>
+                        <volist name="vo" id="vv">
+                            <if condition="$fieldlist[$key]">
+                                <td class="td_{$key}" data-key="{$key}">{$vv}</td>
+                            </if>
+                        </volist>
+                        <td><a href="javascript:;" class="tablelink edit">编辑</a> <a href="javascript:;" class="tablelink dele">删除</a></td>
+                    </tr>
+                </volist>
+            </tbody>
+        </table>
+        <div class="page">{$pagebar}</div>
+    </div>
+</div>
+
+<div id="add_temp" style="display: none">
+    <ul class="forminfo">
+        <input type="hidden" class="input_id" value="">
+        <volist name="fieldlist" id="vo"></volist>
+        <li><label>部门名称</label><input name="title" type="text" class="dfinput input_name" style="width: 300px" /></li>
+        <li><label>&nbsp;</label><input name="submit" type="button" class="btn do_save_btn" value="确认保存"/></li>
+    </ul>
+</div>
+
+<script>
+
+</script>
+
+<include file="Index/footer" />
