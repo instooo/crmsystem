@@ -22,7 +22,8 @@ class WorkController extends CommonController {
      */
     public function partner() {
         $fieldlist = $this->getFieldList('partner');
-        $fieldlist['nickname']['field_name'] = '所有者';
+        $fieldlist['nickname']['field_name'] = '创建人';
+        $fieldlist['addtime']['field_name'] = '创建时间';
         $klist = array_keys($fieldlist);
 
         $count = M('partner p')
@@ -70,7 +71,40 @@ class WorkController extends CommonController {
     /**
      * 联系人管理
      */
-    public function contact() {}
+    public function contact() {
+        $fieldlist = $this->getFieldList('contact');
+        $fieldlist['nickname']['field_name'] = '创建人';
+        $fieldlist['addtime']['field_name'] = '创建时间';
+        $klist = array_keys($fieldlist);
+
+        $count = M('contact p')
+            ->field('p.*,u.id,u.nickname')
+            ->join('left join crm_user u on u.id=p.owner')
+            ->count();
+        $page = new \Think\Page($count, 20);
+        $page->setConfig('prev', '&nbsp;');
+        $page->setConfig('next', '&nbsp;');
+
+        $datalist = M('contact p')
+            ->field('p.*,u.id,u.nickname')
+            ->join('left join crm_user u on u.id=p.owner')
+            ->order('p.id desc')
+            ->limit("{$page->firstRow},{$page->listRows}")
+            ->select();
+
+        $list = array();
+        foreach ($datalist as $val) {
+            $tmp = $this->dataPaser($val, $fieldlist);
+            $tmp['user_id'] = $val['user_id'];
+            $list[] = $tmp;
+        }
+
+        $this->assign('fieldlist', $fieldlist);
+        $this->assign('pagebar', $page->show());
+        $this->assign('list', $list);
+
+        $this->display();
+    }
 
     /**
      * 合同管理

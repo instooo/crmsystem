@@ -166,15 +166,15 @@ class SystemController extends CommonController {
         if ($rs1) {
             return $tablename;
         }
-        if ($tablename == 'partner') {
+        if ($tablename == C('DB_PREFIX').'partner') {
             //客户表
-            $createSql = "CREATE TABLE `{$tablename}` (`id` int(11) unsigned NOT NULL AUTO_INCREMENT,`owner` int(10) NOT NULL COMMENT '所有者',PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
-        }elseif ($tablename == 'contact') {
+            $createSql = "CREATE TABLE `{$tablename}` (`id` int(11) unsigned NOT NULL AUTO_INCREMENT,`owner` int(10) NOT NULL COMMENT '所有者',`addtime` int(15) NOT NULL COMMENT '创建时间',PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+        }elseif ($tablename == C('DB_PREFIX').'contact') {
             //联系人表
-            $createSql = "CREATE TABLE `{$tablename}` (`id` int(11) unsigned NOT NULL AUTO_INCREMENT,`partner_id` int(10) NOT NULL COMMENT '所属客户',PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+            $createSql = "CREATE TABLE `{$tablename}` (`id` int(11) unsigned NOT NULL AUTO_INCREMENT,`owner` int(10) NOT NULL COMMENT '所有者',`addtime` int(15) NOT NULL COMMENT '创建时间',PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
         }else {
             //默认合同表
-            $createSql = "CREATE TABLE `{$tablename}` (`id` int(11) unsigned NOT NULL AUTO_INCREMENT,`partner_id` int(10) NOT NULL COMMENT '所属客户',`owner` int(10) NOT NULL COMMENT '所有者',`status` varchar(16) NOT NULL COMMENT '审批状态',PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+            $createSql = "CREATE TABLE `{$tablename}` (`id` int(11) unsigned NOT NULL AUTO_INCREMENT,`owner` int(10) NOT NULL COMMENT '所有者',`status` varchar(16) NOT NULL COMMENT '审批状态',`addtime` int(15) NOT NULL COMMENT '创建时间',PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
         }
         M('')->execute($createSql);
         return $tablename;
