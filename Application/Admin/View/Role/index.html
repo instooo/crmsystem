@@ -55,6 +55,7 @@
 				var wid ={$wid}+1;				
 				$(parent.document).find('.steps ol li').eq(wid).find('.set-person').html(aa);
 				$(parent.document).find('.steps ol li').eq(wid).find('.set-person').attr("data-uid",bb);
+				$(parent.document).find('.steps ol li').eq(wid).find('.set-person').attr("isenable",'no');
 				var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
 				parent.layer.close(index);
 			})

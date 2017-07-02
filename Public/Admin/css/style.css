@@ -452,6 +452,7 @@ h2{font-weight:normal;}
     text-align: center;
     color: #bac8d5;
     border: dashed 1px #bac8d5;
+	    word-wrap: break-word;
 }
 .approval-process .approvers {
     font-size: 12px;

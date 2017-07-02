@@ -99,6 +99,10 @@ $(document).ready(function(){
 			});
 		});
 		$(document).on('click', '.set-person',function(){
+			var flag = $(this).attr('isenable');
+			if(flag=='no'){
+				return false;
+			}
 			var wid = $(this).parent('li').find('.node div').html();
 			layer_index = layer.open({
 				type: 2,
@@ -109,6 +113,34 @@ $(document).ready(function(){
 				content: '/role/index/wid/'+wid,
 			});			
 		});
+	
 		
 });
 
+function del_lc(wid){
+	layer.msg('去人要删除吗', {
+	   time: 0 //不自动关闭
+	  ,btn: ['确认', '取消']
+	  ,yes: function(index){
+		 layer.msg('正在删除。。。', {time: 1000})
+		$.ajax({
+				type:'post',
+				dataType:'json',
+				data:{wid:wid},
+				url:'/workflow/workflow_del',
+				error:function () {
+					layer.msg('未知错误', {icon:5,time:1000});
+				},
+				success:function (data) {
+					if (data.code == 1) {
+						layer.msg('删除成功', {icon:6,time:1000}, function () {location.reload()});
+					}else {
+						layer.msg(data.msg, {icon:5,time:1000});
+					}
+				}
+			});		  
+		
+		layer.close(index);		
+	  }
+	});
+}

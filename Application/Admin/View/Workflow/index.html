@@ -6,9 +6,8 @@
 	<div class="place">
     <span>位置：</span>
     <ul class="placeul">
-    <li><a href="#">首页</a></li>
-    <li><a href="#">数据表</a></li>
-    <li><a href="#">基本内容</a></li>
+    <li><a href="/">首页</a></li>
+    <li><a href="#">流程管理</a></li>
     </ul>
     </div>
     
@@ -26,7 +25,7 @@
     <table class="tablelist">
     	<thead>
     	<tr>
-        <th><input name="" type="checkbox" value="" checked="checked"/></th>
+        <th><input name="" type="checkbox" value=""/></th>
         <th>编号<i class="sort"><img src="{:C('STATIC_URL')}/images/px.gif" /></i></th>
         <th>流程名称</th>
         <th>添加时间</th>
@@ -40,9 +39,9 @@
         <td><input name="" type="checkbox" value="" /></td>
         <td>{$vo.w_id}</td>
         <td>{$vo.w_name}</td>
-        <td>{$vo.w_createtime}</td>
-        <td>{$vo.status}</td>
-        <td><a href="#" class="tablelink">查看</a>     <a href="#" class="tablelink"> 删除</a></td>
+        <td>{$vo.w_createtime|date='Y-m-d H:i:s',###}</td>
+        <td><if condition="$vo['status'] eq 1 "><font color="#21de3b">正常</font><else /> <font color="#de2125">关闭</font></if></td>
+        <td><a onclick='' class="tablelink">查看</a><a class="tablelink" onclick="del_lc({$vo.w_id})"> 删除</a></td>
         </tr> 
 		</volist>
     </table>     

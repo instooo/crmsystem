@@ -76,4 +76,35 @@ class WorkflowController extends CommonController {
         }while(0);
         exit(json_encode($ret));		
     }
+
+	//节点添加
+    public function workflow_del()
+    {		
+		$ret = array('code'=>-1,'msg'=>'');
+        do{
+            if (!IS_POST) {
+                $ret['code'] = -1;
+                $ret['msg'] = '非法请求';
+                break;
+            }
+			//[step] => steps1:user1|user2,steps2:user1
+					
+            $data = array();
+            $data['wid'] = I('post.wid'); 			
+            if (!$data['wid']) {
+                $ret['code'] = -2;
+                $ret['msg'] = '参数不全';
+                break;
+            }			
+			$map['w_id']=$data['wid'];			
+			M('workflow')->where($map)->delete(); 
+			$mapa['w_id']=$data['wid'];	
+			M('workflow_extend')->where($map)->delete();					
+            $ret['code'] = 1;
+            $ret['msg'] = '成功';
+            break;
+        }while(0);
+        exit(json_encode($ret));		
+    }
+ 
 }
