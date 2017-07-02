@@ -67,5 +67,15 @@ class WorkController extends CommonController {
         $this->display();
     }
 
+    /**
+     * 联系人管理
+     */
+    public function contact() {}
+
+    /**
+     * 合同管理
+     */
+    public function agreement() {}
+
 
 }

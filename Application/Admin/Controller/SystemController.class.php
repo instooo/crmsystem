@@ -174,7 +174,7 @@ class SystemController extends CommonController {
             $createSql = "CREATE TABLE `{$tablename}` (`id` int(11) unsigned NOT NULL AUTO_INCREMENT,`partner_id` int(10) NOT NULL COMMENT '所属客户',PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
         }else {
             //默认合同表
-            $createSql = "CREATE TABLE `{$tablename}` (`id` int(11) unsigned NOT NULL AUTO_INCREMENT,`partner_id` int(10) NOT NULL COMMENT '所属客户',`owner` int(10) NOT NULL COMMENT '所有者',PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+            $createSql = "CREATE TABLE `{$tablename}` (`id` int(11) unsigned NOT NULL AUTO_INCREMENT,`partner_id` int(10) NOT NULL COMMENT '所属客户',`owner` int(10) NOT NULL COMMENT '所有者',`status` varchar(16) NOT NULL COMMENT '审批状态',PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
         }
         M('')->execute($createSql);
         return $tablename;
