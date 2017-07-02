@@ -17,15 +17,7 @@
     <div class="tools">
     
     	<ul class="toolbar">
-        <li class="click" id="clickadd"><span><img src="{:C('STATIC_URL')}/images/t01.png" /></span>添加</li>
-        <li class="click"><span><img src="{:C('STATIC_URL')}/images/t02.png" /></span>修改</li>
-        <li><span><img src="{:C('STATIC_URL')}/images/t03.png" /></span>删除</li>
-        <li><span><img src="{:C('STATIC_URL')}/images/t04.png" /></span>统计</li>
-        </ul>
-        
-        
-        <ul class="toolbar1">
-        <li><span><img src="{:C('STATIC_URL')}/images/t05.png" /></span>设置</li>
+        <li class="click" id="clickadd"><span><img src="{:C('STATIC_URL')}/images/t01.png" /></span>添加</li>       
         </ul>
     
     </div>
@@ -53,28 +45,11 @@
         <td><a href="#" class="tablelink">查看</a>     <a href="#" class="tablelink"> 删除</a></td>
         </tr> 
 		</volist>
-    </table>
-    
-   
-    <div class="pagin">
-    	<div class="message">共<i class="blue">1256</i>条记录，当前显示第&nbsp;<i class="blue">2&nbsp;</i>页</div>
-        <ul class="paginList">
-        <li class="paginItem"><a href="javascript:;"><span class="pagepre"></span></a></li>
-        <li class="paginItem"><a href="javascript:;">1</a></li>
-        <li class="paginItem current"><a href="javascript:;">2</a></li>
-        <li class="paginItem"><a href="javascript:;">3</a></li>
-        <li class="paginItem"><a href="javascript:;">4</a></li>
-        <li class="paginItem"><a href="javascript:;">5</a></li>
-        <li class="paginItem more"><a href="javascript:;">...</a></li>
-        <li class="paginItem"><a href="javascript:;">10</a></li>
-        <li class="paginItem"><a href="javascript:;"><span class="pagenxt"></span></a></li>
-        </ul>
-    </div>    
-    
+    </table>     
     <div class="tipa" id="addlc" style="position:relative;">
       <div class="tipinfo">
         <ul class="forminfo">
-		<li><label>流程名称<span>*</span></label><input name="w_name" type="text" class="dfinput"><i>工作流程的名称</i></li>		
+		<li><label>流程名称<span>*</span></label><input name="w_name" type="text" class="dfinput w_name"><i>工作流程的名称</i></li>		
 		</ul>
 		<div class="approval-process" action="">
         <div class="form-header font16 marginT20 ">
@@ -114,8 +89,6 @@
 	 
     </div>    
     
-	
-
 	
 </div>
 <include file="Index/footer" />

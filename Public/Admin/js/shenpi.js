@@ -3,7 +3,7 @@ $(document).ready(function(){
 	$("#clickadd").click(function(){
 		layer_index = layer.open({
 			type: 1,
-			title: '添加角色',
+			title: '添加流程',
 			skin: 'layui-layer-rim', //加上边框
 			area: ['800px', '600px'], //宽高
 			shade: 0.1,
@@ -26,8 +26,7 @@ $(document).ready(function(){
 			});
 			$(this).parents('li').remove();
 		});
-		$(document).on('click', '.steps ol li .add',function(){		
-		
+		$(document).on('click', '.steps ol li .add',function(){	
 			//设置样式宽度
 			var len = $(".steps ol li").length-2;	
 			var wid=(len+1)*130-75;			
@@ -65,15 +64,27 @@ $(document).ready(function(){
 			$(this).find(".del").remove();
 		});			
 		$(document).on('click', '#addbtn',function(){
-			var w_name=$("input[name='w_name']").val();
+			var w_name=$(".w_name").eq(1).val();			
 			if (w_name == '') {
 				layer.msg('流程名称不能为空', {icon:5,time:1000});
 				return false;
 			}
+			var len = $(".steps ol li").length-2;
+			var formjson="";		
+			for(var i=1;i<len;i++){
+				var bb= $(".steps ol li").eq(i+1).find(".set-person").attr('data-uid');				
+				if(bb=='undefined'||!bb){
+					layer.msg('审批流程不能为空', {icon:5,time:1000});
+					return false;
+				}
+				formjson += "steps"+i+":"+bb + ",";				
+			}
+			if (formjson.length > 0 ) formjson = formjson.substring(0, formjson.length-1);			
+			
 			$.ajax({
 				type:'post',
 				dataType:'json',
-				data:{w_name:w_name},
+				data:{w_name:w_name,step:formjson},
 				url:'/workflow/workflow_add',
 				error:function () {
 					layer.msg('未知错误', {icon:5,time:1000});

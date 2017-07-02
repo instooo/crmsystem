@@ -42,10 +42,19 @@
 			$.fn.zTree.init($("#treeDemo"), setting, zNodes);						
 			$(document).on("click",'.pulldown-input',showMenu);
 			$("#bumenbtn").click(function(){
-				var aa = $(".pulldown-default-show").html();	
+				var aa = $(".pulldown-default-show").html();
+				var bb = $(".pulldown-default-show").attr('data-uid');					
+				if(!aa || aa=='请选择'){
+					parent.layer.open({
+					  content: '请选择用户',
+					  scrollbar: false
+					});
+					return false;					
+				}
 				//$('.set-person', window.parent.document).html(aa);
 				var wid ={$wid}+1;				
 				$(parent.document).find('.steps ol li').eq(wid).find('.set-person').html(aa);
+				$(parent.document).find('.steps ol li').eq(wid).find('.set-person').attr("data-uid",bb);
 				var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
 				parent.layer.close(index);
 			})
@@ -54,6 +63,9 @@
 		var setting = {
 			check: {
 				enable: true
+			},
+			view: {
+				showIcon: showIconForTree
 			},
 			chkboxType : { "Y" : "ps", "N" : "ps" },
 			data: {
@@ -67,37 +79,32 @@
 			}
 		};		
 		
-		 var zNodes =[
-			{id:1, pId:0, name:"北京"},
-			{id:4, pId:0, name:"河北省"},
-			{id:41, pId:4, name:"石家庄"},
-			{id:42, pId:4, name:"保定"},
-			{id:5, pId:0, name:"广东省"},
-			{id:51, pId:5, name:"广州"},
-			{id:52, pId:5, name:"深圳"},
-			{id:6, pId:0, name:"福建省"},
-			{id:61, pId:6, name:"福州"},
-			{id:62, pId:6, name:"厦门"},
-			{id:61, pId:6, name:"福州"},		
-		];
+		var zNodes ={$json_data};
 		function beforeClick(treeId, treeNode) {			
 			var zTree = $.fn.zTree.getZTreeObj("treeDemo");
 			zTree.checkNode(treeNode, !treeNode.checked, null, true);			
 			return false;
 		}	
-		function onCheck(e, treeId, treeNode) {
+		function onCheck(e, treeId, treeNode) {			
 			var zTree = $.fn.zTree.getZTreeObj("treeDemo"),			
 			nodes = zTree.getCheckedNodes(true),			
 			v = "";
-			for (var i=0, l=nodes.length; i<l; i++) {							
-				if(nodes[i].pId){					
+			vuid = "";
+			for (var i=0, l=nodes.length; i<l; i++) {				
+				if(nodes[i].type=='user'){					
 					v += nodes[i].name + ",";
+					vuid += nodes[i].id + "|";
 				}
 			}
 			if (v.length > 0 ) v = v.substring(0, v.length-1);
+			if (vuid.length > 0 ) vuid = vuid.substring(0, vuid.length-1);
 			var cityObj = $(".pulldown-default-show");
+			cityObj.attr('data-uid',vuid);
 			cityObj.html(v);
 		}
+		function showIconForTree(treeId, treeNode) {
+			return !treeNode.isParent;
+		};
 		function showMenu() {		
 			$(".ztree").toggle();
 		}	
