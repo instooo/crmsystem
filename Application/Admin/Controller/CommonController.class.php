@@ -58,6 +58,81 @@ class CommonController extends Controller {
     }
 
     /**
+     * 数据过滤以及格式化
+     * @param $data
+     * @param string $fieldtype
+     * @return array
+     */
+    public function dataFilter($data, $fieldtype = 'partner') {
+        $return_data = array('code'=>-1,'msg'=>'未知错误');
+        do{
+            $fieldlist = $this->getFieldList($fieldtype);
+            foreach ($data as $key=>$val) {
+                if (in_array($fieldlist[$key]['data_type'], array('date_time','date','time'))) {
+                    $data[$key] = strtotime($val);
+                }else {
+                    $data[$key] = trim($val);
+                }
+            }
+
+            $return_data['code'] = 1;
+            $return_data['msg'] = 'success';
+            $return_data['data'] = $data;
+            break;
+        }while(0);
+        return $return_data;
+    }
+
+    /**
+     * 数据检测
+     * @param $data
+     * @param string $fieldtype
+     * @return array
+     */
+    public function dataChecker($data, $fieldtype = 'partner') {
+        $return_data = array('code'=>-1,'msg'=>'未知错误');
+        do{
+            if (!$data) {
+                $return_data['code'] = -2;
+                $return_data['msg'] = '没有获取到数据';
+                break;
+            }
+            $fieldlist = $this->getFieldList($fieldtype);
+            $flag = '';
+            foreach ($data as $key=>$val) {
+                if ($fieldlist[$key]) {
+                    if (!$val && $fieldlist[$key]['not_null'] == 0) {
+                        $flag = $fieldlist[$key]['field_name'].'不能为空';
+                        break;
+                    }
+                    if ($val && in_array($fieldlist[$key]['data_type'], array('int','double'))) {
+                        if (!is_numeric($val)) {
+                            $flag = $fieldlist[$key]['field_name'].'必须为数字';
+                            break;
+                        }
+                    }elseif ($val && in_array($fieldlist[$key]['data_type'], array('date','time','date_time'))) {
+                        if (!strtotime($val)) {
+                            $flag = $fieldlist[$key]['field_name'].'格式非法';
+                            break;
+                        }
+                    }
+                }
+            }
+            if ($flag) {
+                $return_data['code'] =-3;
+                $return_data['msg'] = $flag;
+                break;
+            }
+
+            $return_data['code'] = 1;
+            $return_data['msg'] = '验证通过';
+            $return_data['data'] = $data;
+            break;
+        }while(0);
+        return $return_data;
+    }
+
+    /**
      * 字段数据格式化
      * @param $value
      * @param $fieldlist
@@ -73,6 +148,8 @@ class CommonController extends Controller {
                 $value[$v] = date('Y-m-d', $value[$v]);
             }elseif ($fieldlist[$v]['data_type'] == 'time') {
                 $value[$v] = date('H:i:s', $value[$v]);
+            }elseif ($fieldlist[$v]['data_type'] == 'file') {
+                $value[$v] = '<a class="tablelink" target="_blank" href="'.$value[$v].'">查看</a>';
             }
             $tmp[$v] = $value[$v];
         }
@@ -89,17 +166,17 @@ class CommonController extends Controller {
         $script = '';
         foreach ($fieldlist as $k=>$v) {
             if (in_array($v['data_type'], array('varchar','int','double'))) {
-                $formStr .= '<li><label>'.$v['field_name'].'</label><input name="field'.$v['id'].'" type="text" class="dfinput input_field'.$v['id'].'" style="width: 300px" /></li>';
+                $formStr .= '<li><label>'.$v['field_name'].'</label><input name="field_'.$v['id'].'" type="text" class="dfinput input_field'.$v['id'].'" style="width: 300px" /></li>';
             }elseif (in_array($v['data_type'], array('text'))) {
-                $formStr .= '<li><label>'.$v['field_name'].'</label><textarea name="field'.$v['id'].'" class="dfinput input_field'.$v['id'].'" style="width: 300px;height: 50px"></textarea></li>';
+                $formStr .= '<li><label>'.$v['field_name'].'</label><textarea name="field_'.$v['id'].'" class="dfinput input_field'.$v['id'].'" style="width: 300px;height: 50px"></textarea></li>';
             }elseif (in_array($v['data_type'], array('date'))) {
-                $formStr .= '<li><label>'.$v['field_name'].'</label><input id="input_field'.$v['id'].'" name="field'.$v['id'].'" type="text" class="dfinput input_field'.$v['id'].'" style="width: 300px" readonly /></li>';
+                $formStr .= '<li><label>'.$v['field_name'].'</label><input id="input_field'.$v['id'].'" name="field_'.$v['id'].'" type="text" class="dfinput input_field'.$v['id'].'" style="width: 300px" readonly /></li>';
                 $script .= '<script>laydate({elem: \'#input_field'.$v['id'].'\',format: \'YYYY/MM/DD\'});</script>';
             }elseif (in_array($v['data_type'], array('time'))) {
-                $formStr .= '<li><label>'.$v['field_name'].'</label><input id="input_field'.$v['id'].'" name="field'.$v['id'].'" type="text" class="dfinput input_field'.$v['id'].'" style="width: 300px" readonly /></li>';
+                $formStr .= '<li><label>'.$v['field_name'].'</label><input id="input_field'.$v['id'].'" name="field_'.$v['id'].'" type="text" class="dfinput input_field'.$v['id'].'" style="width: 300px" readonly /></li>';
                 $script .= '<script>laydate({elem: \'#input_field'.$v['id'].'\',format: \'hh:mm:ss\'});</script>';
             }elseif (in_array($v['data_type'], array('date_time'))) {
-                $formStr .= '<li><label>'.$v['field_name'].'</label><input id="input_field'.$v['id'].'" name="field'.$v['id'].'" type="text" class="dfinput input_field'.$v['id'].'" style="width: 300px" readonly /></li>';
+                $formStr .= '<li><label>'.$v['field_name'].'</label><input id="input_field'.$v['id'].'" name="field_'.$v['id'].'" type="text" class="dfinput input_field'.$v['id'].'" style="width: 300px" readonly /></li>';
                 $script .= '<script>laydate({elem: \'#input_field'.$v['id'].'\',format: \'YYYY/MM/DD hh:mm:ss\'});</script>';
             }elseif (in_array($v['data_type'], array('single_option'))) {
                 $optlist = json_decode($v['field_option'], true);
@@ -107,16 +184,16 @@ class CommonController extends Controller {
                 foreach ($optlist as $val) {
                     $optstr .= '<option value="'.$val.'">'.$val.'</option>';
                 }
-                $formStr .= '<li><label>'.$v['field_name'].'</label><select name="field'.$v['id'].'" class="dfinput input_field'.$v['id'].'" style="width: 300px">'.$optstr.'</select></li>';
+                $formStr .= '<li><label>'.$v['field_name'].'</label><select name="field_'.$v['id'].'" class="dfinput input_field'.$v['id'].'" style="width: 300px">'.$optstr.'</select></li>';
             }elseif (in_array($v['data_type'], array('multi_option'))) {
                 $optlist = json_decode($v['field_option'], true);
                 $optstr = '';
                 foreach ($optlist as $val) {
                     $optstr .= '<option value="'.$val.'">'.$val.'</option>';
                 }
-                $formStr .= '<li><label>'.$v['field_name'].'</label><select name="field'.$v['id'].'" class="dfinput input_field'.$v['id'].'" style="width: 300px" multiple="multiple">'.$optstr.'</select></li>';
+                $formStr .= '<li><label>'.$v['field_name'].'</label><select name="field_'.$v['id'].'" class="dfinput input_field'.$v['id'].'" style="width: 300px" multiple="multiple">'.$optstr.'</select></li>';
             }elseif (in_array($v['data_type'], array('file'))) {
-                $formStr .= '<li><label>'.$v['field_name'].'</label><input name="field'.$v['id'].'" type="file" class="dfinput input_field'.$v['id'].'" style="width: 300px" /></li>';
+                $formStr .= '<li><label>'.$v['field_name'].'</label><input name="field_'.$v['id'].'" type="file" class="dfinput input_field'.$v['id'].'" style="width: 300px" /></li>';
             }
             $formStr .= "\r\n";
         }
@@ -129,5 +206,70 @@ class CommonController extends Controller {
     public function getFieldForm() {
         $this->ajaxReturn(array('form'=>$this->createForm($this->getFieldList($_REQUEST['fieldtype']))), 'JSON');
     }
+
+    public function fileUpload() {
+        $return_data = array('code'=>-1,'msg'=>'未知错误');
+        do{
+            $files = $_FILES;
+            if (!$files) {
+                $return_data['code'] = -2;
+                $return_data['msg'] = '没有文件上传';
+                break;
+            }
+            $flag = '';
+            $result = array();
+            $upload = new \Think\Upload();
+            $upload->maxSize = 20*1024*1024;//上传文件不超过20M
+            //$upload->exts = array('jpg', 'gif', 'png', 'jpeg', 'bmp');
+            $upload->autoSub = false;
+            $upload->rootPath = './';
+            $upload->savePath = '/Uploads/'.date('Ymd').'/';
+            foreach ($files as $key=>$value) {
+                $upload->saveName = date('YmdHis').mt_rand(1000,9999);
+                $info = $upload->uploadOne($value);
+                if (!$info) {
+                    $flag = $upload->getError();
+                    break;
+                }
+                $result[$key] = $info['savepath'].$info['savename'];
+            }
+            if ($flag) {
+                $return_data['code'] = -3;
+                $return_data['msg'] = '文件上传失败：'.$flag;
+                break;
+            }
+
+            $return_data['code'] = 1;
+            $return_data['msg'] = 'success';
+            $return_data['data'] = $result;
+            break;
+        }while(0);
+        return $return_data;
+    }
+
+    public function _deleteDir($R){
+        //打开一个目录句柄
+        $handle = opendir($R);
+        //读取目录,直到没有目录为止
+        while(($item = readdir($handle)) !== false){
+            //跳过. ..两个特殊目录
+            if($item != '.' and $item != '..'){
+                //如果遍历到的是目录
+                if(is_dir($R.'/'.$item)){
+                    //继续向目录里面遍历
+                    $this->_deleteDir($R.'/'.$item);
+                }else{
+                    //如果不是目录，删除该文件
+                    if(!unlink($R.'/'.$item))
+                        die('error!');
+                }
+            }
+        }
+        //关闭目录
+        closedir( $handle );
+        //删除空的目录
+        return rmdir($R);
+    }
+
 
 }

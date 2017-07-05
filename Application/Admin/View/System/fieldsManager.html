@@ -192,12 +192,14 @@
                     param.field_option[index] = $(this).val();
                 });
             }
+            var load = layer.load(1);
             $.ajax({
                 type:'post',
                 dataType:'json',
                 data:param,
                 url:"{:U('System/addFields')}",
                 success:function (response) {
+                    layer.close(load);
                     if (response.code == 1) {
                         layer.msg('保存成功', {icon: 1,time: 1000}, function(){
                             loadFieldsList(param.field_type);
@@ -226,12 +228,14 @@
         }
 
         function loadFieldsList(field_type) {
+            var load = layer.load(1);
             $.ajax({
                 type:'post',
                 dataType:'json',
                 data:{field_type:field_type},
                 url:"{:U('System/fieldsManager')}",
                 success:function (response) {
+                    layer.close(load);
                     if (response.code == 1) {
                         var html = '';
                         for (var i in response.data) {

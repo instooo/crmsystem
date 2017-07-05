@@ -97,7 +97,14 @@ class SystemController extends CommonController {
 
             //更新或创建表
             $data['id'] = $rs;
-            $this->alterFields($data);
+            if (false === $this->alterFields($data)) {
+                $return_data['code'] = -5;
+                $return_data['msg'] = '字段更新失败';
+                break;
+            }
+
+            //清除字段缓存
+            _deleteDir(RUNTIME_PATH.'Data/_fields/');
 
             $return_data['code'] = 1;
             $return_data['msg'] = '保存成功';
@@ -142,6 +149,9 @@ class SystemController extends CommonController {
             case 'multi_option':
                 $typeStr = 'text';
                 break;
+            case 'file':
+                $typeStr = 'text';
+                break;
             default:
                 $typeStr = '';
                 break;
@@ -152,8 +162,7 @@ class SystemController extends CommonController {
             $not_null = $data['not_null']?' not null':'';
             $is_unique = $data['is_unique']?' unique':'';
             $alterSql = "ALTER TABLE `{$createRes}` ADD `{$field_name}` {$typeStr}{$not_null}{$is_unique}";
-            M('')->execute($alterSql);
-            return true;
+            return M('')->execute($alterSql);
         }catch (\Exception $e){
             return false;
         }

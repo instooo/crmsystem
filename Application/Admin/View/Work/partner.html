@@ -49,34 +49,64 @@
 
 <div id="add_temp" style="display: none">
     <ul class="forminfo">
-        <input type="hidden" class="input_id" value="">
-        ##FORM##
-        <li><label>&nbsp;</label><input name="submit" type="button" class="btn do_save_btn" value="确认保存"/></li>
+        <form class="dataform" method="post" enctype="multipart/form-data" action="{:U('Work/addPartner')}">
+            <input type="hidden" class="input_id" value="">
+            ##FORM##
+            <li><label>&nbsp;</label><input name="submit" type="button" class="btn do_save_btn" value="确认保存"/></li>
+        </form>
     </ul>
 </div>
 
 <script>
     var layer_index;
     $(document).on('click', '.add_btn', function () {
+        var load = layer.load(1);
         $.ajax({
             type:'post',
             dataType:'json',
             data:{fieldtype:'partner'},
             url:"{:U('Common/getFieldForm')}",
             success:function (response) {
+                layer.close(load);
                 var formHtml = $('#add_temp').html().replace('##FORM##', response.form.html+response.form.script);
                 layer_index = layer.open({
                     type: 1,
                     title: '添加客户',
                     skin: 'layui-layer-rim',
-                    area: ['800px', '600px'],
+                    //area: ['800px', '500px'],
                     scrollbar: false,
                     content: formHtml
                 });
+                $(document).on('click', '#layui-layer'+layer_index+' .btn', function () {
+                    addData($(this).parents('.dataform'));
+                });
             }
         });
-
     });
+    
+    //添加
+    function addData(con) {
+        var load = layer.load(1);
+        con.ajaxSubmit({
+            type:'post',
+            dataType:'json',
+            url:"{:U('Work/addPartner')}",
+            error:function () {
+                layer.close(load);
+            },
+            success:function (response) {
+                layer.close(load);
+                if (response.code == 1) {
+                    layer.msg('保存成功', {icon: 1,time: 1000}, function(){
+                        location.reload();
+                    });
+                }else {
+                    layer.msg(response.msg, {icon: 2,time: 1000});
+                }
+            }
+        });
+    }
+    
 </script>
 
 <include file="Index/footer" />

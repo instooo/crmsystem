@@ -58,6 +58,7 @@ class WorkController extends CommonController {
             }
             */
             $tmp['user_id'] = $val['user_id'];
+            $tmp['addtime'] = date('Y-m-d H:i:s', $val['addtime']);
             $list[] = $tmp;
         }
 
@@ -66,6 +67,53 @@ class WorkController extends CommonController {
         $this->assign('list', $list);
 
         $this->display();
+    }
+
+    public function test() {
+        echo RUNTIME_PATH.'Data/_fields/';die;
+        dump($_SESSION);
+    }
+
+    /**
+     * 添加客户
+     */
+    public function addPartner() {
+        $return_data = array('code'=>-1,'msg'=>'未知错误');
+        do{
+            $post = $_POST;
+            $check = $this->dataChecker($post, 'partner');
+            if ($check['code'] != 1) {
+                $return_data['code'] = -2;
+                $return_data['msg'] = $check['msg'];
+                break;
+            }
+            $filterRes = $this->dataFilter($post, 'partner');
+            $data = $filterRes['data'];
+
+            if ($_FILES) {
+                $uploadRes = $this->fileUpload();
+                if ($uploadRes['code'] != 1) {
+                    $return_data['code'] = -3;
+                    $return_data['msg'] = $uploadRes['msg'];
+                    break;
+                }
+                $data = array_merge($uploadRes['data'], $data);
+            }
+
+            $data['owner'] = $_SESSION[C('USER_AUTH_KEY')];
+            $data['addtime'] = time();
+            $rs = M('partner')->add($data);
+            if (!$rs) {
+                $return_data['code'] = -4;
+                $return_data['msg'] = '保存失败';
+                break;
+            }
+
+            $return_data['code'] = 1;
+            $return_data['msg'] = '保存成功';
+            break;
+        }while(0);
+        $this->ajaxReturn($return_data,'JSON');
     }
 
     /**
