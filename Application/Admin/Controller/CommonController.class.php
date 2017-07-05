@@ -79,4 +79,55 @@ class CommonController extends Controller {
         return $tmp;
     }
 
+    /**
+     * 生成字段表单
+     * @param $fieldlist
+     * @return string
+     */
+    public function createForm($fieldlist) {
+        $formStr = '';
+        $script = '';
+        foreach ($fieldlist as $k=>$v) {
+            if (in_array($v['data_type'], array('varchar','int','double'))) {
+                $formStr .= '<li><label>'.$v['field_name'].'</label><input name="field'.$v['id'].'" type="text" class="dfinput input_field'.$v['id'].'" style="width: 300px" /></li>';
+            }elseif (in_array($v['data_type'], array('text'))) {
+                $formStr .= '<li><label>'.$v['field_name'].'</label><textarea name="field'.$v['id'].'" class="dfinput input_field'.$v['id'].'" style="width: 300px;height: 50px"></textarea></li>';
+            }elseif (in_array($v['data_type'], array('date'))) {
+                $formStr .= '<li><label>'.$v['field_name'].'</label><input id="input_field'.$v['id'].'" name="field'.$v['id'].'" type="text" class="dfinput input_field'.$v['id'].'" style="width: 300px" readonly /></li>';
+                $script .= '<script>laydate({elem: \'#input_field'.$v['id'].'\',format: \'YYYY/MM/DD\'});</script>';
+            }elseif (in_array($v['data_type'], array('time'))) {
+                $formStr .= '<li><label>'.$v['field_name'].'</label><input id="input_field'.$v['id'].'" name="field'.$v['id'].'" type="text" class="dfinput input_field'.$v['id'].'" style="width: 300px" readonly /></li>';
+                $script .= '<script>laydate({elem: \'#input_field'.$v['id'].'\',format: \'hh:mm:ss\'});</script>';
+            }elseif (in_array($v['data_type'], array('date_time'))) {
+                $formStr .= '<li><label>'.$v['field_name'].'</label><input id="input_field'.$v['id'].'" name="field'.$v['id'].'" type="text" class="dfinput input_field'.$v['id'].'" style="width: 300px" readonly /></li>';
+                $script .= '<script>laydate({elem: \'#input_field'.$v['id'].'\',format: \'YYYY/MM/DD hh:mm:ss\'});</script>';
+            }elseif (in_array($v['data_type'], array('single_option'))) {
+                $optlist = json_decode($v['field_option'], true);
+                $optstr = '';
+                foreach ($optlist as $val) {
+                    $optstr .= '<option value="'.$val.'">'.$val.'</option>';
+                }
+                $formStr .= '<li><label>'.$v['field_name'].'</label><select name="field'.$v['id'].'" class="dfinput input_field'.$v['id'].'" style="width: 300px">'.$optstr.'</select></li>';
+            }elseif (in_array($v['data_type'], array('multi_option'))) {
+                $optlist = json_decode($v['field_option'], true);
+                $optstr = '';
+                foreach ($optlist as $val) {
+                    $optstr .= '<option value="'.$val.'">'.$val.'</option>';
+                }
+                $formStr .= '<li><label>'.$v['field_name'].'</label><select name="field'.$v['id'].'" class="dfinput input_field'.$v['id'].'" style="width: 300px" multiple="multiple">'.$optstr.'</select></li>';
+            }elseif (in_array($v['data_type'], array('file'))) {
+                $formStr .= '<li><label>'.$v['field_name'].'</label><input name="field'.$v['id'].'" type="file" class="dfinput input_field'.$v['id'].'" style="width: 300px" /></li>';
+            }
+            $formStr .= "\r\n";
+        }
+        return array('html'=>$formStr,'script'=>$script);
+    }
+
+    /**
+     * 获取表单
+     */
+    public function getFieldForm() {
+        $this->ajaxReturn(array('form'=>$this->createForm($this->getFieldList($_REQUEST['fieldtype']))), 'JSON');
+    }
+
 }

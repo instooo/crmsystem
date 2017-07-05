@@ -19,5 +19,6 @@ return array(
         'date_time'   =>  '日期时间',
         'single_option'   =>  '单选项',
         'multi_option'   =>  '多选项',
+        'file'   =>  '文件',
     )
 );

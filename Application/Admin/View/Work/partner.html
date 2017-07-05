@@ -50,14 +50,33 @@
 <div id="add_temp" style="display: none">
     <ul class="forminfo">
         <input type="hidden" class="input_id" value="">
-        <volist name="fieldlist" id="vo"></volist>
-        <li><label>部门名称</label><input name="title" type="text" class="dfinput input_name" style="width: 300px" /></li>
+        ##FORM##
         <li><label>&nbsp;</label><input name="submit" type="button" class="btn do_save_btn" value="确认保存"/></li>
     </ul>
 </div>
 
 <script>
+    var layer_index;
+    $(document).on('click', '.add_btn', function () {
+        $.ajax({
+            type:'post',
+            dataType:'json',
+            data:{fieldtype:'partner'},
+            url:"{:U('Common/getFieldForm')}",
+            success:function (response) {
+                var formHtml = $('#add_temp').html().replace('##FORM##', response.form.html+response.form.script);
+                layer_index = layer.open({
+                    type: 1,
+                    title: '添加客户',
+                    skin: 'layui-layer-rim',
+                    area: ['800px', '600px'],
+                    scrollbar: false,
+                    content: formHtml
+                });
+            }
+        });
 
+    });
 </script>
 
 <include file="Index/footer" />
