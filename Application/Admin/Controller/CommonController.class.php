@@ -161,37 +161,34 @@ class CommonController extends Controller {
      * @param $fieldlist
      * @return string
      */
-    public function createForm($fieldlist) {
+    public function createForm($fieldlist, $data = array()) {
         $formStr = '';
         $script = '';
         foreach ($fieldlist as $k=>$v) {
             if (in_array($v['data_type'], array('varchar','int','double'))) {
-                $formStr .= '<li><label>'.$v['field_name'].'</label><input name="field_'.$v['id'].'" type="text" class="dfinput input_field'.$v['id'].'" style="width: 300px" /></li>';
+                $formStr .= '<li><label>'.$v['field_name'].'</label><input name="field_'.$v['id'].'" type="text" class="dfinput input_field'.$v['id'].'" style="width: 300px" value="'.$data['field_'.$v['id']].'" /></li>';
             }elseif (in_array($v['data_type'], array('text'))) {
-                $formStr .= '<li><label>'.$v['field_name'].'</label><textarea name="field_'.$v['id'].'" class="dfinput input_field'.$v['id'].'" style="width: 300px;height: 50px"></textarea></li>';
+                $formStr .= '<li><label>'.$v['field_name'].'</label><textarea name="field_'.$v['id'].'" class="dfinput input_field'.$v['id'].'" style="width: 300px;height: 50px">'.$data['field_'.$v['id']].'</textarea></li>';
             }elseif (in_array($v['data_type'], array('date'))) {
-                $formStr .= '<li><label>'.$v['field_name'].'</label><input id="input_field'.$v['id'].'" name="field_'.$v['id'].'" type="text" class="dfinput input_field'.$v['id'].'" style="width: 300px" readonly /></li>';
-                $script .= '<script>laydate({elem: \'#input_field'.$v['id'].'\',format: \'YYYY/MM/DD\'});</script>';
+                $vvv = $data['field_'.$v['id']]?date('Y-m-d',$data['field_'.$v['id']]):'';
+                $formStr .= '<li><label>'.$v['field_name'].'</label><input id="input_field'.$v['id'].'" name="field_'.$v['id'].'" type="text" class="dfinput input_field'.$v['id'].'" style="width: 300px" value="'.$vvv.'" readonly /></li>';
+                $script .= '<script>laydate({elem: \'#input_field'.$v['id'].'\',format: \'YYYY-MM-DD\',istime:false});</script>';
             }elseif (in_array($v['data_type'], array('time'))) {
-                $formStr .= '<li><label>'.$v['field_name'].'</label><input id="input_field'.$v['id'].'" name="field_'.$v['id'].'" type="text" class="dfinput input_field'.$v['id'].'" style="width: 300px" readonly /></li>';
-                $script .= '<script>laydate({elem: \'#input_field'.$v['id'].'\',format: \'hh:mm:ss\'});</script>';
+                $vvv = $data['field_'.$v['id']]?date('H:i:s',$data['field_'.$v['id']]):'';
+                $formStr .= '<li><label>'.$v['field_name'].'</label><input id="input_field'.$v['id'].'" name="field_'.$v['id'].'" type="text" class="dfinput input_field'.$v['id'].'" style="width: 300px" value="'.$vvv.'" readonly /></li>';
+                $script .= '<script>laydate({elem: \'#input_field'.$v['id'].'\',format: \'hh:mm:ss\',istime:false});</script>';
             }elseif (in_array($v['data_type'], array('date_time'))) {
-                $formStr .= '<li><label>'.$v['field_name'].'</label><input id="input_field'.$v['id'].'" name="field_'.$v['id'].'" type="text" class="dfinput input_field'.$v['id'].'" style="width: 300px" readonly /></li>';
-                $script .= '<script>laydate({elem: \'#input_field'.$v['id'].'\',format: \'YYYY/MM/DD hh:mm:ss\'});</script>';
+                $vvv = $data['field_'.$v['id']]?date('Y-m-d H:i:s',$data['field_'.$v['id']]):'';
+                $formStr .= '<li><label>'.$v['field_name'].'</label><input id="input_field'.$v['id'].'" name="field_'.$v['id'].'" type="text" class="dfinput input_field'.$v['id'].'" style="width: 300px" value="'.$vvv.'" readonly /></li>';
+                $script .= '<script>laydate({elem: \'#input_field'.$v['id'].'\',format: \'YYYY-MM-DD hh:mm:ss\',istime:true});</script>';
             }elseif (in_array($v['data_type'], array('single_option'))) {
                 $optlist = json_decode($v['field_option'], true);
                 $optstr = '';
                 foreach ($optlist as $val) {
-                    $optstr .= '<option value="'.$val.'">'.$val.'</option>';
+                    $selected = $data['field_'.$v['id']] == $val?'selected':'';
+                    $optstr .= '<option value="'.$val.'" '.$selected.'>'.$val.'</option>';
                 }
                 $formStr .= '<li><label>'.$v['field_name'].'</label><select name="field_'.$v['id'].'" class="dfinput input_field'.$v['id'].'" style="width: 300px">'.$optstr.'</select></li>';
-            }elseif (in_array($v['data_type'], array('multi_option'))) {
-                $optlist = json_decode($v['field_option'], true);
-                $optstr = '';
-                foreach ($optlist as $val) {
-                    $optstr .= '<option value="'.$val.'">'.$val.'</option>';
-                }
-                $formStr .= '<li><label>'.$v['field_name'].'</label><select name="field_'.$v['id'].'" class="dfinput input_field'.$v['id'].'" style="width: 300px" multiple="multiple">'.$optstr.'</select></li>';
             }elseif (in_array($v['data_type'], array('file'))) {
                 $formStr .= '<li><label>'.$v['field_name'].'</label><input name="field_'.$v['id'].'" type="file" class="dfinput input_field'.$v['id'].'" style="width: 300px" /></li>';
             }
@@ -204,7 +201,14 @@ class CommonController extends Controller {
      * 获取表单
      */
     public function getFieldForm() {
-        $this->ajaxReturn(array('form'=>$this->createForm($this->getFieldList($_REQUEST['fieldtype']))), 'JSON');
+        $id = $_REQUEST['id'];
+        $data = array();
+        if ($id) {
+            $data = M($_REQUEST['fieldtype'])->where(array('id'=>$id))->find();
+        }
+        $this->ajaxReturn(array(
+            'form'=>$this->createForm($this->getFieldList($_REQUEST['fieldtype']), $data),
+        ), 'JSON');
     }
 
     public function fileUpload() {

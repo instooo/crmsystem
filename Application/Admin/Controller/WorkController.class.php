@@ -35,7 +35,7 @@ class WorkController extends CommonController {
         $page->setConfig('next', '&nbsp;');
 
         $datalist = M('partner p')
-            ->field('p.*,u.id,u.nickname')
+            ->field('p.*,u.id as user_id,u.nickname')
             ->join('left join crm_user u on u.id=p.owner')
             ->order('p.id desc')
             ->limit("{$page->firstRow},{$page->listRows}")
@@ -57,6 +57,7 @@ class WorkController extends CommonController {
                 $tmp[$v] = $val[$v];
             }
             */
+            $tmp['id'] = $val['id'];
             $tmp['user_id'] = $val['user_id'];
             $tmp['addtime'] = date('Y-m-d H:i:s', $val['addtime']);
             $list[] = $tmp;
@@ -75,19 +76,24 @@ class WorkController extends CommonController {
     }
 
     /**
-     * 添加客户
+     * 添加数据
      */
-    public function addPartner() {
+    public function addData() {
         $return_data = array('code'=>-1,'msg'=>'未知错误');
         do{
             $post = $_POST;
-            $check = $this->dataChecker($post, 'partner');
+            if (!$post['fieldtype']) {
+                $return_data['code'] = -1;
+                $return_data['msg'] = '参数不全';
+                break;
+            }
+            $check = $this->dataChecker($post, $post['fieldtype']);
             if ($check['code'] != 1) {
                 $return_data['code'] = -2;
                 $return_data['msg'] = $check['msg'];
                 break;
             }
-            $filterRes = $this->dataFilter($post, 'partner');
+            $filterRes = $this->dataFilter($post, $post['fieldtype']);
             $data = $filterRes['data'];
 
             if ($_FILES) {
@@ -102,8 +108,51 @@ class WorkController extends CommonController {
 
             $data['owner'] = $_SESSION[C('USER_AUTH_KEY')];
             $data['addtime'] = time();
-            $rs = M('partner')->add($data);
+            $rs = M($post['fieldtype'])->add($data);
             if (!$rs) {
+                $return_data['code'] = -4;
+                $return_data['msg'] = '保存失败';
+                break;
+            }
+
+            $return_data['code'] = 1;
+            $return_data['msg'] = '保存成功';
+            break;
+        }while(0);
+        $this->ajaxReturn($return_data,'JSON');
+    }
+
+    //修改客户
+    public function editData() {
+        $return_data = array('code'=>-1,'msg'=>'未知错误');
+        do{
+            $post = $_POST;
+            if (!$post['id'] || !$post['fieldtype']) {
+                $return_data['code'] = -1;
+                $return_data['msg'] = '参数不全';
+                break;
+            }
+            $check = $this->dataChecker($post, $post['fieldtype']);
+            if ($check['code'] != 1) {
+                $return_data['code'] = -2;
+                $return_data['msg'] = $check['msg'];
+                break;
+            }
+            $filterRes = $this->dataFilter($post, $post['fieldtype']);
+            $data = $filterRes['data'];
+
+            if ($_FILES) {
+                $uploadRes = $this->fileUpload();
+                if ($uploadRes['code'] != 1) {
+                    $return_data['code'] = -3;
+                    $return_data['msg'] = $uploadRes['msg'];
+                    break;
+                }
+                $data = array_merge($uploadRes['data'], $data);
+            }
+
+            $rs = M($post['fieldtype'])->where(array('id'=>$post['id']))->save($data);
+            if (false === $rs) {
                 $return_data['code'] = -4;
                 $return_data['msg'] = '保存失败';
                 break;
@@ -126,7 +175,7 @@ class WorkController extends CommonController {
         $klist = array_keys($fieldlist);
 
         $count = M('contact p')
-            ->field('p.*,u.id,u.nickname')
+            ->field('p.*,u.id as user_id,u.nickname')
             ->join('left join crm_user u on u.id=p.owner')
             ->count();
         $page = new \Think\Page($count, 20);
@@ -143,7 +192,9 @@ class WorkController extends CommonController {
         $list = array();
         foreach ($datalist as $val) {
             $tmp = $this->dataPaser($val, $fieldlist);
+            $tmp['id'] = $val['id'];
             $tmp['user_id'] = $val['user_id'];
+            $tmp['addtime'] = date('Y-m-d H:i:s', $val['addtime']);
             $list[] = $tmp;
         }
 

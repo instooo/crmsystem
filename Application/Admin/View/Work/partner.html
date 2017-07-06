@@ -32,7 +32,7 @@
             </thead>
             <tbody>
                 <volist name="list" id="vo">
-                    <tr>
+                    <tr data-id="{$vo.id}">
                         <volist name="vo" id="vv">
                             <if condition="$fieldlist[$key]">
                                 <td class="td_{$key}" data-key="{$key}">{$vv}</td>
@@ -50,7 +50,8 @@
 <div id="add_temp" style="display: none">
     <ul class="forminfo">
         <form class="dataform" method="post" enctype="multipart/form-data" action="{:U('Work/addPartner')}">
-            <input type="hidden" class="input_id" value="">
+            <input type="hidden" class="input_id" name="id" value="">
+            <input type="hidden" class="input_fieldtype" name="fieldtype" value="partner">
             ##FORM##
             <li><label>&nbsp;</label><input name="submit" type="button" class="btn do_save_btn" value="确认保存"/></li>
         </form>
@@ -73,7 +74,7 @@
                     type: 1,
                     title: '添加客户',
                     skin: 'layui-layer-rim',
-                    //area: ['800px', '500px'],
+                    area: ['550px', '450px'],
                     scrollbar: false,
                     content: formHtml
                 });
@@ -90,7 +91,60 @@
         con.ajaxSubmit({
             type:'post',
             dataType:'json',
-            url:"{:U('Work/addPartner')}",
+            url:"{:U('Work/addData')}",
+            error:function () {
+                layer.close(load);
+            },
+            success:function (response) {
+                layer.close(load);
+                if (response.code == 1) {
+                    layer.msg('保存成功', {icon: 1,time: 1000}, function(){
+                        location.reload();
+                    });
+                }else {
+                    layer.msg(response.msg, {icon: 2,time: 1000});
+                }
+            }
+        });
+    }
+    
+    $(document).on('click', '.edit', function () {
+        var tr = $(this).parents('tr');
+        var id = tr.attr('data-id');
+        if (!id || id == '') return false;
+        var load = layer.load(1);
+        $.ajax({
+            type:'post',
+            dataType:'json',
+            data:{fieldtype:'partner',id:id},
+            url:"{:U('Common/getFieldForm')}",
+            success:function (response) {
+                layer.close(load);
+                var formHtml = $('#add_temp').html().replace('##FORM##', response.form.html+response.form.script);
+                layer_index = layer.open({
+                    type: 1,
+                    title: '编辑客户',
+                    skin: 'layui-layer-rim',
+                    area: ['550px', '450px'],
+                    scrollbar: false,
+                    content: formHtml
+                });
+                var layer_con = $('#layui-layer'+layer_index);
+                layer_con.find('.input_id').val(id);
+                $(document).on('click', '#layui-layer'+layer_index+' .btn', function () {
+                    editData($(this).parents('.dataform'));
+                });
+            }
+        });
+    });
+
+    //编辑
+    function editData(con) {
+        var load = layer.load(1);
+        con.ajaxSubmit({
+            type:'post',
+            dataType:'json',
+            url:"{:U('Work/editData')}",
             error:function () {
                 layer.close(load);
             },
