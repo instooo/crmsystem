@@ -276,4 +276,130 @@ class CommonController extends Controller {
     }
 
 
+    /**
+     * 添加数据
+     */
+    public function addData() {
+        $return_data = array('code'=>-1,'msg'=>'未知错误');
+        do{
+            $post = $_POST;
+            if (!$post['fieldtype']) {
+                $return_data['code'] = -1;
+                $return_data['msg'] = '参数不全';
+                break;
+            }
+            $check = $this->dataChecker($post, $post['fieldtype']);
+            if ($check['code'] != 1) {
+                $return_data['code'] = -2;
+                $return_data['msg'] = $check['msg'];
+                break;
+            }
+            $filterRes = $this->dataFilter($post, $post['fieldtype']);
+            $data = $filterRes['data'];
+
+            if ($_FILES) {
+                $uploadRes = $this->fileUpload();
+                if ($uploadRes['code'] != 1) {
+                    $return_data['code'] = -3;
+                    $return_data['msg'] = $uploadRes['msg'];
+                    break;
+                }
+                $data = array_merge($uploadRes['data'], $data);
+            }
+
+            $data['owner'] = $_SESSION[C('USER_AUTH_KEY')];
+            $data['addtime'] = time();
+            $rs = M($post['fieldtype'])->add($data);
+            if (!$rs) {
+                $return_data['code'] = -4;
+                $return_data['msg'] = '保存失败';
+                break;
+            }
+
+            $return_data['code'] = 1;
+            $return_data['msg'] = '保存成功';
+            break;
+        }while(0);
+        $this->ajaxReturn($return_data,'JSON');
+    }
+
+    /**
+     * 修改数据
+     */
+    public function editData() {
+        $return_data = array('code'=>-1,'msg'=>'未知错误');
+        do{
+            $post = $_POST;
+            if (!$post['id'] || !$post['fieldtype']) {
+                $return_data['code'] = -1;
+                $return_data['msg'] = '参数不全';
+                break;
+            }
+            $check = $this->dataChecker($post, $post['fieldtype']);
+            if ($check['code'] != 1) {
+                $return_data['code'] = -2;
+                $return_data['msg'] = $check['msg'];
+                break;
+            }
+            $filterRes = $this->dataFilter($post, $post['fieldtype']);
+            $data = $filterRes['data'];
+
+            if ($_FILES) {
+                $uploadRes = $this->fileUpload();
+                if ($uploadRes['code'] != 1) {
+                    $return_data['code'] = -3;
+                    $return_data['msg'] = $uploadRes['msg'];
+                    break;
+                }
+                $data = array_merge($uploadRes['data'], $data);
+            }
+
+            $rs = M($post['fieldtype'])->where(array('id'=>$post['id']))->save($data);
+            if (false === $rs) {
+                $return_data['code'] = -4;
+                $return_data['msg'] = '保存失败';
+                break;
+            }
+
+            $return_data['code'] = 1;
+            $return_data['msg'] = '保存成功';
+            break;
+        }while(0);
+        $this->ajaxReturn($return_data,'JSON');
+    }
+
+    /**
+     * 删除数据
+     */
+    public function deleData() {
+        $return_data = array('code'=>-1,'msg'=>'');
+        do{
+            $idstr = trim($_REQUEST['id']);
+            $fieldtype = trim($_REQUEST['fieldtype']);
+            if (!$idstr || !$fieldtype) {
+                $return_data['code'] = -2;
+                $return_data['msg'] = '参数缺失';
+                break;
+            }
+            $docinfo = M($fieldtype)->where(array('id'=>$idstr))->find();
+            if (!$docinfo) {
+                $return_data['code'] = -3;
+                $return_data['msg'] = '并没有找到你想删除的内容';
+                break;
+            }
+
+            $rs = M($fieldtype)->where(array('id'=>$idstr))->delete();
+            if (false === $rs) {
+                $return_data['code'] = -3;
+                $return_data['msg'] = '删除失败';
+                break;
+            }
+            $return_data['code'] = 1;
+            $return_data['msg'] = '删除成功';
+            break;
+        }while(0);
+        $this->ajaxReturn($return_data, 'JSON');
+    }
+
+
 }

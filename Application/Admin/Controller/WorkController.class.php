@@ -44,19 +44,6 @@ class WorkController extends CommonController {
         $list = array();
         foreach ($datalist as $val) {
             $tmp = $this->dataPaser($val, $fieldlist);
-            /*
-            $tmp = array();
-            foreach ($klist as $v) {
-                if ($fieldlist[$v]['data_type'] == 'date_time') {
-                    $val[$v] = date('Y-m-d H:i:s', $val[$v]);
-                }elseif ($fieldlist[$v]['data_type'] == 'date') {
-                    $val[$v] = date('Y-m-d', $val[$v]);
-                }elseif ($fieldlist[$v]['data_type'] == 'time') {
-                    $val[$v] = date('H:i:s', $val[$v]);
-                }
-                $tmp[$v] = $val[$v];
-            }
-            */
             $tmp['id'] = $val['id'];
             $tmp['user_id'] = $val['user_id'];
             $tmp['addtime'] = date('Y-m-d H:i:s', $val['addtime']);
@@ -70,132 +57,29 @@ class WorkController extends CommonController {
         $this->display();
     }
 
-    public function test() {
-        echo RUNTIME_PATH.'Data/_fields/';die;
-        dump($_SESSION);
+
+    /**
+     * 添加客户
+     */
+    public function addPartner() {
+        $this->addData();
     }
 
     /**
-     * 添加数据
+     * 编辑客户
      */
-    public function addData() {
-        $return_data = array('code'=>-1,'msg'=>'未知错误');
-        do{
-            $post = $_POST;
-            if (!$post['fieldtype']) {
-                $return_data['code'] = -1;
-                $return_data['msg'] = '参数不全';
-                break;
-            }
-            $check = $this->dataChecker($post, $post['fieldtype']);
-            if ($check['code'] != 1) {
-                $return_data['code'] = -2;
-                $return_data['msg'] = $check['msg'];
-                break;
-            }
-            $filterRes = $this->dataFilter($post, $post['fieldtype']);
-            $data = $filterRes['data'];
-
-            if ($_FILES) {
-                $uploadRes = $this->fileUpload();
-                if ($uploadRes['code'] != 1) {
-                    $return_data['code'] = -3;
-                    $return_data['msg'] = $uploadRes['msg'];
-                    break;
-                }
-                $data = array_merge($uploadRes['data'], $data);
-            }
-
-            $data['owner'] = $_SESSION[C('USER_AUTH_KEY')];
-            $data['addtime'] = time();
-            $rs = M($post['fieldtype'])->add($data);
-            if (!$rs) {
-                $return_data['code'] = -4;
-                $return_data['msg'] = '保存失败';
-                break;
-            }
-
-            $return_data['code'] = 1;
-            $return_data['msg'] = '保存成功';
-            break;
-        }while(0);
-        $this->ajaxReturn($return_data,'JSON');
+    public function editPartner() {
+        $this->editData();
     }
 
     /**
-     * 修改数据
+     * 删除客户
      */
-    public function editData() {
-        $return_data = array('code'=>-1,'msg'=>'未知错误');
-        do{
-            $post = $_POST;
-            if (!$post['id'] || !$post['fieldtype']) {
-                $return_data['code'] = -1;
-                $return_data['msg'] = '参数不全';
-                break;
-            }
-            $check = $this->dataChecker($post, $post['fieldtype']);
-            if ($check['code'] != 1) {
-                $return_data['code'] = -2;
-                $return_data['msg'] = $check['msg'];
-                break;
-            }
-            $filterRes = $this->dataFilter($post, $post['fieldtype']);
-            $data = $filterRes['data'];
-
-            if ($_FILES) {
-                $uploadRes = $this->fileUpload();
-                if ($uploadRes['code'] != 1) {
-                    $return_data['code'] = -3;
-                    $return_data['msg'] = $uploadRes['msg'];
-                    break;
-                }
-                $data = array_merge($uploadRes['data'], $data);
-            }
-
-            $rs = M($post['fieldtype'])->where(array('id'=>$post['id']))->save($data);
-            if (false === $rs) {
-                $return_data['code'] = -4;
-                $return_data['msg'] = '保存失败';
-                break;
-            }
-
-            $return_data['code'] = 1;
-            $return_data['msg'] = '保存成功';
-            break;
-        }while(0);
-        $this->ajaxReturn($return_data,'JSON');
+    public function delePartner() {
+        $this->deleData();
     }
 
-    public function deleData() {
-        $return_data = array('code'=>-1,'msg'=>'');
-        do{
-            $idstr = trim($_REQUEST['id']);
-            $fieldtype = trim($_REQUEST['fieldtype']);
-            if (!$idstr || !$fieldtype) {
-                $return_data['code'] = -2;
-                $return_data['msg'] = '参数缺失';
-                break;
-            }
-            $docinfo = M($fieldtype)->where(array('id'=>$idstr))->find();
-            if (!$docinfo) {
-                $return_data['code'] = -3;
-                $return_data['msg'] = '并没有找到你想删除的内容';
-                break;
-            }
 
-            $rs = M($fieldtype)->where(array('id'=>$idstr))->delete();
-            if (false === $rs) {
-                $return_data['code'] = -3;
-                $return_data['msg'] = '删除失败';
-                break;
-            }
-            $return_data['code'] = 1;
-            $return_data['msg'] = '删除成功';
-            break;
-        }while(0);
-        $this->ajaxReturn($return_data, 'JSON');
-    }
 
     /**
      * 联系人管理
@@ -238,9 +122,86 @@ class WorkController extends CommonController {
     }
 
     /**
+     * 添加联系人
+     */
+    public function addContact() {
+        $this->addData();
+    }
+
+    /**
+     * 编辑联系人
+     */
+    public function editContact() {
+        $this->editData();
+    }
+
+    /**
+     * 删除联系人
+     */
+    public function deleContact() {
+        $this->deleData();
+    }
+
+    /**
      * 合同管理
      */
-    public function agreement() {}
+    public function agreement() {
+        $fieldlist = $this->getFieldList('agreement');
+        $fieldlist['nickname']['field_name'] = '创建人';
+        $fieldlist['addtime']['field_name'] = '创建时间';
+        $klist = array_keys($fieldlist);
+
+        $count = M('agreement p')
+            ->field('p.*,u.id as user_id,u.nickname')
+            ->join('left join crm_user u on u.id=p.owner')
+            ->count();
+        $page = new \Think\Page($count, 20);
+        $page->setConfig('prev', '&nbsp;');
+        $page->setConfig('next', '&nbsp;');
+
+        $datalist = M('agreement p')
+            ->field('p.*,u.id,u.nickname')
+            ->join('left join crm_user u on u.id=p.owner')
+            ->order('p.id desc')
+            ->limit("{$page->firstRow},{$page->listRows}")
+            ->select();
+
+        $list = array();
+        foreach ($datalist as $val) {
+            $tmp = $this->dataPaser($val, $fieldlist);
+            $tmp['id'] = $val['id'];
+            $tmp['user_id'] = $val['user_id'];
+            $tmp['addtime'] = date('Y-m-d H:i:s', $val['addtime']);
+            $list[] = $tmp;
+        }
+
+        $this->assign('fieldlist', $fieldlist);
+        $this->assign('pagebar', $page->show());
+        $this->assign('list', $list);
+
+        $this->display();
+    }
+
+    /**
+     * 添加合同
+     */
+    public function addAgreement() {
+        $this->addData();
+    }
+
+    /**
+     * 编辑合同
+     */
+    public function editAgreement() {
+        $this->editData();
+    }
+
+    /**
+     * 删除合同
+     */
+    public function deleAgreement() {
+        $this->deleData();
+    }
 
 
 }

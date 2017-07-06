@@ -10,7 +10,7 @@
         <ul class="placeul">
             <li><a href="#">首页</a></li>
             <li><a href="#">工作管理</a></li>
-            <li><a href="#">联系人管理</a></li>
+            <li><a href="#">合同管理</a></li>
         </ul>
     </div>
 
@@ -49,9 +49,9 @@
 
 <div id="add_temp" style="display: none">
     <ul class="forminfo">
-        <form class="dataform" method="post" enctype="multipart/form-data" action="{:U('Work/addContact')}">
+        <form class="dataform" method="post" enctype="multipart/form-data" action="{:U('Work/addAgreement')}">
             <input type="hidden" class="input_id" name="id" value="">
-            <input type="hidden" class="input_fieldtype" name="fieldtype" value="contact">
+            <input type="hidden" class="input_fieldtype" name="fieldtype" value="agreement">
             ##FORM##
             <li><label>&nbsp;</label><input name="submit" type="button" class="btn do_save_btn" value="确认保存"/></li>
         </form>
@@ -65,14 +65,14 @@
         $.ajax({
             type:'post',
             dataType:'json',
-            data:{fieldtype:'contact'},
+            data:{fieldtype:'agreement'},
             url:"{:U('Common/getFieldForm')}",
             success:function (response) {
                 layer.close(load);
                 var formHtml = $('#add_temp').html().replace('##FORM##', response.form.html+response.form.script);
                 layer_index = layer.open({
                     type: 1,
-                    title: '添加联系人',
+                    title: '添加合同',
                     skin: 'layui-layer-rim',
                     area: ['550px', '450px'],
                     scrollbar: false,
@@ -91,7 +91,7 @@
         con.ajaxSubmit({
             type:'post',
             dataType:'json',
-            url:"{:U('Work/addContact')}",
+            url:"{:U('Work/addAgreement')}",
             error:function () {
                 layer.close(load);
             },
@@ -116,14 +116,14 @@
         $.ajax({
             type:'post',
             dataType:'json',
-            data:{fieldtype:'contact',id:id},
+            data:{fieldtype:'agreement',id:id},
             url:"{:U('Common/getFieldForm')}",
             success:function (response) {
                 layer.close(load);
                 var formHtml = $('#add_temp').html().replace('##FORM##', response.form.html+response.form.script);
                 layer_index = layer.open({
                     type: 1,
-                    title: '编辑联系人',
+                    title: '编辑合同',
                     skin: 'layui-layer-rim',
                     area: ['550px', '450px'],
                     scrollbar: false,
@@ -144,7 +144,7 @@
         con.ajaxSubmit({
             type:'post',
             dataType:'json',
-            url:"{:U('Work/editContact')}",
+            url:"{:U('Work/editAgreement')}",
             error:function () {
                 layer.close(load);
             },
@@ -171,7 +171,7 @@
                 type:'post',
                 dataType:'json',
                 data:{id:id,fieldtype:'partner'},
-                url:"{:U('Work/deleContact')}",
+                url:"{:U('Work/deleAgreement')}",
                 success:function (response) {
                     layer.close(load);
                     if (response.code == 1) {
