@@ -115,6 +115,7 @@
     $(function () {
         loadFieldsList($('.toolbar li.current').attr('data-value'));
         var layer_index;
+        var field_data;
         $(document).on('click', '.toolbar li', function () {
             if ($(this).hasClass('current')) return false;
             $(this).addClass('current').siblings('li').removeClass('current');
@@ -239,7 +240,8 @@
                     if (response.code == 1) {
                         var html = '';
                         for (var i in response.data) {
-                            html += '<tr>' +
+                            field_data = response.data;
+                            html += '<tr data-id="'+response.data[i].id+'" data-key="'+i+'">' +
                                     '<td>'+response.data[i].field_name+'</td>' +
                                     '<td>'+response.data[i].data_type_name+'</td>' +
                                     '<td>'+response.data[i].not_null_name+'</td>' +
@@ -253,9 +255,160 @@
                 }
             });
         }
+
+        //编辑字段
+        $(document).on('click', '.edit', function () {
+            var tr = $(this).parents('tr');
+            if (!field_data) return false;
+            if (!field_data[tr.attr('data-key')]) return false;
+            var fieldinfo = field_data[tr.attr('data-key')];
+            var area;
+            if (fieldinfo.data_type== 'single_option' || fieldinfo.data_type== 'multi_option') {
+                var field_option = eval("("+Unicode.decode(fieldinfo.field_option)+")");
+                area = ['600px', '600px'];
+            }else {
+                area = ['600px', '400px'];
+            }
+            layer_index = layer.open({
+                type: 1,
+                title: '编辑字段',
+                skin: 'layui-layer-rim',
+                area: area,
+                scrollbar: false,
+                content: $('#edit_temp').html()
+            });
+
+            var layer_con = $('#layui-layer'+layer_index);
+            layer_con.find('.input_id').val(fieldinfo.id);
+            layer_con.find('.input_field_type').val(fieldinfo.field_type);
+            layer_con.find('.input_field_name').val(fieldinfo.field_name);
+            layer_con.find('.input_not_null').prop('checked',fieldinfo.not_null==1?true:false);
+            layer_con.find('.input_is_unique[value="'+fieldinfo.is_unique+'"]').prop('checked',true);
+            layer_con.find('.input_is_unique[value!="'+fieldinfo.is_unique+'"]').prop('checked',false);
+            layer_con.find('.input_status[value="'+fieldinfo.status+'"]').prop('checked',true);
+            layer_con.find('.input_status[value!="'+fieldinfo.status+'"]').prop('checked',false);
+            if (fieldinfo.data_type== 'single_option' || fieldinfo.data_type== 'multi_option') {
+                var liHtml = '';
+                for (var i in field_option) {
+                    liHtml += '<li class="">' +
+                            '<label class="sbi-radio-vall" title="a">'+field_option[i]+'</label>' +
+                            '<input data-val="data" type="text" class="sbi-radio-val selected" value="'+field_option[i]+'">' +
+                            '<p><strong></strong><span style="display:none;"></span></p>' +
+                            '</li>';
+                }
+                layer_con.find('.ui-sortable').html(liHtml);
+                layer_con.find('.ui-sortable').sortable({revert: true});
+            }else {
+                layer_con.find('.add_wrapper').css('height', '350px');
+                layer_con.find('.dl_option').remove();
+            }
+            layer_con.find('.btn_yes').click(function () {
+                initEditFields(layer_con);
+            });
+            layer_con.find('.btn_no').click(function () {
+                layer.close(layer_index);
+            });
+        });
+        
+        function initEditFields(con) {
+            var field_type = con.find('.input_field_type').val();
+            var param = {};
+            param.id = con.find('.input_id').val();
+            param.field_name = con.find('.input_field_name').val();
+            param.not_null = con.find(".dl_right dd input[name='not_null']").is(':checked')?1:0;
+            param.is_unique = con.find(".dl_right dd input[name='is_unique']:checked").val();
+            param.status = con.find(".dl_right dd input[name='status']:checked").val();
+            if (con.find('.dl_option').length > 0) {
+                param.field_option = {};
+                con.find('.dl_option .sbi-radio-val').each(function (index) {
+                    param.field_option[index] = $(this).val();
+                });
+            }
+            var load = layer.load(1);
+            $.ajax({
+                type:'post',
+                dataType:'json',
+                data:param,
+                url:"{:U('System/editFields')}",
+                success:function (response) {
+                    layer.close(load);
+                    if (response.code == 1) {
+                        layer.msg('保存成功', {icon: 1,time: 1000}, function(){
+                            layer.close(layer_index);
+                            loadFieldsList(field_type);
+                        });
+                    }else {
+                        layer.msg(response.msg, {icon: 2,time: 1000});
+                    }
+                }
+            });
+        }
+        
+        //删除字段
+        $(document).on('click', '.dele', function () {
+            var tr = $(this).parents('tr');
+            var id = tr.attr('data-id');
+            layer_index = layer.confirm('删除后数据将无法恢复，确定要删除吗？', {btn: ['确定','取消']}, function () {
+                layer.close(layer_index);
+                var load = layer.load(1);
+                $.ajax({
+                    type:'post',
+                    dataType:'json',
+                    data:{id:id},
+                    url:"{:U('System/deleFields')}",
+                    success:function (response) {
+                        layer.close(load);
+                        if (response.code == 1) {
+                            layer.msg('删除成功', {icon: 1,time: 1000}, function(){
+                                layer.close(layer_index);
+                                loadFieldsList($('.toolbar li.current').attr('data-value'));
+                            });
+                        }else {
+                            layer.msg(response.msg, {icon: 2,time: 1000});
+                        }
+                    }
+                });
+            });
+        });
         
 
     });
 </script>
+
+
+<div id="edit_temp" style="display: none">
+    <div class="add_wrapper">
+        <input type="hidden" class="input_id" value="">
+        <input type="hidden" class="input_field_type" value="">
+        <dl class="dl_right">
+            <dt style="padding-top: 0px">&nbsp;</dt>
+            <dd style="padding-left: 45px"><span>字段名称</span><input name="field_name" type="text" class="dfinput input_field_name" /></dd>
+            <dd style="padding-left: 45px"><span>必填</span><label><input name="not_null" type="checkbox" class="dfcheckbox input_not_null" value="1" checked="checked" />必填</label></dd>
+            <dd style="padding-left: 45px"><span>是否查重</span><label><input name="is_unique" type="radio" class="dfradio input_is_unique" value="1" />是</label>&nbsp;&nbsp;<label><input name="is_unique" type="radio" class="dfradio input_is_unique" value="0" checked="checked" />否</label></dd>
+            <dd style="padding-left: 45px"><span>状态</span><label><input name="status" type="radio" class="dfradio input_status" value="1" checked="checked" />启用</label>&nbsp;&nbsp;<label><input name="status" type="radio" class="dfradio input_status" value="0" />禁用</label></dd>
+            <div class="dl_option" style="left: 30px">
+                <h2>选项信息</h2>
+                <ul class="ui-sortable">
+                </ul>
+                <p class="sbi-radio-p">
+                    <input type="hidden" class="input_option_type" value="">
+                    <input type="text" class="sbi-radio-write">
+                    <span class="sbi-radio-btn">添加</span>
+                </p>
+            </div>
+        </dl>
+
+    </div>
+    <div class="add_wrapper_footer">
+        <div class="ui-dialog-buttonset">
+            <button type="button" class="btn_yes" role="button" aria-disabled="false">
+                <span class="ui-button-text">保存</span>
+            </button>
+            <button type="button" class="btn_no" role="button" aria-disabled="false">
+                <span class="ui-button-text">取消</span>
+            </button>
+        </div>
+    </div>
+</div>
 
 <include file="Index/footer" />

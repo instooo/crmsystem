@@ -113,9 +113,95 @@ class SystemController extends CommonController {
         $this->ajaxReturn($return_data,'JSON');
     }
 
-    public function test() {
-        $data = M('fields')->where(array('id'=>2))->find();
-        $this->alterFields($data);
+    /**
+     * 编辑字段
+     */
+    public function editFields() {
+        $return_data = array('code'=>-1,'msg'=>'未知错误');
+        do{
+            $id = trim(htmlspecialchars($_REQUEST['id']));
+            $field_name = trim(htmlspecialchars($_REQUEST['field_name']));
+            $not_null = trim(htmlspecialchars($_REQUEST['not_null']));
+            $is_unique = trim(htmlspecialchars($_REQUEST['is_unique']));
+            $status = trim(htmlspecialchars($_REQUEST['status']));
+            $field_option = $_REQUEST['field_option'];
+            if (!$id) {
+                $return_data['code'] = -2;
+                $return_data['msg'] = '参数错误';
+                break;
+            }
+            if (!$field_name) {
+                $return_data['code'] = -3;
+                $return_data['msg'] = '请输入正确的字段名';
+                break;
+            }
+            $data = array();
+            $data['field_name'] = $field_name;
+            $data['addtime'] = time();
+            if (is_numeric($not_null)) {
+                $data['not_null'] = $not_null;
+            }
+            if (is_numeric($is_unique)) {
+                $data['is_unique'] = $is_unique;
+            }
+            if (is_numeric($status)) {
+                $data['status'] = $status;
+            }
+            if ($field_option) {
+                $data['field_option'] = json_encode($field_option);
+            }
+            $rs = M('fields')->where(array('id'=>$id))->save($data);
+            if (false === $rs) {
+                $return_data['code'] = -4;
+                $return_data['msg'] = '数据保存失败';
+                break;
+            }
+
+            $return_data['code'] = 1;
+            $return_data['msg'] = '保存成功';
+            break;
+        }while(0);
+        $this->ajaxReturn($return_data,'JSON');
+    }
+
+    public function deleFields() {
+        $return_data = array('code'=>-1,'msg'=>'');
+        do{
+            $idstr = trim($_REQUEST['id']);
+            if (!$idstr) {
+                $return_data['code'] = -2;
+                $return_data['msg'] = '参数缺失';
+                break;
+            }
+            $docinfo = M('fields')->where(array('id'=>$idstr))->find();
+            if (!$docinfo) {
+                $return_data['code'] = -3;
+                $return_data['msg'] = '并没有找到你想删除的内容';
+                break;
+            }
+
+            $rs = M('fields')->where(array('id'=>$idstr))->delete();
+            if (false === $rs) {
+                $return_data['code'] = -4;
+                $return_data['msg'] = '删除失败';
+                break;
+            }
+
+            $tablename = C('DB_PREFIX').$docinfo['field_type'];
+            $rs1 = M('')->execute("ALTER TABLE `{$tablename}` DROP COLUMN `field_{$docinfo['id']}`");
+            if (false === $rs1) {
+                $return_data['code'] = -5;
+                $return_data['msg'] = '字段更新失败';
+                break;
+            }
+            //清除字段缓存
+            _deleteDir(RUNTIME_PATH.'Data/_fields/');
+
+            $return_data['code'] = 1;
+            $return_data['msg'] = '删除成功';
+            break;
+        }while(0);
+        $this->ajaxReturn($return_data, 'JSON');
     }
 
     private function alterFields($data) {
@@ -159,9 +245,7 @@ class SystemController extends CommonController {
         if (!$typeStr) return false;
         try{
             $field_name = 'field_'.$data['id'];
-            $not_null = $data['not_null']?' not null':'';
-            $is_unique = $data['is_unique']?' unique':'';
-            $alterSql = "ALTER TABLE `{$createRes}` ADD `{$field_name}` {$typeStr}{$not_null}{$is_unique}";
+            $alterSql = "ALTER TABLE `{$createRes}` ADD `{$field_name}` {$typeStr} default null";
             return M('')->execute($alterSql);
         }catch (\Exception $e){
             return false;

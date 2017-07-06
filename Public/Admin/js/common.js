@@ -10,3 +10,26 @@ function listenLayerClose(index, callback) {
         }
     }, 500);
 }
+/**
+ * 中文Unicode编码解码
+ * */
+var Unicode = {
+
+    encode: function (str) {
+
+        var res = [],
+            len = str.length;
+
+        for (var i = 0; i < len; ++i) {
+            res[i] = ("00" + str.charCodeAt(i).toString(16)).slice(-4);
+        }
+
+        return str ? "\\u" + res.join("\\u") : "";
+    },
+
+    decode: function (str) {
+
+        str = str.replace(/\\/g, "%");
+        return unescape(str);
+    }
+};

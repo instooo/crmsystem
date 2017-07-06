@@ -126,6 +126,7 @@
 }
 .add_wrapper_footer button{
     margin-right: 20px;
+    padding: 8px;
 }
 .add_wrapper_footer .btn_yes{
     background-color: #3EAFE0;
