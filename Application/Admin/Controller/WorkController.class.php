@@ -122,7 +122,9 @@ class WorkController extends CommonController {
         $this->ajaxReturn($return_data,'JSON');
     }
 
-    //修改客户
+    /**
+     * 修改数据
+     */
     public function editData() {
         $return_data = array('code'=>-1,'msg'=>'未知错误');
         do{
@@ -163,6 +165,36 @@ class WorkController extends CommonController {
             break;
         }while(0);
         $this->ajaxReturn($return_data,'JSON');
+    }
+
+    public function deleData() {
+        $return_data = array('code'=>-1,'msg'=>'');
+        do{
+            $idstr = trim($_REQUEST['id']);
+            $fieldtype = trim($_REQUEST['fieldtype']);
+            if (!$idstr || !$fieldtype) {
+                $return_data['code'] = -2;
+                $return_data['msg'] = '参数缺失';
+                break;
+            }
+            $docinfo = M($fieldtype)->where(array('id'=>$idstr))->find();
+            if (!$docinfo) {
+                $return_data['code'] = -3;
+                $return_data['msg'] = '并没有找到你想删除的内容';
+                break;
+            }
+
+            $rs = M($fieldtype)->where(array('id'=>$idstr))->delete();
+            if (false === $rs) {
+                $return_data['code'] = -3;
+                $return_data['msg'] = '删除失败';
+                break;
+            }
+            $return_data['code'] = 1;
+            $return_data['msg'] = '删除成功';
+            break;
+        }while(0);
+        $this->ajaxReturn($return_data, 'JSON');
     }
 
     /**

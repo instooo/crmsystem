@@ -161,6 +161,32 @@
         });
     }
     
+    $(document).on('click', '.dele', function () {
+        var tr = $(this).parents('tr');
+        var id = tr.attr('data-id');
+        layer_index = layer.confirm('删除后数据将无法恢复，确定要删除吗？', {btn: ['确定','取消']},function () {
+            layer.close(layer_index);
+            var load = layer.load(1);
+            $.ajax({
+                type:'post',
+                dataType:'json',
+                data:{id:id,fieldtype:'partner'},
+                url:"{:U('Work/deleData')}",
+                success:function (response) {
+                    layer.close(load);
+                    if (response.code == 1) {
+                        layer.msg('删除成功', {icon: 1,time: 1000}, function(){
+                            layer.close(layer_index);
+                            location.reload();
+                        });
+                    }else {
+                        layer.msg(response.msg, {icon: 2,time: 1000});
+                    }
+                }
+            });
+        });
+    });
+    
 </script>
 
 <include file="Index/footer" />
