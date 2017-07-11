@@ -315,6 +315,8 @@ class CommonController extends Controller {
                 $return_data['msg'] = '保存失败';
                 break;
             }
+            $partnerConfig = include(CONF_PATH.'partner.config.php');
+            \Common\Vendor\Eventlog::saveLog('添加了'.$partnerConfig['FIELDS_TYPE'][$post['fieldtype']], $rs, $post['fieldtype']);
 
             $return_data['code'] = 1;
             $return_data['msg'] = '保存成功';
@@ -360,6 +362,8 @@ class CommonController extends Controller {
                 $return_data['msg'] = '保存失败';
                 break;
             }
+            $partnerConfig = include(CONF_PATH.'partner.config.php');
+            \Common\Vendor\Eventlog::saveLog('修改了'.$partnerConfig['FIELDS_TYPE'][$post['fieldtype']], $post['id'], $post['fieldtype']);
 
             $return_data['code'] = 1;
             $return_data['msg'] = '保存成功';
@@ -394,6 +398,9 @@ class CommonController extends Controller {
                 $return_data['msg'] = '删除失败';
                 break;
             }
+            $partnerConfig = include(CONF_PATH.'partner.config.php');
+            \Common\Vendor\Eventlog::saveLog('删除了'.$partnerConfig['FIELDS_TYPE'][$_REQUEST['fieldtype']]);
+
             $return_data['code'] = 1;
             $return_data['msg'] = '删除成功';
             break;
