@@ -15,7 +15,8 @@
                 $(this).addClass("active");
             });
 
-            $('.title').click(function () {
+            $(document).on('click','.title',function () {
+
                 var $ul = $(this).next('ul');
                 $('dd').find('ul').slideUp();
                 if ($ul.is(':visible')) {
@@ -23,6 +24,7 @@
                 } else {
                     $(this).next('ul').slideDown();
                 }
+                $(this).addClass('on');
             });
         })
     </script>
