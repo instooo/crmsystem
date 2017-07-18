@@ -21,8 +21,11 @@ class CasedemoController extends CommonController {
     }
 
 	//获取流程状态
-    public function get_case_info()
+    public function step_go()
     {
-		
+		$data['uid'] = $_SESSION['authId'];//用户id		
+		$data['c_id']= 1;//为空的时候,则添加新的实例		
+		$workcase = new workflow();	
+		$workcase->doStep($data);
 	}
 }
