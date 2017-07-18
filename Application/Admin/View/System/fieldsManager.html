@@ -1,10 +1,5 @@
 <include file="Index/header" />
-<div id="main" >
-<style>
-    .toolbar li{text-align: center;padding: 0 !important;width: 50px;}
-    .toolbar li.current{color: #FFFFFF;background: #3EAFE0 !important;}
-    .toolbar1 li{cursor: pointer}
-</style>
+<div id="main">
 <div class="place">
     <span>位置：</span>
     <ul class="placeul">
@@ -27,21 +22,22 @@
         </ul>
     </div>
 
-
-    <table class="tablelist">
-        <thead>
-        <tr>
-            <th>字段名称</th>
-            <th>字段类型</th>
-            <th>必填</th>
-            <th>状态</th>
-            <th>查重</th>
-            <th>操作</th>
-        </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+    <div class="tablelist_w">
+        <table class="tablelist">
+            <thead>
+            <tr>
+                <th>字段名称</th>
+                <th>字段类型</th>
+                <th>必填</th>
+                <th>状态</th>
+                <th>查重</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
     
     <div id="dd_list" style="display: none;">
         <div class="div_field_name"><dd><span>字段名称</span><input name="field_name" type="text" class="dfinput input_field_name" /></dd></div>

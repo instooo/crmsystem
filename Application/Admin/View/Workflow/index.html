@@ -21,30 +21,31 @@
     
     </div>
     
-    
-    <table class="tablelist">
-    	<thead>
-    	<tr>
-        <th><input name="" type="checkbox" value=""/></th>
-        <th>编号<i class="sort"><img src="{:C('STATIC_URL')}/images/px.gif" /></i></th>
-        <th>流程名称</th>
-        <th>添加时间</th>
-        <th>状态</th>
-        <th>操作</th>
-        </tr>
-        </thead>
-        <tbody>
-		<volist name='result' id="vo">
-        <tr>
-        <td><input name="" type="checkbox" value="" /></td>
-        <td>{$vo.w_id}</td>
-        <td>{$vo.w_name}</td>
-        <td>{$vo.w_createtime|date='Y-m-d H:i:s',###}</td>
-        <td><if condition="$vo['status'] eq 1 "><font color="#21de3b">正常</font><else /> <font color="#de2125">关闭</font></if></td>
-        <td><a onclick='' class="tablelink">查看</a><a class="tablelink" onclick="del_lc({$vo.w_id})"> 删除</a></td>
-        </tr> 
-		</volist>
-    </table>     
+    <div class="tablelist_w">
+        <table class="tablelist">
+        	<thead>
+        	<tr>
+            <th><input name="" type="checkbox" value=""/></th>
+            <th>编号<i class="sort"><img src="{:C('STATIC_URL')}/images/px.gif" /></i></th>
+            <th>流程名称</th>
+            <th>添加时间</th>
+            <th>状态</th>
+            <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+    		<volist name='result' id="vo">
+            <tr>
+            <td><input name="" type="checkbox" value="" /></td>
+            <td>{$vo.w_id}</td>
+            <td>{$vo.w_name}</td>
+            <td>{$vo.w_createtime|date='Y-m-d H:i:s',###}</td>
+            <td><if condition="$vo['status'] eq 1 "><font color="#21de3b">正常</font><else /> <font color="#de2125">关闭</font></if></td>
+            <td><a onclick='' class="tablelink">查看</a><a class="tablelink" onclick="del_lc({$vo.w_id})"> 删除</a></td>
+            </tr> 
+    		</volist>
+        </table>  
+    </div>   
     <div class="tipa" id="addlc" style="position:relative;">
       <div class="tipinfo">
         <ul class="forminfo">

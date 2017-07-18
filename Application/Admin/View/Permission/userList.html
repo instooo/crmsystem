@@ -30,30 +30,30 @@
 
     </div>
 
-
-    <table class="tablelist">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>用户名</th>
-            <th>昵称</th>
-            <th>角色</th>
-            <th>操作</th>
-        </tr>
-        </thead>
-        <tbody>
-        <volist name="list" id="vo">
+    <div class="tablelist_w">
+        <table class="tablelist">
+            <thead>
             <tr>
-                <td class="td_id">{$vo.id}</td>
-                <td class="td_username">{$vo.username}</td>
-                <td class="td_nickname">{$vo.nickname}</td>
-                <td class="td_role" data-roleid="{$vo.role_id}">{$vo.rolename}</td>
-                <td><a href="javascript:;" class="tablelink edit_btn">修改</a> <a href="javascript:;" class="tablelink dele_btn"> 删除</a></td>
+                <th>ID</th>
+                <th>用户名</th>
+                <th>昵称</th>
+                <th>角色</th>
+                <th>操作</th>
             </tr>
-        </volist>
-        </tbody>
-    </table>
-
+            </thead>
+            <tbody>
+            <volist name="list" id="vo">
+                <tr>
+                    <td class="td_id">{$vo.id}</td>
+                    <td class="td_username">{$vo.username}</td>
+                    <td class="td_nickname">{$vo.nickname}</td>
+                    <td class="td_role" data-roleid="{$vo.role_id}">{$vo.rolename}</td>
+                    <td><a href="javascript:;" class="tablelink edit_btn">修改</a> <a href="javascript:;" class="tablelink dele_btn"> 删除</a></td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
     <div id="add_temp" style="display: none">
         <ul class="forminfo">
             <input type="hidden" class="input_id" value="">

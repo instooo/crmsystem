@@ -20,30 +20,31 @@
                 <li class="add_btn"><span><img src="{:C('STATIC_URL')}/images/t01.png"/></span>添加</li>
             </ul>
         </div>
-
-        <table class="tablelist">
-            <thead>
-            <tr>
-                <volist name="fieldlist" id="vo">
-                    <th>{$vo.field_name}</th>
-                </volist>
-                <th>操作</th>
-            </tr>
-            </thead>
-            <tbody>
-            <volist name="list" id="vo">
-                <tr data-id="{$vo.id}">
-                    <volist name="vo" id="vv">
-                        <if condition="$fieldlist[$key]">
-                            <td class="td_{$key}" data-key="{$key}">{$vv}</td>
-                        </if>
+        <div class="tablelist_w">
+            <table class="tablelist">
+                <thead>
+                <tr>
+                    <volist name="fieldlist" id="vo">
+                        <th>{$vo.field_name}</th>
                     </volist>
-                    <td><a href="javascript:;" class="tablelink edit">编辑</a> <a href="javascript:;" class="tablelink dele">删除</a></td>
+                    <th>操作</th>
                 </tr>
-            </volist>
-            </tbody>
-        </table>
-        <div class="page">{$pagebar}</div>
+                </thead>
+                <tbody>
+                <volist name="list" id="vo">
+                    <tr data-id="{$vo.id}">
+                        <volist name="vo" id="vv">
+                            <if condition="$fieldlist[$key]">
+                                <td class="td_{$key}" data-key="{$key}">{$vv}</td>
+                            </if>
+                        </volist>
+                        <td><a href="javascript:;" class="tablelink edit">编辑</a> <a href="javascript:;" class="tablelink dele">删除</a></td>
+                    </tr>
+                </volist>
+                </tbody>
+            </table>
+            <div class="page">{$pagebar}</div>
+        </div>
     </div>
 </div>
 
