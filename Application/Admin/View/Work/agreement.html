@@ -24,6 +24,10 @@
             <table class="tablelist">
                 <thead>
                 <tr>
+                    <th>合同名称</th>
+                    <th>客户名称</th>
+                    <th>总金额</th>
+                    <th>所有者</th>
                     <volist name="fieldlist" id="vo">
                         <th>{$vo.field_name}</th>
                     </volist>
@@ -33,6 +37,10 @@
                 <tbody>
                 <volist name="list" id="vo">
                     <tr data-id="{$vo.id}">
+                        <td class="td_agree_name">{$vo.agree_name}</td>
+                        <td class="td_partner_id" data="{$vo.partner_id}">{$vo.partner_name}</td>
+                        <td class="td_total_money">{$vo.total_money}</td>
+                        <td>{$vo.nickname}</td>
                         <volist name="vo" id="vv">
                             <if condition="$fieldlist[$key]">
                                 <td class="td_{$key}" data-key="{$key}">{$vv}</td>
@@ -53,6 +61,15 @@
         <form class="dataform" method="post" enctype="multipart/form-data" action="{:U('Work/addAgreement')}">
             <input type="hidden" class="input_id" name="id" value="">
             <input type="hidden" class="input_fieldtype" name="fieldtype" value="agreement">
+            <li><label>合同名称</label><input name="agree_name" type="text" class="dfinput input_agree_name" value="" style="width: 300px"/></li>
+            <li>
+                <label>客户名称</label>
+                <select class="dfinput input_partner_id" name="partner_id" style="width: 300px">
+                    <option value="">请选择</option>
+                    <volist name="partnerlist" id="vo"><option value="{$vo.id}">{$vo.partner_name}</option></volist>
+                </select>
+            </li>
+            <li><label>总金额</label><input name="total_money" type="text" class="dfinput input_total_money" value="" style="width: 300px"/></li>
             ##FORM##
             <li><label>&nbsp;</label><input name="submit" type="button" class="btn do_save_btn" value="确认保存"/></li>
         </form>
@@ -132,6 +149,9 @@
                 });
                 var layer_con = $('#layui-layer'+layer_index);
                 layer_con.find('.input_id').val(id);
+                layer_con.find('.input_agree_name').val(tr.find('.td_agree_name').html());
+                layer_con.find('.input_partner_id').val(tr.find('.td_partner_id').attr('data'));
+                layer_con.find('.input_total_money').val(tr.find('.td_total_money').html());
                 $(document).on('click', '#layui-layer'+layer_index+' .btn', function () {
                     editData($(this).parents('.dataform'));
                 });

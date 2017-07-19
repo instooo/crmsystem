@@ -24,6 +24,8 @@
             <table class="tablelist">
                 <thead>
                 <tr>
+                    <th>创建人</th>
+                    <th>创建时间</th>
                     <volist name="fieldlist" id="vo">
                         <th>{$vo.field_name}</th>
                     </volist>
@@ -33,6 +35,8 @@
                 <tbody>
                 <volist name="list" id="vo">
                     <tr data-id="{$vo.id}">
+                        <td>{$vo.nickname}</td>
+                        <td>{$vo.addtime|date="Y-m-d H:i:s",###}</td>
                         <volist name="vo" id="vv">
                             <if condition="$fieldlist[$key]">
                                 <td class="td_{$key}" data-key="{$key}">{$vv}</td>

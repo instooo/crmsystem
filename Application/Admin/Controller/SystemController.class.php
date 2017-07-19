@@ -207,6 +207,7 @@ class SystemController extends CommonController {
     private function alterFields($data) {
         if (!$data['field_type'] || !$data['id']) return false;
         $createRes = $this->createTable($data['field_type']);
+        if (!$createRes) return false;
         switch ($data['data_type']) {
             case 'varchar':
                 $typeStr = 'varchar(128)';
@@ -258,7 +259,10 @@ class SystemController extends CommonController {
         $rs1 = M('')->query("SHOW TABLES LIKE '{$tablename}'");
         if ($rs1) {
             return $tablename;
+        }else {
+            return false;
         }
+        /*
         if ($tablename == C('DB_PREFIX').'partner') {
             //客户表
             $createSql = "CREATE TABLE `{$tablename}` (`id` int(11) unsigned NOT NULL AUTO_INCREMENT,`owner` int(10) NOT NULL COMMENT '所有者',`addtime` int(15) NOT NULL COMMENT '创建时间',PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
@@ -271,5 +275,6 @@ class SystemController extends CommonController {
         }
         M('')->execute($createSql);
         return $tablename;
+        */
     }
 }

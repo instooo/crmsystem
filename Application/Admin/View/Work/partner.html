@@ -24,6 +24,9 @@
             <table class="tablelist">
                 <thead>
                 <tr>
+                    <th>客户名称</th>
+                    <th>所有者</th>
+                    <th>创建时间</th>
                     <volist name="fieldlist" id="vo">
                         <th>{$vo.field_name}</th>
                     </volist>
@@ -33,6 +36,9 @@
                 <tbody>
                     <volist name="list" id="vo">
                         <tr data-id="{$vo.id}">
+                            <td class="td_partner_name">{$vo.partner_name}</td>
+                            <td>{$vo.nickname}</td>
+                            <td>{$vo.addtime|date="Y-m-d H:i:s",###}</td>
                             <volist name="vo" id="vv">
                                 <if condition="$fieldlist[$key]">
                                     <td class="td_{$key}" data-key="{$key}">{$vv}</td>
@@ -53,6 +59,7 @@
         <form class="dataform" method="post" enctype="multipart/form-data" action="{:U('Work/addPartner')}">
             <input type="hidden" class="input_id" name="id" value="">
             <input type="hidden" class="input_fieldtype" name="fieldtype" value="partner">
+            <li><label>客户名称</label><input name="partner_name" type="text" class="dfinput input_partner_name" value="" style="width: 300px"/></li>
             ##FORM##
             <li><label>&nbsp;</label><input name="submit" type="button" class="btn do_save_btn" value="确认保存"/></li>
         </form>
@@ -132,6 +139,7 @@
                 });
                 var layer_con = $('#layui-layer'+layer_index);
                 layer_con.find('.input_id').val(id);
+                layer_con.find('.input_partner_name').val(tr.find('.td_partner_name').html());
                 $(document).on('click', '#layui-layer'+layer_index+' .btn', function () {
                     editData($(this).parents('.dataform'));
                 });
