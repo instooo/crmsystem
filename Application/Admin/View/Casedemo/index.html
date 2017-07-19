@@ -1,0 +1,42 @@
+<html>
+<head>
+<script language="JavaScript" src="{:C('STATIC_URL')}/js/jquery.js"></script>
+<script type="text/javascript" src="{:C('STATIC_URL')}/ztree/js/jquery.ztree.core.js"></script>
+<script type="text/javascript" src="{:C('STATIC_URL')}/ztree/js/jquery.ztree.excheck.js"></script>
+<link href="{:C('STATIC_URL')}/css/style.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="{:C('STATIC_URL')}/ztree/css/zTreeStyle/zTreeStyle.css" type="text/css">
+</head>
+<body style="overflow-x: hidden;overflow-y: auto;">	
+<select name="user">
+<volist name='user' id='vo'>
+<option value="{$vo.id}">{$vo.username}</option>
+</volist>
+</select>
+
+<select name="work_case">
+<volist name='work_case' id='vo'>
+<option value="{$vo.c_id}">{$vo.c_title}</option>
+</volist>
+</select>
+
+
+<input name="" type="button" class="btn" id="bumenbtn" value="切换账号">	
+<script>
+$(function(){
+	$("#bumenbtn").click(function(){
+		var user = $("select[name='user']").val();
+		var work_case = $("select[name='work_case']").val();
+		$.ajax({
+            type:'post',
+            dataType:'json',
+            data:{user:user,work_case:work_case},
+            url:"{:U('Casedemo/index')}",
+            success:function (response) {               
+            }
+        });
+	})
+})
+	
+</script>
+</body>
+</html>

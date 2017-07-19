@@ -82,11 +82,39 @@ class workflow{
 		}while(0);
 		return $ret;
 	}	
+	
 	//修改实例状态
 	private function case_status($data){		
 		$map['c_id']=$data['c_id'];
 		$update_data['c_state']=$data['c_state'];
 		M('work_case')->where($map)->save($update_data);
+	}
+	
+	//是否达到下一步条件
+	private function shenpi_map(){
+		
+	}
+	//获取当前流程可以执行的操作
+	public function get_act($data){
+		$ret = array('code'=>-1,'msg'=>'');
+        do{			
+			$stepmap['uid'] = $data['user'];
+			$stepmap['e_id'] = $data['work_case'];
+			$stepresult  = M('work_case_step')->where($stepmap)->order('step desc')->find();			
+			if($stepresult['w_id'] && $stepresult['w_id']!=2){//如果不是已完成
+				$map['step_id'] =$stepresult['step']; 
+				$map['w_id'] =$stepresult['w_id'];
+				$workflow_extendresult = M('workflow_extend')->where($map)->find();
+				//返回按钮、
+				$actmap['id']=array('in',$workflow_extendresult['action']);
+				$actresult = M('workflow_action')->where($actmap)->select();				
+				$ret['code'] = '1';
+				$ret['msg'] = '完成';
+				$ret['data'] = $actresult;
+				break;
+			}
+		}while(0);
+		return $ret;
 	}
 	
 }

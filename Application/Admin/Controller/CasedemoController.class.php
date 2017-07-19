@@ -8,6 +8,22 @@ namespace Admin\Controller;
 use Think\Controller;
 use \Common\Vendor\Workflow\workflow;
 class CasedemoController extends CommonController {	
+	public function index(){
+		if(IS_POST){
+			$data['user'] = $_POST['user'];
+			$data['work_case'] = $_POST['work_case'];
+			$workcase = new workflow();	
+			$result = $workcase->get_act($data);
+			print_r($result);die;
+			
+		}
+		$user = M('user')->select();			
+		$this->assign('user',$user);
+		//查找当前登录用户
+		$work_case = M('work_case')->select();
+		$this->assign('work_case',$work_case);				
+		$this->display();
+	}
 	
 	//涉及走工作流的,添加实例
     public function add_case()
