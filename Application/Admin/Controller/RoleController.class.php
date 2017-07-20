@@ -31,7 +31,10 @@ class RoleController extends CommonController {
 			$array_data[$key]['type']='user';
 		}
 		$array_data = array_merge($array_data,$role);
-		$json_data = json_encode($array_data);		
+		$json_data = json_encode($array_data);
+		//查找对应的action
+		$actresult = M('workflow_action')->select();
+		$this->assign('actresult',$actresult);
 		$this->assign('wid',$wid);
 		$this->assign('json_data',$json_data);
 		$this->display();

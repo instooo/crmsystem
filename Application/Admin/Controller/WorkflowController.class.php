@@ -26,14 +26,15 @@ class WorkflowController extends CommonController {
                 break;
             }
 			//[step] => steps1:user1|user2,steps2:user1
-					
+			//[acts] => steps1:act1|act2,steps2:act1
             $data = array();
             $data['w_name'] = I('post.w_name'); 
 			$data['w_createtime']=time();
 			//处理流程的几个步骤
 			$steps=I('post.step');
+			$acts=rtrim(I('post.act'),',');			
 			$steps_arr = explode(',',$steps);	
-			
+			$acts_arr = explode(',',$acts);
 			
             if (!$data['w_name']) {
                 $ret['code'] = -2;
@@ -64,6 +65,12 @@ class WorkflowController extends CommonController {
 				$extend_data[$key]['child_wid']=0;
 				$extend_data[$key]['w_id']=$rs;
 			}
+			foreach($acts_arr as $key=>$val ){
+				$tmp_ar=explode(':',$val);					
+				$extend_data[$key]['step_id']=str_replace('steps','',$tmp_ar[0]);
+				$extend_data[$key]['action']=str_replace('user','',rtrim($tmp_ar[1],'|'));
+				$extend_data[$key]['status']=1;
+			}			
 			$map['w_id']=$rs;			
 			$extend = M('workflow_extend')->where($map)->find(); 
 			if ($extend) {

@@ -70,21 +70,28 @@ $(document).ready(function(){
 				return false;
 			}
 			var len = $(".steps ol li").length-2;
-			var formjson="";		
+			var formjson="";
+			var actjson="";				
 			for(var i=1;i<len;i++){
-				var bb= $(".steps ol li").eq(i+1).find(".set-person").attr('data-uid');				
+				var bb= $(".steps ol li").eq(i+1).find(".set-person").attr('data-uid');	
+				var act= $(".steps ol li").eq(i+1).find(".set-person").attr('data-act');				
 				if(bb=='undefined'||!bb){
 					layer.msg('审批流程不能为空', {icon:5,time:1000});
 					return false;
 				}
-				formjson += "steps"+i+":"+bb + ",";				
+				if(act=='undefined'||!act){
+					layer.msg('操作不能为空', {icon:5,time:1000});
+					return false;
+				}
+				formjson += "steps"+i+":"+bb + ",";	
+				actjson += "steps"+i+":"+act + ",";		
 			}
 			if (formjson.length > 0 ) formjson = formjson.substring(0, formjson.length-1);			
 			
 			$.ajax({
 				type:'post',
 				dataType:'json',
-				data:{w_name:w_name,step:formjson},
+				data:{w_name:w_name,step:formjson,act:actjson},
 				url:'/workflow/workflow_add',
 				error:function () {
 					layer.msg('未知错误', {icon:5,time:1000});

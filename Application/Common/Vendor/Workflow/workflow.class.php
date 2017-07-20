@@ -109,8 +109,8 @@ class workflow{
 				$actmap['id']=array('in',$workflow_extendresult['action']);
 				$actresult = M('workflow_action')->where($actmap)->select();				
 				$ret['code'] = '1';
-				$ret['msg'] = '完成';
-				$ret['data'] = $actresult;
+				$ret['msg'] = '完成';				
+				$ret['data']= $actresult;
 				break;
 			}
 		}while(0);

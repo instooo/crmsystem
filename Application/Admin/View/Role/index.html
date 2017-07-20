@@ -34,8 +34,14 @@
                 </div>
          </div> 
 		<div id="treeDemo" class="ztree" style="display:none;"></div>	
-		</div>		 
+		</div>		
 	</div>	
+	<div id="act" class='approval-form'>
+		<div style='width:23%;font-size:16px; font-weight:bolder; padding-bottom:10px;border-bottom:1px solid #e1e1e1'>选择执行操作</div>
+		<volist name="actresult" id='vo'>
+			<label style="float:left; line-height:18px; padding:5px;"><input style="margin-top:-2px;" type="checkbox" name="acts[]" value="{$vo.id}" >{$vo.des}</label>
+		</volist>
+	</div>
 	<div style="position:fixed; bottom:20px;padding: 20px 20px 5px 20px;"><input name="" type="button" class="btn" id="bumenbtn" value="确认保存"></div>	
 	<script>
 		$(function(){
@@ -51,14 +57,28 @@
 					});
 					return false;					
 				}
-				//$('.set-person', window.parent.document).html(aa);
+				var acts='';			
+				$("input[name='acts[]']:checked").each(function(){          
+				   acts += $(this).val()+"|";  
+				}); 
+				if(acts==""){
+					parent.layer.open({
+					  content: '请选择操作',
+					  scrollbar: false
+					});
+					return false;		
+				}
 				var wid ={$wid}+1;				
 				$(parent.document).find('.steps ol li').eq(wid).find('.set-person').html(aa);
 				$(parent.document).find('.steps ol li').eq(wid).find('.set-person').attr("data-uid",bb);
+				$(parent.document).find('.steps ol li').eq(wid).find('.set-person').attr("data-act",acts);
+				
 				$(parent.document).find('.steps ol li').eq(wid).find('.set-person').attr("isenable",'no');
 				var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
 				parent.layer.close(index);
 			})
+			
+			//选择执行操作
 			
 		})
 		var setting = {

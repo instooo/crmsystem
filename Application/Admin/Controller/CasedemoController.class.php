@@ -14,11 +14,20 @@ class CasedemoController extends CommonController {
 			$data['work_case'] = $_POST['work_case'];
 			$workcase = new workflow();	
 			$result = $workcase->get_act($data);
-			print_r($result);die;
+			$result['html']='';
+			foreach($result['data'] as $key=>$val){
+				$result['html'].="<input type='button' class='do' act='".$val['action']."' value='".$val['des']."'/>";
+			}
+			exit(json_encode($result));
 			
 		}
 		$user = M('user')->select();			
 		$this->assign('user',$user);
+		
+		$workflow = M('workflow')->select();			
+		$this->assign('workflow',$workflow);
+		
+		
 		//查找当前登录用户
 		$work_case = M('work_case')->select();
 		$this->assign('work_case',$work_case);				
@@ -28,10 +37,9 @@ class CasedemoController extends CommonController {
 	//涉及走工作流的,添加实例
     public function add_case()
     {	
-		$data['uid'] = $_SESSION['authId'];//用户id
-		$data['wid'] = 17;//添加合同时候，选择哪种流程
-		$data['c_id']='';//为空的时候,则添加新的实例
-		$data['title']='测试合同名称';//为空的时候,则添加新的实例
+		$data['uid'] = $_POST['user'];
+		$data['wid'] = $_POST['workflow'];
+		$data['title'] = $_POST['htname'];		
 		$workcase = new workflow();	
 		$workcase->doActive($data);
     }
@@ -39,9 +47,10 @@ class CasedemoController extends CommonController {
 	//获取流程状态
     public function step_go()
     {
-		$data['uid'] = $_SESSION['authId'];//用户id		
-		$data['c_id']= 1;//为空的时候,则添加新的实例		
+		$data['uid'] = $_POST['user'];
+		$data['c_id'] = $_POST['work_case'];
+		$data['act'] = $_POST['act'];		
 		$workcase = new workflow();	
-		$workcase->doStep($data);
+		$result = $workcase->doStep($data);
 	}
 }
