@@ -8,7 +8,44 @@ namespace Admin\Controller;
 use Think\Controller;
 use \Common\Vendor\Workflow\workflow;
 class CasedemoController extends CommonController {	
-	public function index(){
+	//获取当前账号
+	private function get_nowuid(){
+		if($_SESSION['tem_uid']){
+			//查找当前用户
+			$nowuid = $_SESSION['tem_uid'];			
+		}else if($_SESSION['authId']){
+			//查找当前用户
+			$nowuid = $_SESSION['authId'];
+		}else{
+			echo "未登录";die;
+		}
+		return $nowuid;
+	}
+	//切换当前账号
+	public function index(){	
+		if(IS_POST){			
+			$_SESSION['tem_uid'] = $_POST['user'];
+			//查找当前用户
+			$usermap['id'] = $_POST['user'];
+			$result = M('user')->where($usermap)->find();
+			exit(json_encode($result));			
+		}else{
+			$nowuid = $this->get_nowuid();			
+			$usermap['id'] = $nowuid ;	
+			$userinfo = M('user')->where($usermap)->find();
+			$this->assign('userinfo',$userinfo);
+			$user = M('user')->select();			
+			$this->assign('user',$user);
+			$this->display();
+		}		
+		
+	}
+	//查看当前用户拥有的合同
+	public function case_list(){
+		$this->display();
+	}
+
+	public function act(){
 		if(IS_POST){
 			$data['user'] = $_POST['user'];
 			$data['work_case'] = $_POST['work_case'];

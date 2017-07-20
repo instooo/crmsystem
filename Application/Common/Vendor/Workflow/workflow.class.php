@@ -97,11 +97,32 @@ class workflow{
 	//获取当前流程可以执行的操作
 	public function get_act($data){
 		$ret = array('code'=>-1,'msg'=>'');
-        do{			
+        do{	
+			//查看相关实例是否存在
+			$caseremap['e_id'] = $data['work_case'];
+			$casere = M('work_case')->where($caseremap)->find();
+			if(!$casere){
+				$ret['code'] = '-1';
+				$ret['msg'] = '实例不存在';	
+				break;
+			}
+			//查找实例目前目前进行到哪一步
 			$stepmap['uid'] = $data['user'];
 			$stepmap['e_id'] = $data['work_case'];
 			$stepresult  = M('work_case_step')->where($stepmap)->order('step desc')->find();			
-			if($stepresult['w_id'] && $stepresult['w_id']!=2){//如果不是已完成
+			//如果还未送审
+			if(!$stepresult){
+				if($stepmap['uid'] == $casere['c_create_uid']){
+					$ret['code'] = '1';
+					$ret['msg'] = '完成';				
+					$ret['data'][]= array('action'=>'so_start','des'=>'提交审批',);
+					break;
+				}else{
+					$ret['code'] = '-1';
+					$ret['msg'] = '无当前实例数据';		
+				}		
+			}
+			if($stepresult['w_id'] && ($stepresult['st_status']==0||$stepresult['st_status']==1)){//如果不是已完成
 				$map['step_id'] =$stepresult['step']; 
 				$map['w_id'] =$stepresult['w_id'];
 				$workflow_extendresult = M('workflow_extend')->where($map)->find();
@@ -112,6 +133,9 @@ class workflow{
 				$ret['msg'] = '完成';				
 				$ret['data']= $actresult;
 				break;
+			}else{
+				$ret['code'] = '-1';
+				$ret['msg'] = '已完成';		
 			}
 		}while(0);
 		return $ret;

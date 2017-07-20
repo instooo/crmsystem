@@ -1,0 +1,104 @@
+<html>
+<head>
+<script language="JavaScript" src="{:C('STATIC_URL')}/js/jquery.js"></script>
+<script type="text/javascript" src="{:C('STATIC_URL')}/ztree/js/jquery.ztree.core.js"></script>
+<script type="text/javascript" src="{:C('STATIC_URL')}/ztree/js/jquery.ztree.excheck.js"></script>
+<link href="{:C('STATIC_URL')}/css/style.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="{:C('STATIC_URL')}/ztree/css/zTreeStyle/zTreeStyle.css" type="text/css">
+<style>
+.caozuo{float:right; margin}
+.caozuo input { width:80px; height:20px; margin-left:10px;}
+body,input,select{ font-size:14px; line-height:18px;}
+</style>
+</head>
+<body style="overflow-x: hidden;overflow-y: auto;">	
+<b style=" font-size:16px">用户：</b><select name="user">
+<volist name='user' id='vo'>
+<option value="{$vo.id}">{$vo.username}</option>
+</volist>
+</select>
+<b style=" font-size:16px">实例（具体合同）：</b>
+<select name="work_case">
+<volist name='work_case' id='vo'>
+<option value="{$vo.c_id}">{$vo.c_title}</option>
+</volist>
+</select>
+<input name="" type="button" class="btn" id="bumenbtn" value="切换账号">
+
+<div class="caozuo"></div>	
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<b style=" font-size:16px">用户：</b>
+<select name="user_case">
+<volist name='user' id='vo'>
+<option value="{$vo.id}">{$vo.username}</option>
+</volist>
+</select>
+<b style=" font-size:16px">流程（属于哪个流程）：</b>
+<select name="workflow">
+<volist name='workflow' id='vo'>
+<option value="{$vo.w_id}">{$vo.w_name}</option>
+</volist>
+</select>
+<b style=" font-size:16px">实例名称：</b>
+<input name="htname" type="txt"  id="htname" value="">
+<input name="" type="button" class="btn" id="casebtn" value="添加实例">
+
+
+<script>
+$(function(){
+	$("#bumenbtn").click(function(){
+		var user = $("select[name='user']").val();
+		var work_case = $("select[name='work_case']").val();
+		$.ajax({
+            type:'post',
+            dataType:'json',
+            data:{user:user,work_case:work_case},
+            url:"{:U('Casedemo/index')}",
+            success:function (response) {  
+				if(response.code==1){					
+					$(".caozuo").html(response.html);
+				}
+            }
+        });
+	})	
+	$("#casebtn").click(function(){
+		var user = $("select[name='user_case']").val();
+		var workflow = $("select[name='workflow']").val();
+		var htname =$("#htname").val(); 
+		$.ajax({
+            type:'post',
+            dataType:'json',
+            data:{user:user,workflow:workflow,htname:htname},
+            url:"{:U('Casedemo/add_case')}",
+            success:function (response) {  
+				if(response.code==1){					
+					$(".caozuo").html(response.html);
+				}
+            }
+        });
+	})	
+})
+$(document).on("click",'.do',function(){
+	var act = $(this).attr('act');
+	var user = $("select[name='user']").val();
+	var work_case = $("select[name='work_case']").val();	
+	$.ajax({
+		type:'post',
+		dataType:'json',
+		data:{user:user,work_case:work_case,act:act},
+		url:"{:U('Casedemo/step_go')}",
+		success:function (response) {  
+			alert (1);
+		}
+   });
+});
+
+	
+</script>
+</body>
+</html>
