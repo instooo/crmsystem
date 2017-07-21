@@ -8,6 +8,12 @@ namespace Admin\Controller;
 use Think\Controller;
 use \Common\Vendor\Workflow\workflow;
 class CasedemoController extends CommonController {	
+	public function  _initialize(){		
+		$nowuid = $this->get_nowuid();			
+		$usermap['id'] = $nowuid ;	
+		$userinfo = M('user')->where($usermap)->find();
+		$this->assign('userinfo',$userinfo);
+	}
 	//获取当前账号
 	private function get_nowuid(){
 		if($_SESSION['tem_uid']){
@@ -41,7 +47,30 @@ class CasedemoController extends CommonController {
 		
 	}
 	//查看当前用户拥有的合同
-	public function case_list(){
+	public function case_list(){		
+		$nowuid = $this->get_nowuid();	
+		//查找所拥有的合同实例
+		$type=$_GET['type'];
+		$type=$type?$type:'done';
+		if($type == 'done'){//完成的实例
+			$map['c_create_uid'] = $nowuid;
+			$map['c_state'] = 2;
+			$result = M('work_case a')			
+			->where($map)			
+			->select();
+		}else if($type == 'doing'){//正在进行的实例
+			$map['a.c_create_uid'] = $nowuid;
+			$map['a.c_state'] = 1;
+			$result = M('work_case a')
+			->field("a.c_id,distinct('b.c_id')")
+			->join('crm_work_case_log b on b.c_id=a.c_id')
+			->where($map)
+			->order('b.step desc')
+			->select();
+			print_r( M('work_case a')->getLastSql());die;
+		}
+		
+		$this->assign('list',$result);
 		$this->display();
 	}
 
