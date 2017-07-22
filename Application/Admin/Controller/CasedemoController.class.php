@@ -43,43 +43,29 @@ class CasedemoController extends CommonController {
 			$user = M('user')->select();			
 			$this->assign('user',$user);
 			$this->display();
-		}		
-		
+		}
 	}
 	//查看当前用户拥有的合同
 	public function case_list(){		
 		$nowuid = $this->get_nowuid();	
 		//查找所拥有的合同实例
 		$type=$_GET['type'];
-		$type=$type?$type:'done';
-		if($type == 'done'){//完成的实例
-			$map['c_create_uid'] = $nowuid;
-			$map['c_state'] = 2;
-			$result = M('work_case a')			
-			->where($map)			
-			->select();
-		}else if($type == 'doing'){//正在进行的实例
-			$map['a.c_create_uid'] = $nowuid;
-			$map['a.c_state'] = 1;
-			$result = M('work_case a')
-			->field("a.c_id,distinct('b.c_id')")
-			->join('crm_work_case_log b on b.c_id=a.c_id')
-			->where($map)
-			->order('b.step desc')
-			->select();
-			print_r( M('work_case a')->getLastSql());die;
-		}
-		
-		$this->assign('list',$result);
+		$type=$type?$type:'done';		
+		$data['user'] =$nowuid;
+		$data['type'] = $type;
+		$workcase = new workflow();	
+		$result = $workcase->caselist_detail($data);
+		$this->assign('list',$result['data']);
 		$this->display();
 	}
-
+	//获取当前实例的操作
 	public function act(){
-		if(IS_POST){
-			$data['user'] = $_POST['user'];
-			$data['work_case'] = $_POST['work_case'];
-			$workcase = new workflow();	
-			$result = $workcase->get_act($data);
+		$nowuid = $this->get_nowuid();	
+		$workcase = new workflow();	
+		if(IS_POST){			
+			$data['user'] =$nowuid;
+			$data['work_case'] = $_POST['work_case'];			
+			$result = $workcase->get_act($data);			
 			$result['html']='';
 			foreach($result['data'] as $key=>$val){
 				$result['html'].="<input type='button' class='do' act='".$val['action']."' value='".$val['des']."'/>";
@@ -87,36 +73,36 @@ class CasedemoController extends CommonController {
 			exit(json_encode($result));
 			
 		}
-		$user = M('user')->select();			
-		$this->assign('user',$user);
-		
-		$workflow = M('workflow')->select();			
-		$this->assign('workflow',$workflow);
-		
-		
-		//查找当前登录用户
-		$work_case = M('work_case')->select();
-		$this->assign('work_case',$work_case);				
+		//查找当前登录用户拥有的实例	
+		$casedata['user'] =$nowuid;
+		$work_case = $workcase->caselist($casedata);
+		$this->assign('work_case',$work_case['data']);				
 		$this->display();
 	}
 	
-	//涉及走工作流的,添加实例
-    public function add_case()
-    {	
-		$data['uid'] = $_POST['user'];
-		$data['wid'] = $_POST['workflow'];
-		$data['title'] = $_POST['htname'];		
-		$workcase = new workflow();	
-		$workcase->doActive($data);
-    }
+	
+	//添加合同和实例
+	public function addcase(){
+		if(IS_POST){			
+			$data['uid'] = $this->get_nowuid();	
+			$data['wid'] = $_POST['workflow'];
+			$data['title'] = $_POST['htname'];				
+			$workcase = new workflow();	
+			$workcase->addCase($data);
+		}
+		$workflow = M('workflow')->select();			
+		$this->assign('workflow',$workflow);
+		$this->display();
+	}
 
 	//获取流程状态
     public function step_go()
     {
-		$data['uid'] = $_POST['user'];
+		$data['uid'] = $this->get_nowuid();	
 		$data['c_id'] = $_POST['work_case'];
-		$data['act'] = $_POST['act'];		
+		$data['act'] = $_POST['act'];				
 		$workcase = new workflow();	
 		$result = $workcase->doStep($data);
+		exit(json_encode($result));
 	}
 }

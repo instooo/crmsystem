@@ -9,30 +9,6 @@
 .caozuo{float:right; margin}
 .caozuo input { width:80px; height:20px; margin-left:10px;}
 body,input,select{ font-size:14px; line-height:18px;}
-table.gridtable {
-	font-family: verdana,arial,sans-serif;
-	font-size:11px;
-	color:#333333;
-	border-width: 1px;
-	border-color: #666666;
-	border-collapse: collapse;
-	width:99%;
-}
-table.gridtable th {
-	border-width: 1px;
-	padding: 6px;
-	border-style: solid;
-	border-color: #666666;
-	background-color: #dedede;
-}
-table.gridtable td {
-	border-width: 1px;
-	padding: 6px;
-	border-style: solid;
-	border-color: #666666;
-	background-color: #ffffff;
-	text-align:center;
-}
 </style>
 </head>
 <body style="overflow-x: hidden;overflow-y: auto;">	
@@ -42,8 +18,7 @@ table.gridtable td {
 <br/>
 <a href="/casedemo" class="btn" >首页</a>
 <br/>
-<br/>
-<a  class="btn" style='display:block; float:left; margin-left:5px; text-align:center; line-height:28px;' href='/casedemo/case_list'>我的合同</a>
+<br/><a  class="btn" style='display:block; float:left; margin-left:5px; text-align:center; line-height:28px;' href='/casedemo/case_list'>我的合同</a>
 <a  class="btn" style='display:block; float:left; margin-left:5px; text-align:center; line-height:28px;' href='/casedemo/addcase'>添加合同</a>
 <a  class="btn" style='display:block; float:left; margin-left:5px; text-align:center; line-height:28px;' href='/casedemo/act'>合同审批</a>
 <br/>
@@ -52,28 +27,35 @@ table.gridtable td {
 <br/><br/>
 <br/><br/>
 <br/>
-
-<ul>
-<li><a class="btn" style='display:block; float:left; margin-left:5px; text-align:center; line-height:28px;'href="/casedemo/case_list?type=done">处理完成</a></li>
-<li><a class="btn" style='display:block; float:left; margin-left:5px; text-align:center; line-height:28px;' href="/casedemo/case_list?type=doing">正在执行</a></li>
-</ul>
-
-<br/>
-
-
-<table class="gridtable">
-<tr>
-<th>合同ID</th>
-<th>合同名称</th>
-<th>合同状态</th>
-</tr>
-<volist name='list' id="vo">
-<tr>
-	<td>{$vo.c_id}</td>
-	<td>{$vo.c_title}</td>
-	<td>{$vo.c_state}</td>
-</tr>
+<b style=" font-size:16px">流程（属于哪个流程）：</b>
+<select name="workflow">
+<volist name='workflow' id='vo'>
+<option value="{$vo.w_id}">{$vo.w_name}</option>
 </volist>
-</table>
+</select>
+<b style=" font-size:16px">实例名称：</b>
+<input name="htname" type="txt"  id="htname" value="">
+<input name="" type="button" class="btn" id="casebtn" value="添加实例">
+
+
+<script>
+$(function(){
+	$("#casebtn").click(function(){		
+		var workflow = $("select[name='workflow']").val();
+		var htname =$("#htname").val(); 
+		$.ajax({
+            type:'post',
+            dataType:'json',
+            data:{workflow:workflow,htname:htname},
+            url:"{:U('Casedemo/addcase')}",
+            success:function (response) {  
+				if(response.code==1){					
+					$(".caozuo").html(response.html);
+				}
+            }
+        });
+	})	
+})	
+</script>
 </body>
 </html>
