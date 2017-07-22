@@ -11,14 +11,11 @@ use Org\Util\Rbac;
 
 class PublicController extends Controller {
     public function test() {
-        //$datalist   =   D('Node')->getNodeListByUid($_SESSION[C('USER_AUTH_KEY')]);
-        //$tree = D('Node')->getChildNode(0,$datalist);
-        //dump($tree);die;
-        //dump(Rbac::getAccessList(2));die;
-
-        //$data = array();
-        //if ($data) echo 111;
-        dump($_SESSION);
+        dump($_SESSION);die;
+        $max_id = M('user')->max('id');
+        $num = $max_id?$max_id+1:1;
+        dump(strlen($num));die;
+        dump(array_fill(0,5,0));
     }
 
     public function adduser() {
@@ -69,6 +66,7 @@ class PublicController extends Controller {
             }
             $_SESSION[C('USER_AUTH_KEY')] = $userinfo['id'];
             $_SESSION['username'] = $userinfo['username'];
+            $_SESSION['user_number'] = $userinfo['user_number'];
             if (in_array($username, array("admin"))) {
                 $_SESSION[C('ADMIN_AUTH_KEY')] = true;
             }

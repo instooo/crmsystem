@@ -397,8 +397,13 @@ class PermissionController extends CommonController {
                 $return_data['msg'] = '您添加的用户名已存在';
                 break;
             }
+            $max_id = M('user')->max('id');
+            $num = $max_id?$max_id+1:1;
+            $user_num = 's'.implode('', array_fill(0, 5-strlen($num), 0)).$num.'n';
+
 
             $data = array();
+            $data['user_number'] = $user_num;
             $data['username'] = $username;
             $data['password'] = md5($password);
             $data['nickname'] = $nickname;
