@@ -7,6 +7,7 @@
  */
 namespace Admin\Controller;
 
+use Common\Vendor\Workflow\workflow;
 use Think\Controller;
 use Org\Util\Rbac;
 
@@ -315,6 +316,17 @@ class CommonController extends Controller {
                 $return_data['msg'] = '保存失败';
                 break;
             }
+
+            if ($post['fieldtype'] == 'agreement') {
+                //添加当前合同实例
+                $adddata = array();
+                $adddata['uid'] = $_SESSION[C('USER_AUTH_KEY')];
+                $adddata['wid'] = 1;
+                $adddata['title'] = $data['agree_name'];
+                $workcase = new workflow();
+                $workcase->doActive($adddata);
+            }
+
             $partnerConfig = include(CONF_PATH.'partner.config.php');
             \Common\Vendor\Eventlog::saveLog('添加了'.$partnerConfig['FIELDS_TYPE'][$post['fieldtype']], $rs, $post['fieldtype']);
 
