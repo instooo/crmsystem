@@ -54,8 +54,9 @@ table.gridtable td {
 <br/>
 
 <ul>
-<li><a class="btn" style='display:block; float:left; margin-left:5px; text-align:center; line-height:28px;'href="/casedemo/case_list?type=done">处理完成</a></li>
-<li><a class="btn" style='display:block; float:left; margin-left:5px; text-align:center; line-height:28px;' href="/casedemo/case_list?type=doing">正在执行</a></li>
+<li><a class="btn" style='display:block; float:left; margin-left:5px; text-align:center; line-height:28px;'href="/casedemo/case_list?type=mine">我的合同</a></li>
+<li><a class="btn" style='display:block; float:left; margin-left:5px; text-align:center; line-height:28px;'href="/casedemo/case_list?type=done">已审合同</a></li>
+<li><a class="btn" style='display:block; float:left; margin-left:5px; text-align:center; line-height:28px;' href="/casedemo/case_list?type=doing">待审合同</a></li>
 </ul>
 
 <br/>
@@ -66,12 +67,20 @@ table.gridtable td {
 <th>合同ID</th>
 <th>合同名称</th>
 <th>合同状态</th>
+<th>操作</th>
 </tr>
 <volist name='list' id="vo">
 <tr>
 	<td>{$vo.c_id}</td>
 	<td>{$vo.c_title}</td>
-	<td>{$vo.c_state}</td>
+	<if condition='$vo.c_state eq 2'>
+	<td>已完成</td>
+	<elseif condition='$vo.c_state eq 0'/>
+	<td>草稿</td>
+	<else/>
+	<td>{$vo.c_state}{$vo.des}</td>
+	</if>
+	<td><a href="/casedemo/onecase/cid/{$vo.c_id}">查看</td>
 </tr>
 </volist>
 </table>

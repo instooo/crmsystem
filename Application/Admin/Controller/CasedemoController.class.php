@@ -9,7 +9,7 @@ use Think\Controller;
 use \Common\Vendor\Workflow\workflow;
 class CasedemoController extends CommonController {	
 	public function  _initialize(){		
-		$nowuid = $this->get_nowuid();			
+		$nowuid = $this->get_numuid();			
 		$usermap['id'] = $nowuid ;	
 		$userinfo = M('user')->where($usermap)->find();
 		$this->assign('userinfo',$userinfo);
@@ -27,16 +27,31 @@ class CasedemoController extends CommonController {
 		}
 		return $nowuid;
 	}
+	//获取当前账号
+	private function get_numuid(){
+		if($_SESSION['tem_num']){
+			//查找当前用户
+			$nowuid = $_SESSION['tem_num'];			
+		}else if($_SESSION['authId']){
+			//查找当前用户
+			$nowuid = $_SESSION['authId'];
+		}else{
+			echo "未登录";die;
+		}
+		return $nowuid;
+	}
+	
 	//切换当前账号
 	public function index(){	
 		if(IS_POST){			
-			$_SESSION['tem_uid'] = $_POST['user'];
+			$_SESSION['tem_uid'] = 's'.$_POST['user'].'n';
+			$_SESSION['tem_num'] = $_POST['user'];
 			//查找当前用户
 			$usermap['id'] = $_POST['user'];
 			$result = M('user')->where($usermap)->find();
 			exit(json_encode($result));			
 		}else{
-			$nowuid = $this->get_nowuid();			
+			$nowuid = $this->get_numuid();			
 			$usermap['id'] = $nowuid ;	
 			$userinfo = M('user')->where($usermap)->find();
 			$this->assign('userinfo',$userinfo);
@@ -50,12 +65,36 @@ class CasedemoController extends CommonController {
 		$nowuid = $this->get_nowuid();	
 		//查找所拥有的合同实例
 		$type=$_GET['type'];
-		$type=$type?$type:'done';		
+		$type=$type?$type:'mine';		
 		$data['user'] =$nowuid;
 		$data['type'] = $type;
 		$workcase = new workflow();	
 		$result = $workcase->caselist_detail($data);
 		$this->assign('list',$result['data']);
+		$this->display();
+	}
+	
+	//查看当前合同具体信息
+	public function onecase(){
+		$cid = $_GET['cid'];
+		if($cid==''){
+			echo "参数不全";die;
+		}else{
+			$nowuid = $this->get_nowuid();	
+			$workcase = new workflow();				
+			$data['user'] =$nowuid;
+			$data['work_case'] = $cid;			
+			$result = $workcase->get_act($data);			
+			$result['html']='';
+			foreach($result['data'] as $key=>$val){
+				$result['html'].="<input type='button' class='do' act='".$val['action']."' value='".$val['des']."'/>";
+			}
+			//查找当前登录用户拥有的实例	
+			$casedata['c_id'] =$cid;			
+			$work_case = $workcase->onecase($casedata);			
+			$this->assign('result',$result);	
+			$this->assign('work_case',$work_case);	
+		}
 		$this->display();
 	}
 	//获取当前实例的操作
@@ -100,7 +139,7 @@ class CasedemoController extends CommonController {
     {
 		$data['uid'] = $this->get_nowuid();	
 		$data['c_id'] = $_POST['work_case'];
-		$data['act'] = $_POST['act'];				
+		$data['act'] = $_POST['act'];		
 		$workcase = new workflow();	
 		$result = $workcase->doStep($data);
 		exit(json_encode($result));
