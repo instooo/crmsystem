@@ -9,6 +9,7 @@
 .caozuo{float:right; margin}
 .caozuo input { width:80px; height:20px; margin-left:10px;}
 body,input,select{ font-size:14px; line-height:18px;}
+li{ line-height:18px; margin-top:5px; border:1px solid #ccc;}
 </style>
 </head>
 <body style="overflow-x: hidden;overflow-y: auto;">	
@@ -21,19 +22,24 @@ body,input,select{ font-size:14px; line-height:18px;}
 <br/>
 <a  class="btn" style='display:block; float:left; margin-left:5px; text-align:center; line-height:28px;' href='/casedemo/case_list'>我的合同</a>
 <a  class="btn" style='display:block; float:left; margin-left:5px; text-align:center; line-height:28px;' href='/casedemo/addcase'>添加合同</a>
-<a  class="btn" style='display:block; float:left; margin-left:5px; text-align:center; line-height:28px;' href='/casedemo/act'>合同审批</a>
 <br/>
 <br/><br/>
 <br/><br/>
 <br/><br/>
 <br/><br/>
 <br/>
-<b style=" font-size:16px">具体合同名称:{$work_case.c_title}</b>
-<input type='hidden' name='work_case' value="{$work_case.c_id}">
+<b style=" font-size:16px">具体合同名称:{$work_case.info.c_title}</b>
+<input type='hidden' name='work_case' value="{$work_case.info.c_id}">
 <div class="caozuo">{$result.html}</div>	
 <br/>
 <br/>
 <br/>
+<b style=" font-size:16px">历史记录</b>
+<ul>
+<volist name="work_case['history']" id='vo'>
+<li>{$vo.uid}在{$vo.create_time|date='Y-m-d H:i:s',###}{$vo.des}</li>
+</volist>
+</ul>
 <br/>
 <br/>
 <br/>
@@ -42,6 +48,10 @@ body,input,select{ font-size:14px; line-height:18px;}
 $(document).on("click",'.do',function(){
 	var act = $(this).attr('act');	
 	var work_case = $("input[name='work_case']").val();	
+	if(act =='return'){
+		  window.history.go(-1);
+		  return false;
+	}
 	$.ajax({
 		type:'post',
 		dataType:'json',

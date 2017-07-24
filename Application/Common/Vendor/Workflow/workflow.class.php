@@ -4,64 +4,62 @@
 *author:dengxiaolong
 */
 namespace Common\Vendor\Workflow;
+use \Common\Vendor\Workflow\caselog;
 
 class workflow{	
+	
+	//获取单个实例的具体信息
+	public function onecase($data){
+		$map['c_id']=$data['c_id'];
+		$result['info'] = M('work_case a')			
+			->where($map)			
+			->find();
+		$result['history'] = M('work_case_log')			
+			->where($map)
+			->order('step desc')
+			->select();
+		return $result;
+	}
 	
 	//获取当前用户拥有实例列表
 	public function caselist($data){
 		$ret = array('code'=>-1,'msg'=>'');
         do{	
 			$type = $data['type'];
-			$nowuid = $data['user'];		
-			$map['c_create_uid'] = $nowuid;			
-			$result = M('work_case a')			
-			->where($map)			
-			->select();
-			if($result){
-				$ret['code'] = '1';
-				$ret['msg'] = '获得数据';
-				$ret['data'] = $result;
-			}	
-			break;
-		}while(0);
-		return $ret;		
-	}	
-	
-	//获取单个实例的具体信息
-	public function onecase($data){
-		$map['c_id']=$data['c_id'];
-		$result = M('work_case a')			
-			->where($map)			
-			->find();
-		return $result;
-	}
-	//获取当前用户拥有实例列表
-	public function caselist_detail($data){
-		$ret = array('code'=>-1,'msg'=>'');
-        do{	
-			$type = $data['type'];
 			$nowuid = $data['user'];
 			if($type == 'mine'){//完成的实例
 				$map['a.c_create_uid'] = $nowuid;				
-				$result = M('work_case a')			
-						  ->join('crm_work_case_step b on a.c_id=b.c_id')
-						  ->join('crm_workflow_extend c on c.e_id=b.e_id and c.w_id=b.w_id')						
+				$result = M('work_case a')
+						  ->join('crm_work_case_log b on b.c_id=a.c_id and a.step=b.step')
 						  ->where($map)			
-						  ->select();
+						  ->select();				
 			}else if($type == 'done'){//已完成的审核
-				$map['uid'] = $nowuid;
-				$result = M('work_case_step')
-						  ->where($map)
-						  ->select();
+				//查找审核过的合同
+				$map['a.uid'] = $nowuid;
+				$map['a.step'] = array('not in',array(-1,0));		
+				$result_tmp = M('work_case_log a')
+						  ->field('a.c_id')									  
+						  ->where($map)			
+						  ->select();				
+				if(!$result_tmp){
+					break;
+				}
+				//查找合同的状态		  
+				$c_idarr = array_column($result_tmp,'c_id');				
+				$mapnew['a.c_id'] = array('in',$c_idarr);				
+				$result = M('work_case_log a')						 
+						  ->join('crm_work_case b on b.c_id=a.c_id and a.step=b.step')
+						  ->where($mapnew)			
+						  ->select();				
+				
 			}else if($type == 'doing'){//正在进行的实例
 				$map['a.uid'] = array('like','%'.$nowuid.'%');
-				$map['a.st_status'] = array('in',array(0,1));				
+				$map['a.st_status'] = array('in',array(0));				
 				$result = M('work_case_step a')	
 						  ->join('crm_work_case b on a.c_id=b.c_id')
-						  ->join('crm_workflow_extend c on c.e_id=a.e_id and c.w_id=a.w_id')						
+						  ->join('crm_work_case_log c on c.c_id=a.c_id and b.step=c.step')
 						  ->where($map)			
-						  ->select();
-				print_r($result);
+						  ->select();				
 			}
 			if($result){
 				$ret['code'] = '1';
@@ -88,11 +86,23 @@ class workflow{
 			$adddata['c_id']='';
 			$adddata['w_id']=$data['wid'];
 			$adddata['c_title']=$data['title'];
-			$adddata['step']	=0;
+			$adddata['step']	=-1;
 			$adddata['c_state']	=0;
 			$adddata['c_create_uid']=$data['uid'];
 			$adddata['c_create_time']=time();
 			$result  =M ('work_case')->add($adddata);
+			
+			//添加日志			
+			$logdata['c_id']=$result;
+			$logdata['w_id']=$data['wid'];			
+			$logdata['step']	=-1;
+			$logdata['uid']	=$data['uid'];			
+			$logdata['act_id']=0;				
+			$logdata['des']="添加合同";
+			$logdata['status']=0;			
+			$workcase = new caselog();	
+			$workcase->addCaselog($logdata);
+			
 			if($result){
 				$ret['code'] = '1';
 				$ret['msg'] = '添加成功';
@@ -146,23 +156,26 @@ class workflow{
 					$extendmap['w_id'] = $caseresult['w_id'];
 					$extendresult = M ('workflow_extend')->where($extendmap)->order('step_id asc')->find();
 					
-					$adddata[0]['c_id']=$data['c_id'];
-					$adddata[0]['e_id']=0;
-					$adddata[0]['w_id']=0;
-					$adddata[0]['uid']=$data['uid'];
-					$adddata[0]['step']	=0;
-					$adddata[0]['st_status']=2;
-					$adddata[0]['st_create_time']=time();	
+					$adddata['c_id']=$data['c_id'];
+					$adddata['e_id']=$extendresult['e_id'];
+					$adddata['w_id']=$caseresult['w_id'];
+					$adddata['uid']=$extendresult['uid'];
+					$adddata['step']	=1;
+					$adddata['st_status']=0;
+					$adddata['st_create_time']=time();				
+					$result  =M ('work_case_step')->add($adddata);
 					
+					//添加日志			
+					$logdata['c_id']=$data['c_id'];
+					$logdata['w_id']=$caseresult['w_id'];	
+					$logdata['step']	=0;
+					$logdata['uid']	=$data['uid'];//用户id		
+					$logdata['act_id']=0;				
+					$logdata['des']="提交审核";
+					$logdata['status']=0;			
+					$workcase = new caselog();	
+					$workcase->addCaselog($logdata);
 					
-					$adddata[1]['c_id']=$data['c_id'];
-					$adddata[1]['e_id']=$extendresult['e_id'];
-					$adddata[1]['w_id']=$caseresult['w_id'];
-					$adddata[1]['uid']=$extendresult['uid'];
-					$adddata[1]['step']	=1;
-					$adddata[1]['st_status']=0;
-					$adddata[1]['st_create_time']=time();				
-					$result  =M ('work_case_step')->addAll($adddata);
 					if(!$result){
 						$ret['code'] = '-1';
 						$ret['msg'] = '系统错误';
@@ -172,28 +185,62 @@ class workflow{
 				//修改当前实例状态
 				$cdata['c_id']=$data['c_id'];
 				$cdata['c_state'] = 1;
-				$cdata['step'] = 1;
+				$cdata['step'] = 0;
 				$this->case_status($cdata);
 				$ret['code'] = '1';
 				$ret['msg'] = '提交审核成功';
 				break;
-			}else{					
+			}else
+			{					
 				//查找流程最大步骤
 				$extendmap['w_id'] = $caseresult['w_id'];
-				$extendresult = M ('workflow_extend')->where($extendmap)->order('step_id desc')->find();
-				$nowstep = $stepresult['step']?$stepresult['step']:0;				
-				if($nowstep < $extendresult['step_id']){
-					$adddata['e_id']=$data['c_id'];
-					$adddata['w_id']=$caseresult['w_id'];
-					$adddata['uid']=$data['uid'];
-					$adddata['step']	=$nowstep+1;
-					$adddata['st_status']=0;
-					$adddata['st_create_time']=time();
-					$result  =M ('work_case_step')->add($adddata);
-					($adddata['step']==$extendresult['step_id'])?$updatedata['c_state']=3:$updatedata['c_state']=2;				
-					$updatedata['c_id']=$data['c_id'];									
-					$this->case_status($updatedata);
-			
+				$extendresult = M ('workflow_extend')->where($extendmap)->order('step_id desc')->find();					
+				$nowstep = $stepresult['step'];		
+				if($nowstep <= $extendresult['step_id']){					
+					//修改上一步的状态
+					$ssmap['c_id']=$data['c_id'];
+					$ssmap['step']=$nowstep;	
+					$updatess['st_status']=($data['act']=='pass'?1:2);
+					$result  =M ('work_case_step')->where($ssmap)->save($updatess);					
+					
+					//添加日志记录					
+					$logdata['c_id']=$data['c_id'];
+					$logdata['w_id']=$caseresult['w_id'];	
+					$logdata['step']	=$nowstep;
+					$logdata['uid']	=$data['uid'];//用户id		
+					$logdata['act_id']=0;				
+					$logdata['des']= ($data['act']=='pass'?"审核通过":"审核不通过");
+					$logdata['status']=0;			
+					$workcase = new caselog();	
+					$workcase->addCaselog($logdata);
+					
+					//添加下一个流程的记录
+					if($nowstep < $extendresult['step_id']){						
+						//查找下一步流程
+						$extendmap['w_id'] = $caseresult['w_id'];
+						$extendmap['step_id']=$nowstep+1;
+						$nextresult = M ('workflow_extend')->where($extendmap)->order('step_id desc')->find();
+						
+						
+						$adddata['c_id']=$data['c_id'];
+						$adddata['e_id']=$nextresult['e_id'];
+						$adddata['w_id']=$caseresult['w_id'];
+						$adddata['uid']=$nextresult['uid'];
+						$adddata['step']	=$nowstep+1;
+						$adddata['st_status']=0;
+						$adddata['st_create_time']=time();
+						$result  =M ('work_case_step')->add($adddata);		
+					}
+							
+
+					//修改当前实例状态
+					$cdata['c_id']=$data['c_id'];
+					$cdata['c_state'] = ($nowstep ==$extendresult['step_id'])?2:1;
+					$cdata['step'] = $nowstep;
+					$this->case_status($cdata);
+					$ret['code'] = '1';
+					$ret['msg'] = '提交审核成功';
+					break;
 				}else{
 					$ret['code'] = '1';
 					$ret['msg'] = '项目已完成';
@@ -219,48 +266,61 @@ class workflow{
 		$ret = array('code'=>-1,'msg'=>'');
         do{					
 			//查看相关实例是否存在
+			$uid = $data['user'];	
 			$caseremap['c_id'] = $data['work_case'];			
 			$casere = M('work_case')->where($caseremap)->find();			
 			if(!$casere){
 				$ret['code'] = '-1';
 				$ret['msg'] = '实例不存在';	
 				break;
-			}
-			//查找实例目前目前进行到哪一步
-			$stepmap['uid'] = array('like','%'.$data['user'].'%');
-			$stepmap['c_id'] = $data['work_case'];			
-			$stepresult  = M('work_case_step')->where($stepmap)->order('step desc')->find();			
-			//如果还未送审
-			if(!$stepresult){
-				if($data['user'] == $casere['c_create_uid']){
+			}else if($casere['c_state']==2){
+				$ret['code'] = '-1';
+				$ret['msg'] = '已完成';	
+				$ret['data'][]= array(
+					'action'=>'return',
+					'des'=>'返回'
+				);			
+				break;	
+			}else{
+				if($casere['step']==0){
+					if($casere['c_create_uid']==$uid){
+						$ret['code'] = '1';
+						$ret['msg'] = '返回';				
+						$ret['data'][]= array('action'=>'return','des'=>'返回',);
+						break;
+					}else{
+						$ret['code'] = '-1';
+						$ret['msg'] = '已完成';	
+						$ret['data'][]= array(
+							'action'=>'pass',
+							'des'=>'通过'
+						);	
+						$ret['data'][]= array(
+							'action'=>'nopass',
+							'des'=>'不通过'
+						);					
+						break;	
+					}				
+					
+				}else if($casere['step']==-1){
 					$ret['code'] = '1';
-					$ret['msg'] = '完成';				
+					$ret['msg'] = '提交审批';				
 					$ret['data'][]= array('action'=>'so_start','des'=>'提交审批',);
 					break;
 				}else{
 					$ret['code'] = '-1';
-					$ret['msg'] = '无当前实例数据';		
-					break;
-				}		
+					$ret['msg'] = '已完成';	
+					$ret['data'][]= array(
+						'action'=>'pass',
+						'des'=>'通过'
+					);	
+					$ret['data'][]= array(
+						'action'=>'nopass',
+						'des'=>'不通过'
+					);					
+					break;	
+				}
 			}			
-			if($stepresult['w_id'] && ($stepresult['st_status']==0||$stepresult['st_status']==1)){//如果不是已完成
-				$map['step_id'] =$stepresult['step']; 
-				$map['w_id'] =$stepresult['w_id'];
-				$workflow_extendresult = M('workflow_extend')->where($map)->find();
-				//
-				$action = explode('|',$workflow_extendresult['action']);
-				//返回按钮、
-				$actmap['id']=array('in',$action);
-				$actresult = M('workflow_action')->where($actmap)->select();				
-				$ret['code'] = '1';
-				$ret['msg'] = '完成';				
-				$ret['data']= $actresult;
-				break;
-			}else{
-				$ret['code'] = '-1';
-				$ret['msg'] = '已完成';	
-				break;	
-			}
 		}while(0);
 		return $ret;
 	}

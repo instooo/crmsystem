@@ -25,13 +25,14 @@ class RoleController extends CommonController {
 			$role[$key]=$val;			
 		}
 		foreach($member as $key =>$val){			
-			$array_data[$key]['id']="user".$val['id'];	
+			//$array_data[$key]['id']="user".$val['id'];
+			$array_data[$key]['id']="user".$val['user_number'];				
 			$array_data[$key]['name']=$val['username'];		
 			$array_data[$key]['pId']=$val['role_id'];	
 			$array_data[$key]['type']='user';
 		}
 		$array_data = array_merge($array_data,$role);
-		$json_data = json_encode($array_data);
+		$json_data = json_encode($array_data);		
 		//查找对应的action
 		$actresult = M('workflow_action')->select();
 		$this->assign('actresult',$actresult);
