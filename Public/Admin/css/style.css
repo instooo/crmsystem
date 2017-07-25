@@ -115,6 +115,8 @@ h2{font-weight:normal;}
 .tools{clear:both; height: 46px; border-bottom: 1px solid #ccc; padding: 0 20px;}
 .toolbar{float:left;}
 .toolbar li{position: relative; border:solid 1px #d3dbde; float:left; text-align: center; min-width: 65px; padding: 0 20px; font-size: 16px; line-height: 45px; border-radius: 3px 3px 0 0; background-color: #f4f4f4;color: #222; margin-right:5px; cursor:pointer; border-bottom: 0;}
+.toolbar li a{min-width: 65px; font-size: 16px; line-height: 45px;color: #222;  cursor:pointer; border-bottom: 0;}
+
 .toolbar li span{float:left; margin-left:10px; margin-right:5px; margin-top:11px;}
 .toolbar1{float:right;}
 .toolbar1 li{background:url(../images/toolbg.gif) repeat-x; line-height:33px; height:33px; border:solid 1px #d3dbde; float:left; padding-right:10px; margin-left:5px;border-radius: 3px; behavior:url(js/pie.htc);}
@@ -132,8 +134,7 @@ h2{font-weight:normal;}
 
 .new_tablelist .tablelist td{text-align: center; border: 1px solid #ececec; line-height: 22px; padding: 10px 5px; font-size: 14px;}
 .new_tablelist .tablelist td font{font-size: 14px;}
-.toolbar li.current,.toolbar li:hover{color: #5092e1; background: #fff;}
-
+.toolbar li.current a,.toolbar li:hover a{color: #5092e1; }
 
 /*page*/
 .pagin{position:relative;margin-top:10px;padding:0 12px;}

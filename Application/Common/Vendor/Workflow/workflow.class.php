@@ -106,6 +106,9 @@ class workflow{
 			if($result){
 				$ret['code'] = '1';
 				$ret['msg'] = '添加成功';
+				$redata=$adddata;
+				$redata['c_id'] = $result;
+				$ret['data'] = $redata;
 				break;
 			}else{
 				$ret['code'] = '1';

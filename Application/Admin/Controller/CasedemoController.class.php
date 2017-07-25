@@ -14,19 +14,6 @@ class CasedemoController extends CommonController {
 		$userinfo = M('user')->where($usermap)->find();
 		$this->assign('userinfo',$userinfo);
 	}
-	//获取当前账号
-	private function get_numuid(){
-		if($_SESSION['tem_num']){
-			//查找当前用户
-			$nowuid = $_SESSION['tem_num'];			
-		}else if($_SESSION['authId']){
-			//查找当前用户
-			$nowuid = $_SESSION['authId'];
-		}else{
-			echo "未登录";die;
-		}
-		return $nowuid;
-	}
 	
 	//切换当前账号
 	public function index(){	

@@ -41,6 +41,22 @@ class CommonController extends Controller {
 
     }
 
+	
+	//获取当前账号
+	public function get_numuid(){
+		if($_SESSION['tem_num']){
+			//查找当前用户
+			$nowuid = $_SESSION['tem_num'];			
+		}else if($_SESSION['authId']){
+			//查找当前用户
+			$nowuid = $_SESSION['authId'];
+		}else{
+			echo "未登录";die;
+		}
+		return $nowuid;
+	}
+	
+	
     /**
      * 获取字段列表
      * @param $field_type
@@ -280,10 +296,15 @@ class CommonController extends Controller {
     /**
      * 添加数据
      */
-    public function addData() {
+    public function addData($extpar = array()) {
         $return_data = array('code'=>-1,'msg'=>'未知错误');
         do{
-            $post = $_POST;
+			if($extpar){
+				$post = $_POST;
+				$post = array_merge($post,$extpar);
+			}else{
+				 $post = $_POST;
+			}   			
             if (!$post['fieldtype']) {
                 $return_data['code'] = -1;
                 $return_data['msg'] = '参数不全';
@@ -315,18 +336,7 @@ class CommonController extends Controller {
                 $return_data['code'] = -4;
                 $return_data['msg'] = '保存失败';
                 break;
-            }
-
-            if ($post['fieldtype'] == 'agreement') {
-                //添加当前合同实例
-                $adddata = array();
-                $adddata['uid'] = $_SESSION[C('USER_AUTH_KEY')];
-                $adddata['wid'] = 1;
-                $adddata['title'] = $data['agree_name'];
-                $workcase = new workflow();
-                $workcase->doActive($adddata);
-            }
-
+            }			
             $partnerConfig = include(CONF_PATH.'partner.config.php');
             \Common\Vendor\Eventlog::saveLog('添加了'.$partnerConfig['FIELDS_TYPE'][$post['fieldtype']], $rs, $post['fieldtype']);
 
