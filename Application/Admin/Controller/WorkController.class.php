@@ -90,16 +90,18 @@ class WorkController extends CommonController {
         $klist = array_keys($fieldlist);
 
         $count = M('contact p')
-            ->field('p.*,u.id as user_id,u.nickname')
+            ->field('p.*,u.id as user_id,u.nickname,t.partner_name')
             ->join('left join crm_user u on u.id=p.owner')
+            ->join('left join crm_partner t on t.id=p.partner_id')
             ->count();
         $page = new \Think\Page($count, 20);
         $page->setConfig('prev', '&nbsp;');
         $page->setConfig('next', '&nbsp;');
 
         $datalist = M('contact p')
-            ->field('p.*,u.id,u.nickname')
+            ->field('p.*,u.id as user_id,u.nickname,t.partner_name')
             ->join('left join crm_user u on u.id=p.owner')
+            ->join('left join crm_partner t on t.id=p.partner_id')
             ->order('p.id desc')
             ->limit("{$page->firstRow},{$page->listRows}")
             ->select();
@@ -109,12 +111,19 @@ class WorkController extends CommonController {
             $tmp = $this->dataPaser($val, $fieldlist);
             $tmp['id'] = $val['id'];
             $tmp['user_id'] = $val['user_id'];
+            $tmp['partner_id'] = $val['partner_id'];
+            $tmp['partner_name'] = $val['partner_name'];
+            $tmp['addtime'] = $val['addtime'];
+            $tmp['nickname'] = $val['nickname'];
             $list[] = $tmp;
         }
 
         $this->assign('fieldlist', $fieldlist);
         $this->assign('pagebar', $page->show());
         $this->assign('list', $list);
+
+        $partner_list = M('partner')->select();
+        $this->assign('partner_list', $partner_list);
 
         $this->display();
     }
