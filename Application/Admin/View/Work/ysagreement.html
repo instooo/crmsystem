@@ -39,7 +39,7 @@
                 <tbody>
                 <volist name="list" id="vo">
                     <tr data-id="{$vo.id}">
-                        <td class="td_agree_name">{$vo.agree_name}</td>
+                        <td class="td_agree_name" data-cid="{$vo.c_id}">{$vo.agree_name}</td>
                         <td class="td_partner_id" data="{$vo.partner_id}">{$vo.partner_name}</td>
                         <td class="td_total_money">{$vo.total_money}</td>
                         <td>{$vo.nickname}</td>
@@ -56,11 +56,7 @@
 						<td>{$vo.uid}已{$vo.des}(进行中)</td>
 						</if>	
 
-						<if condition='$vo.c_state eq 0'>
-						<td><a href="javascript:;" class="tablelink edit">编辑</a> <a href="javascript:;" class="tablelink dele">删除</a></td>
-						<else/>
-						<td><a href="/casedemo/onecase/cid/{$vo.c_id}">查看</td>
-						</if>	
+						<td>{$vo.addtime|date='Y-m-d H:i:s',###}</td>
                     </tr>
                 </volist>
                 </tbody>
@@ -228,7 +224,19 @@
             });
         });
     });
-
+	//查看合同状态
+	$(document).on('click', '.td_agree_name', function (){
+	     var cid = $(this).attr('data-cid');
+		 layer_index = layer.open({
+			type: 2,
+			title: '合同详情',
+			skin: 'layui-layer-rim',
+			area: ['60%', '98%'],
+			shade: 0.1,
+			scrollbar: false,
+			content: '/Agreetment/detail/cid/'+cid,
+		});
+	});
 </script>
 
 <include file="Index/footer" />

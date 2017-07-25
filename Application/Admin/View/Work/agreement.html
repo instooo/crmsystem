@@ -39,7 +39,7 @@
                 <tbody>
                 <volist name="list" id="vo">
                     <tr data-id="{$vo.id}">
-                        <td class="td_agree_name">{$vo.agree_name}</td>
+                        <td class="td_agree_name" data-cid="{$vo.c_id}">{$vo.agree_name}</td>
                         <td class="td_partner_id" data="{$vo.partner_id}">{$vo.partner_name}</td>
                         <td class="td_total_money">{$vo.total_money}</td>
                         <td>{$vo.nickname}</td>
@@ -69,7 +69,7 @@
 <div id="add_temp" style="display: none">
     <ul class="forminfo">
         <form class="dataform" method="post" enctype="multipart/form-data" action="{:U('Work/addAgreement')}">
-            <input type="hidden" class="input_id" name="id" value="">
+            <input type="hidden" class="input_id" name="id" value="{$vo.c_id}">
             <input type="hidden" class="input_fieldtype" name="fieldtype" value="agreement">
             <li><label>合同名称</label><input name="agree_name" type="text" class="dfinput input_agree_name" value="" style="width: 300px"/></li>
 			<li>
@@ -225,6 +225,21 @@
         });
     });
 
+	
+	//查看合同状态
+	$(document).on('click', '.td_agree_name', function (){
+	     var cid = $(this).attr('data-cid');
+		 layer_index = layer.open({
+			type: 2,
+			title: '合同详情',
+			skin: 'layui-layer-rim',
+			area: ['60%', '98%'],
+			shade: 0.1,
+			scrollbar: false,
+			content: '/Agreetment/detail/cid/'+cid,
+		});
+	});
+	
 </script>
 
 <include file="Index/footer" />
