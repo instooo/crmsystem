@@ -1,0 +1,83 @@
+<html>
+<head>
+<script language="JavaScript" src="{:C('STATIC_URL')}/js/jquery.js"></script>
+<link href="{:C('STATIC_URL')}/css/style.css" rel="stylesheet" type="text/css" />
+</head>
+<body style="overflow-x: hidden;overflow-y: auto;">
+	
+<div class="detail_left_inner">
+	<div class="detail_left_head">
+		<span class="sp-icon"></span>
+		<input type='hidden' name='work_case' value="{$work_case.info.c_id}">
+		<span class="detail_left_title">{$work_case.info.c_title}</span>
+		<div class="caozuo">
+			{$result.html}
+		</div>
+	</div>
+	<div class="cus_simple_info">
+		<div>
+			客户名称：<span class="contract-customer-name">
+			测试公司</span>
+		</div>
+		<div>
+			<span class="inline-block marginR30">合同日期：2017-07-19&nbsp;&nbsp;至&nbsp;&nbsp;2017-07-19</span>
+			<span class="inline-block marginR30">合同总金额：123.00元</span>
+			<span class="inline-block">未回款金额：123.00元</span>
+		</div>
+		<div class="marginB5">
+			<span class="contract-detail-state" style="background-color:#ff6e7f">已作废</span>
+		</div>
+	</div>
+	
+	<div class="customer_tabs fn-clear">
+		<ul class="detail_main_nav">
+			<li><a class="slide-panel-tab slide_nav_hover" data-index="0" href="#">动态</a></li>
+			<li><a class="slide-panel-tab" data-index="1" href="#">回款</a></li>
+			<li><a class="slide-panel-tab" data-index="2" href="#">信息</a></li>
+			<li><a class="slide-panel-tab" data-index="4" href="#">文档</a></li>
+		</ul>
+	</div>
+	<div class="dynamic-input-info">	
+	</div> 
+	<div class="dynamic-detail-body">
+	<volist name="work_case['history']" id='vo'>		<div class="dynamic-replay-dialog">
+			<div class="dynamic-replay-body">
+				<div class="dynamic-replay-self-info">
+					<span class="crm-image-show-client" style="width: 40px; height: 40px; line-height: 40px; background-color: rgb(92, 179, 137);"></span>
+					<div class="dynamic-self-info">
+						<span class="dynamic-self-name">{$vo.uid}</span>
+					</div>
+					<div class="dynamic-self-mess">
+						<span class="dynamic-normal-content">{$vo.des}</span>					
+					</div>
+					<div class="dynamic-self-time">{$vo.create_time|date='Y-m-d H:i:s',###}</div>
+				</div>
+			</div>
+		</div>
+	</volist>	
+	</div>	
+</div>
+
+<script>
+$(document).on("click",'.do',function(){
+	var act = $(this).attr('act');	
+	var work_case = $("input[name='work_case']").val();	
+	if(act =='return'){
+		  window.history.go(-1);
+		  return false;
+	}
+	$.ajax({
+		type:'post',
+		dataType:'json',
+		data:{work_case:work_case,act:act},
+		url:"{:U('Casedemo/step_go')}",
+		success:function (response) {  
+			 location.reload() 
+		}
+   });
+});
+
+	
+</script>
+</body>
+</html>
