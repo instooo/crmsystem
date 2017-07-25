@@ -329,7 +329,7 @@ class CommonController extends Controller {
                 $data = array_merge($uploadRes['data'], $data);
             }
 
-            $data['owner'] = $_SESSION[C('USER_AUTH_KEY')];
+            $data['owner'] = $this->get_numuid();
             $data['addtime'] = time();
             $rs = M($post['fieldtype'])->add($data);
             if (!$rs) {

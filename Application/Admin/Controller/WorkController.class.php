@@ -148,7 +148,7 @@ class WorkController extends CommonController {
         $klist = array_keys($fieldlist);
 
         $count = M('agreement p')
-            ->join('left join crm_user u on u.id=p.owner')
+            ->join('left join crm_user u on u.user_number=p.owner')
             ->join('left join crm_partner t on t.id=p.partner_id')
             ->count();
         $page = new \Think\Page($count, 20);
@@ -163,7 +163,7 @@ class WorkController extends CommonController {
             ->field('p.*,u.id as user_id,u.nickname,t.partner_name,a.*,b.*')
 			->join('crm_work_case a on a.c_id = p.e_id')
 			->join('crm_work_case_log b on b.c_id=a.c_id and a.step=b.step')			
-            ->join('left join crm_user u on u.id=p.owner')
+            ->join('left join crm_user u on u.user_number=p.owner')
             ->join('left join crm_partner t on t.id=p.partner_id')
 			->where($map)
             ->order('p.id desc')
@@ -185,6 +185,7 @@ class WorkController extends CommonController {
 			$tmp['des'] = $val['des'];
 			$tmp['uid'] = $val['uid'];
 			$tmp['c_id'] = $val['c_id'];
+			$tmp['step'] = $val['step'];
             $list[] = $tmp;
         }
 		
@@ -209,7 +210,7 @@ class WorkController extends CommonController {
         $klist = array_keys($fieldlist);
 
         $count = M('agreement p')
-            ->join('left join crm_user u on u.id=p.owner')
+            ->join('left join crm_user u on u.user_number=p.owner')
             ->join('left join crm_partner t on t.id=p.partner_id')
             ->count();
         $page = new \Think\Page($count, 20);
@@ -225,7 +226,7 @@ class WorkController extends CommonController {
 			->join('crm_work_case_step a on a.c_id=p.e_id')
 			->join('crm_work_case b on a.c_id=b.c_id')
 			->join('crm_work_case_log c on c.c_id=a.c_id and b.step=c.step')
-            ->join('left join crm_user u on u.id=p.owner')
+            ->join('left join crm_user u on u.user_number=p.owner')
             ->join('left join crm_partner t on t.id=p.partner_id')
 			->where($map)
             ->order('p.id desc')
@@ -267,10 +268,9 @@ class WorkController extends CommonController {
      */
 	public function ysagreement(){
 		$fieldlist = $this->getFieldList('agreement');
-        $klist = array_keys($fieldlist);
-
+        $klist = array_keys($fieldlist);		
         $count = M('agreement p')
-            ->join('left join crm_user u on u.id=p.owner')
+            ->join('left join crm_user u on u.user_number=p.owner')
             ->join('left join crm_partner t on t.id=p.partner_id')
             ->count();
         $page = new \Think\Page($count, 20);
@@ -286,7 +286,7 @@ class WorkController extends CommonController {
 				  ->field('a.c_id')									  
 				  ->where($map)	
 				  ->group('a.c_id')
-				  ->select();				
+				  ->select();		
 		if($result_tmp){
 			//查找合同的状态		  
 			$c_idarr = array_column($result_tmp,'c_id');				
@@ -296,7 +296,7 @@ class WorkController extends CommonController {
 				->join('crm_work_case a on a.c_id=p.e_id')
 				->join('crm_work_case_log b on a.c_id=b.c_id and a.step=b.step')				
 				->join('crm_work_case_log c on c.c_id=a.c_id and b.step=c.step')
-				->join('left join crm_user u on u.id=p.owner')
+				->join('left join crm_user u on u.user_number=p.owner')
 				->join('left join crm_partner t on t.id=p.partner_id')
 				->where($mapnew)			
 				->order('p.id desc')
@@ -318,13 +318,19 @@ class WorkController extends CommonController {
 				$tmp['uid'] = $val['uid'];
 				$tmp['c_id'] = $val['c_id'];
 				$list[] = $tmp;
-			}
+			}			
 			
-			$this->assign('fieldlist', $fieldlist);
-			$this->assign('pagebar', $page->show());
-			$this->assign('list', $list);
         }
-		$this->display();
+		$this->assign('fieldlist', $fieldlist);
+		$this->assign('pagebar', $page->show());
+		$this->assign('list', $list);
+		//查询客户
+        $partnerlist = M('partner')->select();
+        $this->assign('partnerlist', $partnerlist);
+		//查询流程
+        $workflow = M('workflow')->select();			
+		$this->assign('workflow',$workflow);
+        $this->display();
 		
 	}
 

@@ -33,7 +33,7 @@
                         <th>{$vo.field_name}</th>
                     </volist>
 					<th>进度</th>
-                    <th>操作</th>
+                    <th>创建时间</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -54,13 +54,9 @@
 						<td>草稿</td>
 						<else/>
 						<td>{$vo.uid}已{$vo.des}(进行中)</td>
-						</if>	
+						</if>
+						<td>{$vo.addtime|date='Y-m-d H:i:s',###}</td>
 
-						<if condition='$vo.c_state eq 0'>
-						<td><a href="javascript:;" class="tablelink edit">编辑</a> <a href="javascript:;" class="tablelink dele">删除</a></td>
-						<else/>
-						<td><a href="/casedemo/onecase/cid/{$vo.c_id}">查看</td>
-						</if>	
                     </tr>
                 </volist>
                 </tbody>
