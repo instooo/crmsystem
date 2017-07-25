@@ -242,7 +242,7 @@ class CommonController extends Controller {
                 $return_data['msg'] = '没有文件上传';
                 break;
             }
-            $dir = $dir?$dir:date('Ymd');
+            $dir = $dir?$dir:'attachment';
             $flag = '';
             $result = array();
             $upload = new \Think\Upload();
@@ -250,7 +250,7 @@ class CommonController extends Controller {
             //$upload->exts = array('jpg', 'gif', 'png', 'jpeg', 'bmp');
             $upload->autoSub = false;
             $upload->rootPath = './';
-            $upload->savePath = '/Uploads/'.$dir.'/';
+            $upload->savePath = '/Uploads/'.$dir.'/'.date('Ymd').'/';
             foreach ($files as $key=>$value) {
                 $upload->saveName = date('YmdHis').mt_rand(1000,9999);
                 $info = $upload->uploadOne($value);
