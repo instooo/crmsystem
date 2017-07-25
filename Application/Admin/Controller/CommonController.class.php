@@ -228,7 +228,12 @@ class CommonController extends Controller {
         ), 'JSON');
     }
 
-    public function fileUpload() {
+
+    /**
+     * 文件上传
+     * @return array
+     */
+    public function fileUpload($dir = '') {
         $return_data = array('code'=>-1,'msg'=>'未知错误');
         do{
             $files = $_FILES;
@@ -237,6 +242,7 @@ class CommonController extends Controller {
                 $return_data['msg'] = '没有文件上传';
                 break;
             }
+            $dir = $dir?$dir:date('Ymd');
             $flag = '';
             $result = array();
             $upload = new \Think\Upload();
@@ -244,7 +250,7 @@ class CommonController extends Controller {
             //$upload->exts = array('jpg', 'gif', 'png', 'jpeg', 'bmp');
             $upload->autoSub = false;
             $upload->rootPath = './';
-            $upload->savePath = '/Uploads/'.date('Ymd').'/';
+            $upload->savePath = '/Uploads/'.$dir.'/';
             foreach ($files as $key=>$value) {
                 $upload->saveName = date('YmdHis').mt_rand(1000,9999);
                 $info = $upload->uploadOne($value);
