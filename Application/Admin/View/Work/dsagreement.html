@@ -70,8 +70,7 @@
 
 <div id="add_temp" style="display: none">
     <ul class="forminfo">
-        <form class="dataform" method="post" enctype="multipart/form-data" action="{:U('Work/addAgreement')}">
-            <input type="hidden" class="input_id" name="id" value="">
+        <form class="dataform" method="post" enctype="multipart/form-data" action="{:U('Work/addAgreement')}">            
             <input type="hidden" class="input_fieldtype" name="fieldtype" value="agreement">
             <li><label>合同名称</label><input name="agree_name" type="text" class="dfinput input_agree_name" value="" style="width: 300px"/></li>
 			<li>
@@ -237,6 +236,9 @@
 			shade: 0.1,
 			scrollbar: false,
 			content: '/Agreetment/detail/cid/'+cid,
+			end: function () {
+				location.reload() 
+			}
 		});
 	});
 </script>

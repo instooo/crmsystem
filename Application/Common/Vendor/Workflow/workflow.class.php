@@ -267,31 +267,26 @@ class workflow{
 	//获取当前流程可以执行的操作
 	public function get_act($data){
 		$ret = array('code'=>-1,'msg'=>'');
-        do{					
+        do{		
 			//查看相关实例是否存在
 			$uid = $data['user'];	
 			$caseremap['c_id'] = $data['work_case'];			
-			$casere = M('work_case')->where($caseremap)->find();			
+			$casere = M('work_case a')					
+					->where($caseremap)
+					->find();			
 			if(!$casere){
 				$ret['code'] = '-1';
 				$ret['msg'] = '实例不存在';	
 				break;
-			}else if($casere['c_state']==2){
-				$ret['code'] = '-1';
-				$ret['msg'] = '已完成';	
-				$ret['data'][]= array(
-					'action'=>'return',
-					'des'=>'返回'
-				);			
-				break;	
 			}else{
-				if($casere['step']==0){
-					if($casere['c_create_uid']==$uid){
-						$ret['code'] = '1';
-						$ret['msg'] = '返回';				
-						$ret['data'][]= array('action'=>'return','des'=>'返回',);
-						break;
-					}else{
+				if($casere['step']==0){					
+					//查找当前的操作
+					$map['uid'] = array('like','%'.$uid.'%');
+					$map['c_id'] = $data['work_case'];
+					$map['step'] = $casere['step']+1;
+					$map['st_status'] = 0;
+					$sresult = M('work_case_step')->where($map)->find();
+					if($sresult){
 						$ret['code'] = '-1';
 						$ret['msg'] = '已完成';	
 						$ret['data'][]= array(
@@ -303,7 +298,10 @@ class workflow{
 							'des'=>'不通过'
 						);					
 						break;	
-					}				
+					}else{
+						$ret['code'] = '-1';
+						$ret['msg'] = '已完成';	
+					}
 					
 				}else if($casere['step']==-1){
 					$ret['code'] = '1';
@@ -311,17 +309,28 @@ class workflow{
 					$ret['data'][]= array('action'=>'so_start','des'=>'提交审批',);
 					break;
 				}else{
-					$ret['code'] = '-1';
-					$ret['msg'] = '已完成';	
-					$ret['data'][]= array(
-						'action'=>'pass',
-						'des'=>'通过'
-					);	
-					$ret['data'][]= array(
-						'action'=>'nopass',
-						'des'=>'不通过'
-					);					
-					break;	
+					//查找当前的操作
+					$map['uid'] = array('like','%'.$uid.'%');
+					$map['c_id'] = $data['work_case'];
+					$map['step'] = $casere['step']+1;
+					$map['st_status'] = 0;
+					$sresult = M('work_case_step')->where($map)->find();
+					if($sresult){
+						$ret['code'] = '-1';
+						$ret['msg'] = '已完成';	
+						$ret['data'][]= array(
+							'action'=>'pass',
+							'des'=>'通过'
+						);	
+						$ret['data'][]= array(
+							'action'=>'nopass',
+							'des'=>'不通过'
+						);					
+						break;	
+					}else{
+						$ret['code'] = '-1';
+						$ret['msg'] = '已完成';	
+					}
 				}
 			}			
 		}while(0);
