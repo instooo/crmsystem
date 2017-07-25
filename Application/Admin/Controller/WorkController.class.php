@@ -372,5 +372,43 @@ class WorkController extends CommonController {
         $this->deleData();
     }
 
+    /**
+     * 添加回款记录
+     */
+    public function addMoneylog() {
+        $data = array();
+        $data['user_id'] = $this->get_numuid();
+        $data['agree_id'] = intval($_POST['agree_id']);
+        $data['money'] = $_POST['money'];
+        $data['type'] = intval($_POST['type']);
+        $data['status'] = intval($_POST['status']);
+        $data['finish_time'] = strtotime($_POST['finish_time']);
+        $data['addtime'] = time();
+        if (!$data['agree_id'] || !$data['money'] || !$data['type'] || !is_numeric($data['status']) || !$data['finish_time']) {
+            $this->ajaxReturn(array('code'=>-1,'msg'=>'参数不全'), 'JSON');
+        }
+        $money_log = M('money_log');
+        if ($data['type'] == 1) {
+            //添加回款计划
+            $map = array(
+                'agree_id'  =>  $data['agree_id'],
+                'type'  =>  1
+            );
+            $log = $money_log->where($map)->order('period desc')->select();
+            $data['period'] = $log['period']?$log['period']+1:1;
+        }else {
+            $data['period'] = intval($_POST['period']);
+            if (!$data['period']) {
+                $this->ajaxReturn(array('code'=>-1,'msg'=>'期次缺失'), 'JSON');
+            }
+        }
+        $rs = $money_log->add($data);
+        if (!$rs) {
+            $this->ajaxReturn(array('code'=>-2,'msg'=>'数据保存失败'), 'JSON');
+        }
+
+        $this->ajaxReturn(array('code'=>1,'msg'=>'上传成功'), 'JSON');
+    }
+
 
 }
