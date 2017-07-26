@@ -49,7 +49,7 @@ class CommonController extends Controller {
 			$nowuid = $_SESSION['tem_num'];			
 		}else if($_SESSION['authId']){
 			//查找当前用户
-			$nowuid = $_SESSION['authId'];
+			$nowuid = $_SESSION['user_number'];
 		}else{
 			echo "未登录";die;
 		}

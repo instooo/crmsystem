@@ -175,10 +175,10 @@ class WorkController extends CommonController {
             ->join('left join crm_user u on u.user_number=p.owner')
             ->join('left join crm_partner t on t.id=p.partner_id')
 			->where($map)
+			->group('b.c_id')
             ->order('p.id desc')
             ->limit("{$page->firstRow},{$page->listRows}")
-            ->select();	
-			
+            ->select();			
         $list = array();
         foreach ($datalist as $val) {
             $tmp = $this->dataPaser($val, $fieldlist);
@@ -238,6 +238,7 @@ class WorkController extends CommonController {
             ->join('left join crm_user u on u.user_number=p.owner')
             ->join('left join crm_partner t on t.id=p.partner_id')
 			->where($map)
+			->group('c.c_id')
             ->order('p.id desc')
             ->limit("{$page->firstRow},{$page->listRows}")
             ->select();			
@@ -303,10 +304,10 @@ class WorkController extends CommonController {
 			$datalist = M('agreement p')
 				->field('p.*,u.id as user_id,u.nickname,t.partner_name,a.*,b.*')
 				->join('crm_work_case a on a.c_id=p.e_id')
-				->join('crm_work_case_log b on a.c_id=b.c_id and a.step=b.step')				
-				->join('crm_work_case_log c on c.c_id=a.c_id and b.step=c.step')
+				->join('crm_work_case_log b on a.c_id=b.c_id and a.step=b.step')			
 				->join('left join crm_user u on u.user_number=p.owner')
 				->join('left join crm_partner t on t.id=p.partner_id')
+				->group('b.c_id')
 				->where($mapnew)			
 				->order('p.id desc')
 				->limit("{$page->firstRow},{$page->listRows}")
