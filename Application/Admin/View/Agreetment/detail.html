@@ -29,17 +29,17 @@
 		</div>
 	</div>
 	
+	<div class='mainbody'>
 	<div class="customer_tabs fn-clear">
 		<ul class="detail_main_nav">
-			<li><a class="slide-panel-tab slide_nav_hover" data-index="0" href="#">动态</a></li>
+			<li class='slide_nav_hover'><a class="slide-panel-tab" data-index="0" href="#">动态</a></li>
 			<li><a class="slide-panel-tab" data-index="1" href="#">回款</a></li>
 			<li><a class="slide-panel-tab" data-index="2" href="#">信息</a></li>
 			<li><a class="slide-panel-tab" data-index="4" href="#">文档</a></li>
 		</ul>
 	</div>
-	<div class="dynamic-input-info">	
-	</div> 
-	<div class="dynamic-detail-body">
+	<div>
+	<div class="dynamic-detail-body tablist" style='display:block;'>
 	<volist name="work_case['history']" id='vo'>		<div class="dynamic-replay-dialog">
 			<div class="dynamic-replay-body">
 				<div class="dynamic-replay-self-info">
@@ -56,6 +56,46 @@
 		</div>
 	</volist>	
 	</div>	
+	
+	<div class="dynamic-detail-body tablist">
+	2
+	</div>	
+	
+	
+	<div class="dynamic-detail-body tablist">
+		<div class="modify-detail-container">
+		<div class="modify-body">
+		<div class="modify-base-info">
+		<div class="newclient-item-info" mappingname="name">
+		<span class="lable-container">
+		<span class="input-label">客户名称</span>
+		<span class="normal"></span>
+		</span>
+		<span class="input-container" id="1002">
+		<span class="clientmodify-pen">
+		<span class="clientmodify-default-text">暗示法撒</span>
+		</span></span><span class="error-warn"></span>
+		</div>
+		<div class="newclient-item-info" mappingname="fstatus">
+		<span class="lable-container">
+		<span class="input-label">客户状态</span>
+		<span class="normal"></span>
+		</span>
+		<span class="input-container" id="2038">
+		<span class="clientmodify-pen">
+		<span class="clientmodify-default-text">初步沟通</span>
+		</span></span>
+		<span class="error-warn"></span>
+		</div>
+
+
+	</div>	
+	
+	<div class="dynamic-detail-body tablist">
+		4
+	</div>	
+	</div>
+	</div>
 </div>
 
 <script>
@@ -76,6 +116,35 @@ $(document).on("click",'.do',function(){
 		}
    });
 });
+
+;(function (window, $, undefined) {
+    /*
+     * tab切换插件
+     * 用例：$('*').createTab();
+     */
+    $.fn.createTab = function (opt) {
+        var def = {
+            activeEvt: 'click',
+            activeCls: 'cur'
+        }
+        $.extend(def, opt);
+        this.each(function () {
+            var $this = $(this);
+            var timer;
+            $this.find('ul.detail_main_nav li').click(def.activeEvt,function(){
+                var index = $(this).index(),
+                    that = $(this);		   
+				that.addClass('slide_nav_hover').siblings().removeClass('slide_nav_hover');
+				$('.tablist').eq(index).show().siblings().hide();
+               
+            });
+        });
+    }
+
+})(window, jQuery);
+$(function(){
+    $(".mainbody").createTab()
+})
 
 	
 </script>

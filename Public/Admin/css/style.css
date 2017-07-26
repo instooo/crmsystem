@@ -782,8 +782,52 @@ label {
 	    min-height: 70%;
 }
     
+.modify-detail-container .modify-body {
+    padding-bottom: 10px;
+}
+.modify-base-info {
+	padding-top:30px;
+    margin-left: 30px;
+}
+.newclient-item-info {
+    min-height: 30px;
+    line-height: 30px;
+    vertical-align: middle;
+    position: relative;   
+}
+.modify-detail-container .lable-container {
+    float: left;
+    padding-left: 10px;
+    width: 10%;
+    min-width: 130px;
+}
+.modify-base-info .input-label, .modify-special-info .input-label {
+    width: 120px;
+    color: #959ca8;
+}
+.normal {
+    float: left;
+    width: 10px;
+    height: 27px;
+}
+.modify-detail-container .input-container {
+    float: left;
+    min-width: 300px;
+    word-break: break-all;
+    word-wrap: break-word;
+    color: #959ca8;
+    width: 50%;
+}
 
-
+.clientmodify-default-text {
+    padding-right: 20px;
+    line-height: 30px;
+    word-break: break-all;
+    word-wrap: break-word;
+    display: inline-block;
+    color: #34495e;
+}
+.tablist{display:none}
 
 
 
