@@ -206,6 +206,14 @@ class CommonController extends Controller {
                     $optstr .= '<option value="'.$val.'" '.$selected.'>'.$val.'</option>';
                 }
                 $formStr .= '<li><label>'.$v['field_name'].'</label><select name="field_'.$v['id'].'" class="dfinput input_field'.$v['id'].'" style="width: 300px">'.$optstr.'</select></li>';
+            }elseif (in_array($v['data_type'], array('multi_option'))) {
+                $optlist = json_decode($v['field_option'], true);
+                $optstr = '';
+                foreach ($optlist as $val) {
+                    $selected = $data['field_'.$v['id']] == $val?'selected':'';
+                    $optstr .= '<option value="'.$val.'" '.$selected.'>'.$val.'</option>';
+                }
+                $formStr .= '<li><label>'.$v['field_name'].'</label><select name="field_'.$v['id'].'" class="dfinput input_field'.$v['id'].'" multiple="multiple" style="width: 300px">'.$optstr.'</select></li>';
             }elseif (in_array($v['data_type'], array('file'))) {
                 $formStr .= '<li><label>'.$v['field_name'].'</label><input name="field_'.$v['id'].'" type="file" class="dfinput input_field'.$v['id'].'" style="width: 300px" /></li>';
             }
