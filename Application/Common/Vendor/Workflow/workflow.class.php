@@ -99,7 +99,7 @@ class workflow{
 			$logdata['uid']	=$data['uid'];			
 			$logdata['act_id']=0;				
 			$logdata['des']="添加合同";
-			$logdata['status']=0;			
+			$logdata['status']=0;							
 			$workcase = new caselog();	
 			$workcase->addCaselog($logdata);
 			
@@ -127,6 +127,7 @@ class workflow{
 			$data['uid'] = $data['uid'];//用户id
 			$data['c_id'] = $data['c_id'];//添加合同时候，选择哪种流程
 			$data['act'] = $data['act'];//用户id
+			$data['comment'] = $data['comment'];//用户id
 			if( $data['uid']=='' || $data['c_id']==''|| $data['act']==''){
 				$ret['code'] = '-40';
 				$ret['msg'] = '参数不全';
@@ -186,7 +187,8 @@ class workflow{
 					$logdata['uid']	=$data['uid'];//用户id		
 					$logdata['act_id']=0;				
 					$logdata['des']="提交审核";
-					$logdata['status']=0;			
+					$logdata['status']=0;
+					$logdata['comment']=$data['comment'];				
 					$workcase = new caselog();	
 					$workcase->addCaselog($logdata);
 					
@@ -226,7 +228,8 @@ class workflow{
 						$logdata['uid']	=$data['uid'];//用户id		
 						$logdata['act_id']=0;				
 						$logdata['des']= "审核通过";
-						$logdata['status']=0;			
+						$logdata['status']=0;
+						$logdata['comment']=$data['comment'];						
 						$workcase = new caselog();	
 						$workcase->addCaselog($logdata);
 						
@@ -269,7 +272,8 @@ class workflow{
 					$logdata['uid']	=$data['uid'];//用户id		
 					$logdata['act_id']=0;				
 					$logdata['des']= "审核不通过";
-					$logdata['status']=-1;			
+					$logdata['status']=-1;
+					$logdata['comment']=$data['comment'];				
 					$workcase = new caselog();	
 					$workcase->addCaselog($logdata);
 					
@@ -295,7 +299,8 @@ class workflow{
 					$logdata['uid']	=$data['uid'];//用户id		
 					$logdata['act_id']=0;				
 					$logdata['des']="重新提交审核";
-					$logdata['status']=0;			
+					$logdata['status']=0;
+					$logdata['comment']=$data['comment'];					
 					$workcase = new caselog();	
 					$workcase->addCaselog($logdata);
 					
@@ -342,8 +347,8 @@ class workflow{
 				$ret['code'] = '-1';
 				$ret['msg'] = '实例不存在';	
 				break;
-			}else{
-				if($casere['step']==-1 && $uid ==$caseremap['c_create_uid']){
+			}else{			
+				if($casere['step']==-1 && $uid ==$casere['c_create_uid']){
 					$ret['code'] = '1';
 					$ret['msg'] = '提交审批';				
 					$ret['data'][]= array('action'=>'so_start','des'=>'提交审批',);

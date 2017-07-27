@@ -17,6 +17,7 @@ class caselog{
 		$logdata['create_time']=time();
 		$logdata['des']=$data['des'];
 		$logdata['status']=$data['status'];
+		$logdata['comment']=$data['comment'];			
 		M('work_case_log')->add($logdata);
 	}
 	//添加消息记录

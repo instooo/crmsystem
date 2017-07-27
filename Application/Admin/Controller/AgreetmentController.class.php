@@ -43,4 +43,26 @@ class AgreetmentController extends CommonController {
 		$this->display();
 	}
 
+	//获取流程状态
+    public function step_go()
+    {
+		$data['uid'] = $this->get_numuid();	
+		$data['c_id'] = $_POST['work_case'];
+		$data['act'] = $_POST['act'];
+		$data['comment'] = $_POST['comment'];		
+		$workcase = new workflow();	
+		$result = $workcase->doStep($data);
+		exit(json_encode($result));
+	}
+	
+	public function do_act(){
+		$cid = $_GET['cid'];
+		$act = $_GET['act'];
+		if($cid=='' || $act=='' ){
+			echo "参数不全";die;
+		}
+		$this->assign('cid',$cid);
+		$this->assign('act',$act);
+		$this->display();
+	}
 }
