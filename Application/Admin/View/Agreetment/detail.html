@@ -42,6 +42,7 @@
 	<div>
 	
 	<div class="dynamic-detail-body tablist" style='display:block;'>
+	<if condition="$result.html neq null">
 	<div style="background: #eaedf2;">
 	<ul class="forminfo" style='margin-top:20px; padding:0 0 10px 0; background:#fff'>
 	<li><textarea name="" cols="" rows="" id='comment' class="textinput" style="width:100%" placeholder="建议和说明"></textarea></li>
@@ -49,6 +50,7 @@
     <li><input name="" type="button" id='message' class="btn btn-primary" value="发布"></li>
 	</ul>
 	</div>
+	</if>
 	<volist name="work_case['history']" id='vo'>		<div class="dynamic-replay-dialog">
 			<div class="dynamic-replay-body">
 				<div class="dynamic-replay-self-info">
@@ -59,7 +61,42 @@
 					<div class="dynamic-self-mess">						
 						<span class="dynamic-normal-content">{$vo.comment}</span>						
 					</div>
-					<div class="dynamic-self-time">{$vo.create_time|date='Y-m-d H:i:s',###}<a href="javascript:void(0);" class="remake-list-time-rpl" onclick="reply_sign('102');">回复</a></div>
+					<div class="dynamic-self-time">
+					
+					{$vo.create_time|date='Y-m-d H:i:s',###}<a href="javascript:void(0);" class="remake-list-time-rpl" onclick="reply_sign({$vo.log_id});">回复</a>
+					<div class="remark-sub-list" style="padding-left:25px">
+						<span class="remark-sub-list-name">
+							<a target="_blank">邓小龙</a>  
+						回复：
+						</span>
+						<br>
+						<div class="content">
+							萨达干撒嘎嘎按规定撒gas
+						</div>
+						<div class="remake-list-time">2017-07-27 14:55:50&nbsp;
+							<a href="javascript:void(0);" class="remake-list-time-rpl" onclick="reply_sign('102');">回复</a>
+						</div>
+						<div class="remark-sub-list" style="padding-left:25px">
+							<span class="remark-sub-list-name">
+								<a target="_blank">邓小龙</a>  
+							回复：
+							</span>
+							<br>
+							<div class="content">
+								萨达干撒嘎嘎按规定撒gas
+							</div>
+							<div class="remake-list-time">2017-07-27 14:55:50&nbsp;
+								<a href="javascript:void(0);" class="remake-list-time-rpl" onclick="reply_sign('102');">回复</a>
+							</div>					
+						</div>						
+					</div>
+					
+					
+					</div>
+					
+					
+					
+					
 				</div>
 			</div>
 		</div>
@@ -124,7 +161,21 @@ $(document).on("click",'.do',function(){
 		}
 	});	
 });
-
+function reply_sign(log_id){
+	var log_id = log_id;	
+	layer_index = layer.open({
+		type: 2,
+		title: '合同详情',
+		skin: 'layui-layer-rim',
+		area: ['60%', '50%'],
+		shade: 0.1,
+		scrollbar: false,
+		content: '/Message/replay/logid/'+log_id,
+		end: function () {
+			location.reload() 
+		}
+	});
+}
 ;(function (window, $, undefined) {
     /*
      * tab切换插件

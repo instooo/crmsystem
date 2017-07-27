@@ -929,4 +929,7 @@ input[type="file"] {
 .remake-list-time-rpl{
 	margin-left:10px;
 }
-
+.remark-sub-list {  
+    padding-top: 10px;
+    border-left: 1px dashed #bbb;
+}

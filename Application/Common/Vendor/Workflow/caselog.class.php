@@ -12,7 +12,8 @@ class caselog{
 		$logdata['w_id']=$data['w_id'];			
 		$logdata['step']=$data['step'];
 		$logdata['uid']	=$data['uid'];
-		$logdata['re_uid']	=0;		
+		$logdata['pid']	=$data['pid'];
+		$logdata['re_uid']	=$data['re_uid'];
 		$logdata['act_id']=$data['act_id'];
 		$logdata['create_time']=time();
 		$logdata['des']=$data['des'];
