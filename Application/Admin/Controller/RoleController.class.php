@@ -12,7 +12,12 @@ class RoleController extends CommonController {
 
     public function index(){
 		//前端传过来的对应审核人ID
-		$wid=$_GET['wid'];		
+		$wid=$_GET['wid'];
+		$uid=str_replace('user','',$_GET['uid']);
+		$title_html =$_GET['title_html']; 
+		$uidarr = explode('|',$uid);
+		$act=$_GET['act'];
+		$extend_tit=$_GET['extend_tit'];
 		//查询出对应的职位和对应的用户，数量比较少，忽略性能
 		$role = M('role')->field('id,name,pid')->select();
 		//查询出所有的用户，数量比较少，忽略性能
@@ -27,15 +32,21 @@ class RoleController extends CommonController {
 		foreach($member as $key =>$val){			
 			//$array_data[$key]['id']="user".$val['id'];
 			$array_data[$key]['id']="user".$val['user_number'];				
-			$array_data[$key]['name']=$val['username'];		
+			$array_data[$key]['name']=$val['nickname'];	
+			//$array_data[$key]['nickname']=$val['nickname'];	
 			$array_data[$key]['pId']=$val['role_id'];	
 			$array_data[$key]['type']='user';
-		}
+			if(in_array($val['user_number'],$uidarr)){
+				$array_data[$key]['checked']=true;
+			}
+		}	
 		$array_data = array_merge($array_data,$role);
 		$json_data = json_encode($array_data);		
 		//查找对应的action
 		$actresult = M('workflow_action')->select();
 		$this->assign('actresult',$actresult);
+		$this->assign('extend_tit',$extend_tit);
+		$this->assign('title_html',$title_html);
 		$this->assign('wid',$wid);
 		$this->assign('json_data',$json_data);
 		$this->display();

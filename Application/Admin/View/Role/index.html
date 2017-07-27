@@ -23,25 +23,23 @@
 </style>
 </head>
 <body style="overflow-x: hidden;overflow-y: auto;">
+	<ul class="forminfo" style='margin-top:10px'>
+		<li><label style='width:22.5%'>节点名称<span>*</span></label><input name="extend_tit" type="text" class="dfinput w_name"value="{$extend_tit}"></li>		
+	</ul>
 	<div id="bumen" style="width:600px;position:relative;">
 		<div class="approval-form">
 	    <div class="form-group marginB30">
                 <label>审批人<span>*</span></label>
                 <div>                  
                     <div class="set-tree pulldown-container">
-                        <div class="pulldown-input"><span class="pulldown-text pulldown-default-show">请选择</span><span class="pulldown-icon"></span></div>
+                        <div class="pulldown-input"><span class="pulldown-text pulldown-default-show">{$title_html}</span><span class="pulldown-icon"></span></div>
                     </div>                   
                 </div>
          </div> 
 		<div id="treeDemo" class="ztree" style="display:none;"></div>	
 		</div>		
 	</div>	
-	<div id="act" class='approval-form'>
-		<div style='width:23%;font-size:16px; font-weight:bolder; padding-bottom:10px;border-bottom:1px solid #e1e1e1'>选择执行操作</div>
-		<volist name="actresult" id='vo'>
-			<label style="float:left; line-height:18px; padding:5px;"><input style="margin-top:-2px;" type="checkbox" name="acts[]" value="{$vo.id}" >{$vo.des}</label>
-		</volist>
-	</div>
+
 	<div style="position:fixed; bottom:20px;padding: 20px 20px 5px 20px;"><input name="" type="button" class="btn" id="bumenbtn" value="确认保存"></div>	
 	<script>
 		$(function(){
@@ -49,7 +47,8 @@
 			$(document).on("click",'.pulldown-input',showMenu);
 			$("#bumenbtn").click(function(){
 				var aa = $(".pulldown-default-show").html();
-				var bb = $(".pulldown-default-show").attr('data-uid');					
+				var bb = $(".pulldown-default-show").attr('data-uid');	
+				var extend_tit=$("input[name='extend_tit']").val();				
 				if(!aa || aa=='请选择'){
 					parent.layer.open({
 					  content: '请选择用户',
@@ -57,23 +56,14 @@
 					});
 					return false;					
 				}
-				var acts='';			
-				$("input[name='acts[]']:checked").each(function(){          
-				   acts += $(this).val()+"|";  
-				}); 
-				if(acts==""){
-					parent.layer.open({
-					  content: '请选择操作',
-					  scrollbar: false
-					});
-					return false;		
-				}
+				var acts='2|3|';				
 				var wid ={$wid}+1;				
 				$(parent.document).find('.steps ol li').eq(wid).find('.set-person').html(aa);
 				$(parent.document).find('.steps ol li').eq(wid).find('.set-person').attr("data-uid",bb);
 				$(parent.document).find('.steps ol li').eq(wid).find('.set-person').attr("data-act",acts);
+				$(parent.document).find('.steps ol li').eq(wid).find('.set-person').attr("data-extend_tit",extend_tit);
 				
-				$(parent.document).find('.steps ol li').eq(wid).find('.set-person').attr("isenable",'no');
+				//$(parent.document).find('.steps ol li').eq(wid).find('.set-person').attr("isenable",'no');
 				var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
 				parent.layer.close(index);
 			})

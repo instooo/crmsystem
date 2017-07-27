@@ -33,9 +33,9 @@ $(document).ready(function(){
 			$('.steps ol').width(wid);
 			var _this= $(this).parents('li');
 			index = $(".steps ol li").index(_this)-1;
-			var html = " <li><div class=add><div class='mini-icon icon-add'></div></div><div class=arr></div><div class=standard></div><div class=node><div>"+(index+1)+"</div></div><div class=set-person>点击设置审批人</div><div class=approvers></div></li>";			
+			var html = " <li><div class=add><div class='mini-icon icon-add'></div></div><div class=arr></div><div class=standard></div><div class=node><div>"+(index+1)+"</div></div><div class=set-person data-uid='' data-act='' data-extend_tit=''>点击设置审批人</div><div class=approvers></div></li>";			
 			if(index==len){
-				var html = " <li><div class=add><div class='mini-icon icon-add'></div></div><div class=arr></div><div class=standard></div><div class=node><div>"+(index)+"</div></div><div class=set-person>点击设置审批人</div><div class=approvers></div></li>";				
+				var html = " <li><div class=add><div class='mini-icon icon-add'></div></div><div class=arr></div><div class=standard></div><div class=node><div>"+(index)+"</div></div><div class=set-person data-uid='' data-act='' data-extend_tit=''>点击设置审批人</div><div class=approvers></div></li>";				
 				$(_this).before(html);				
 			}else{	
 				$(_this).after(html);	
@@ -106,18 +106,18 @@ $(document).ready(function(){
 			});
 		});
 		$(document).on('click', '.set-person',function(){
-			var flag = $(this).attr('isenable');
-			if(flag=='no'){
-				return false;
-			}
 			var wid = $(this).parent('li').find('.node div').html();
+			var datauid = $(this).attr('data-uid');
+			var dataact = $(this).attr('data-act');
+			var dataextend_tit = $(this).attr('data-extend_tit');	
+			var title_html=$(this).html();
 			layer_index = layer.open({
 				type: 2,
 				title: '设置审批人',
 				skin: 'layui-layer-rim', //加上边框
 				area: ['600px', '400px'], //宽高
 				shade: 0.5,
-				content: '/role/index/wid/'+wid,
+				content: '/role/index/wid/'+wid+'?uid='+datauid+'&act='+dataact+'&extend_tit='+dataextend_tit+'&title_html='+title_html,
 			});			
 		});
 	
