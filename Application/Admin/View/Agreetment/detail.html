@@ -3,9 +3,13 @@
 <script language="JavaScript" src="{:C('STATIC_URL')}/js/jquery.js"></script>
 <link href="{:C('STATIC_URL')}/css/style.css" rel="stylesheet" type="text/css" />
 <script src="{:C('STATIC_URL')}/layer/layer.js" type="text/javascript"></script>
+<script language="JavaScript" src="{:C('STATIC_URL')}/js/jquery.form.min.js"></script>
 </head>
+<style>
+	.act_td{display: none;text-align: right;padding-right: 10px}
+</style>
 <body style="overflow-x: hidden;overflow-y: auto;">
-	
+
 <div class="detail_left_inner">
 	<div class="detail_left_head">
 		<span class="sp-icon"></span>
@@ -29,7 +33,7 @@
 			<span class="contract-detail-state" style="background-color:#ff6e7f">已作废</span>
 		</div>
 	</div>
-	
+
 	<div class='mainbody'>
 	<div class="customer_tabs fn-clear">
 		<ul class="detail_main_nav">
@@ -40,29 +44,30 @@
 		</ul>
 	</div>
 	<div>
-	
+
 	<div class="dynamic-detail-body tablist" style='display:block;'>
 	<if condition="$result.html neq null">
 	<div style="background: #eaedf2;">
 	<ul class="forminfo" style='margin-top:20px; padding:0 0 10px 0; background:#fff'>
 	<li><textarea name="" cols="" rows="" id='comment' class="textinput" style="width:100%" placeholder="建议和说明"></textarea></li>
-	<li><a class="addfile" href="javascript:;">添加附件<input type="file" class="addfile" name="ATTACHMENT1_1" id="ATTACHMENT1_1" size="1"></a></li>	
+	<li><a class="addfile" href="javascript:;">添加附件<input type="file" class="addfile" name="ATTACHMENT1_1" id="ATTACHMENT1_1" size="1"></a></li>
     <li><input name="" type="button" id='message' class="btn btn-primary" value="发布"></li>
 	</ul>
 	</div>
 	</if>
-	<volist name="work_case['history']" id='vo'>		<div class="dynamic-replay-dialog">
+	<volist name="work_case['history']" id='vo'>
+		<div class="dynamic-replay-dialog">
 			<div class="dynamic-replay-body">
 				<div class="dynamic-replay-self-info">
 					<span class="crm-image-show-client" style="width: 40px; height: 40px; line-height: 40px; background-color: rgb(92, 179, 137);"></span>
 					<div class="dynamic-self-info">
 						<span class="dynamic-self-name">{$vo.uid}:{$vo.des}</span>
 					</div>
-					<div class="dynamic-self-mess">						
-						<span class="dynamic-normal-content">{$vo.comment}</span>						
+					<div class="dynamic-self-mess">
+						<span class="dynamic-normal-content">{$vo.comment}</span>
 					</div>
 					<div class="dynamic-self-time">
-					
+
 					{$vo.create_time|date='Y-m-d H:i:s',###}<a href="javascript:void(0);" class="remake-list-time-rpl" onclick="reply_sign({$vo.log_id});">回复</a>
 					<div class="remark-sub-list" style="padding-left:25px">
 						<span class="remark-sub-list-name">
@@ -87,27 +92,27 @@
 							</div>
 							<div class="remake-list-time">2017-07-27 14:55:50&nbsp;
 								<a href="javascript:void(0);" class="remake-list-time-rpl" onclick="reply_sign('102');">回复</a>
-							</div>					
-						</div>						
+							</div>
+						</div>
 					</div>
-					
-					
+
+
 					</div>
-					
-					
-					
-					
+
+
+
+
 				</div>
 			</div>
 		</div>
-	</volist>	
-	</div>	
-	
+	</volist>
+	</div>
+
 	<div class="dynamic-detail-body tablist">
 	2
-	</div>	
-	
-	
+	</div>
+
+
 	<div class="dynamic-detail-body tablist">
 		<div class="modify-detail-container">
 		<div class="modify-body">
@@ -135,18 +140,161 @@
 		</div>
 
 
-	</div>	
-	
-	<div class="dynamic-detail-body tablist">
-		4
-	</div>	
 	</div>
-	</div>
-</div>
 
+
+	</div>
+	</div>
+    </div>
+
+        <div class="dynamic-detail-body tablist">
+            <div style="background: #eaedf2;">
+                <form id="add_doc_form">
+                    <ul class="forminfo" style='margin-top:20px; padding:0 0 10px 0; background:#fff'>
+                        <li>
+                            <input name="id" type="hidden" id="doc_id" value="{$vo.log_id}">
+                            <input name="subdir" type="hidden" id="subdir" value="agreement/{$vo.log_id}">
+                            <input name="doc_file" type="file" class="doc_file" style="display: none">
+                            <input name="upload_doc" type="button" class="btn btn-primary add_doc_btn" value="上传文档">
+                            <input name="add_fold" type="button" class="btn btn-primary add_fold_btn" value="新建文件夹">
+                        </li>
+                    </ul>
+                </form>
+				<table class="filetable" id="dirlist"></table>
+            </div>
+        </div>
+
+		<div id="add_dir_temp" style="display: none">
+			<ul class="forminfo" style="padding: 20px">
+				<li><label>文件夹名称&nbsp;</label><input name="dirname" type="text" class="dfinput input_dirname" style="width: 230px" /></li>
+				<li><label>&nbsp;</label><input name="submit" type="button" class="btn do_savedir_btn" value="保存"/></li>
+			</ul>
+		</div>
 <script>
+	var layer_index;
+    $(document).on('click', '.add_doc_btn', function () {
+        $('.doc_file').trigger('click');
+    });
+	$(document).on('click', '.add_fold_btn', function () {
+		layer_index = layer.open({
+			type: 1,
+			title: '新建文件夹',
+			skin: 'layui-layer-rim', //加上边框
+			area: ['470px', '220px'], //宽高
+			content: $('#add_dir_temp').html()
+		});
+	});
+	$(document).on('click', '.do_savedir_btn', function () {
+		var param = {};
+		param.subdir = $('#subdir').val();
+		param.dirname = $(this).parents('.forminfo').find('.input_dirname').val();
+		var load = layer.load(1);
+		$.ajax({
+			type:'post',
+			dataType:'json',
+			data:param,
+			url:"{:U('Attach/createDir')}",
+			success:function (response) {
+				layer.close(load);
+				if (response.code == 1) {
+					layer.msg('保存成功', {icon: 1,time: 1000}, function(){
+						layer.close(layer_index);
+						var subdir = $('#subdir').val();
+						readDir(subdir);
+					});
+				}else {
+					layer.msg(response.msg, {icon: 2,time: 1000});
+				}
+			}
+		});
+	});
+	//上传文件
+    $(document).on('change', '.doc_file', function () {
+		var load = layer.load(1);
+        $('#add_doc_form').ajaxSubmit({
+            type:'post',
+            dataType:'json',
+            url:"{:U('Attach/uploadAgreeDoc')}",
+            success:function (response) {
+                layer.close(load);
+                if (response.code == 1) {
+                    layer.msg('保存成功', {icon: 1,time: 1000}, function(){
+						var subdir = $('#subdir').val();
+						readDir(subdir);
+                    });
+                }else {
+                    layer.msg(response.msg, {icon: 2,time: 1000});
+                }
+            }
+        });
+    });
+	//访问目录
+	$(document).on('click', '.dirname_td', function () {
+		var subdir = $('#subdir').val();
+		subdir = subdir + '/' + $(this).parents('tr').attr('data-name');
+		readDir(subdir);
+	});
+	//上一目录
+	$(document).on('click', '.up_btn', function () {
+		var subdir = $('#subdir').val();
+		if (subdir == 'agreement/'+$('#doc_id').val()) return false;
+		var subarr = subdir.split('/');
+		var new_subdir = '';
+		for (var i in subarr) {
+			if (i == subarr.length-1) break;
+			new_subdir += subarr[i]+'/';
+		}
+		readDir(new_subdir);
+	});
+	//下载文件
+	$(document).on('click', '.dl_btn', function () {
+		window.open($(this).parents('tr').attr('data-url'));
+	});
+	readDir('agreement/1');
+	function readDir(subdir) {
+		subdir = subdir.replace(/(^\/*)|(\/*$)/g,"");
+		$.ajax({
+			type:'post',
+			dataType:'json',
+			data:{subdir:subdir},
+			url:"{:U('Attach/readDir')}",
+			success:function (response) {
+				if (response.code == 1) {
+					var dir_img = "{:C('STATIC_URL')}/images/f01.png";
+					var file_img = "{:C('STATIC_URL')}/images/f03.png";
+					var tree = subdir.replace("agreement/1", "目录");
+					var dirlist = '<tr><td>'+tree+'</td><td class="act_td"><a href="javascript:;" class="tablelink up_btn">上一级</a></td></tr>';
+					for (var i in response.list) {
+						if (response.list[i].isfile == 1) {
+							dirlist += '<tr data-type="file" data-url="'+response.list[i].url+'" data-subdir="'+response.list[i].subdir+'">' +
+									'<td><img src="'+file_img+'" />'+response.list[i].name+'</td>' +
+									'<td class="act_td"><a href="javascript:;" class="tablelink del_btn">删除</a>&nbsp;<a href="javascript:;" class="tablelink dl_btn">下载</a></td>' +
+									'</tr>';
+						}else {
+							dirlist += '<tr data-type="dir" data-subdir="'+response.list[i].subdir+'" data-name="'+response.list[i].name+'">' +
+									'<td class="dirname_td"><img src="'+dir_img+'" />'+response.list[i].name+'</td>' +
+									'<td class="act_td"><a href="javascript:;" class="tablelink del_btn">删除</a></td>' +
+									'</tr>';
+						}
+					}
+					$('#dirlist').html(dirlist);
+					$('#dirlist tr').hover(function () {
+						$(this).find('.act_td').show();
+					},function () {
+						$(this).find('.act_td').hide();
+					});
+					//更改当前目录状态
+					$('#subdir').val(subdir);
+				}
+			}
+		});
+	}
+
+
+
+
 $(document).on("click",'.do',function(){
-	var act = $(this).attr('act');	
+	var act = $(this).attr('act');
 	var work_case = $("input[name='work_case']").val();
 	layer_index = layer.open({
 		type: 2,
@@ -157,12 +305,12 @@ $(document).on("click",'.do',function(){
 		scrollbar: false,
 		content: '/Agreetment/do_act/act/'+act+'/cid/'+work_case,
 		end: function () {
-			location.reload() 
+			location.reload()
 		}
-	});	
+	});
 });
 function reply_sign(log_id){
-	var log_id = log_id;	
+	var log_id = log_id;
 	layer_index = layer.open({
 		type: 2,
 		title: '合同详情',
@@ -172,7 +320,7 @@ function reply_sign(log_id){
 		scrollbar: false,
 		content: '/Message/replay/logid/'+log_id,
 		end: function () {
-			location.reload() 
+			location.reload()
 		}
 	});
 }
@@ -192,10 +340,10 @@ function reply_sign(log_id){
             var timer;
             $this.find('ul.detail_main_nav li').click(def.activeEvt,function(){
                 var index = $(this).index(),
-                    that = $(this);		   
+                    that = $(this);
 				that.addClass('slide_nav_hover').siblings().removeClass('slide_nav_hover');
 				$('.tablist').eq(index).show().siblings().hide();
-               
+
             });
         });
     }
@@ -204,7 +352,7 @@ function reply_sign(log_id){
 $(function(){
     $(".mainbody").createTab()
 })
-	
+
 </script>
 </body>
 </html>

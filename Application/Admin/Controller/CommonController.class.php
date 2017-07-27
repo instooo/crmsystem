@@ -241,7 +241,7 @@ class CommonController extends Controller {
      * 文件上传
      * @return array
      */
-    public function fileUpload($dir = '') {
+    public function fileUpload($dir = '', $autoname = true) {
         $return_data = array('code'=>-1,'msg'=>'未知错误');
         do{
             $files = $_FILES;
@@ -258,9 +258,15 @@ class CommonController extends Controller {
             //$upload->exts = array('jpg', 'gif', 'png', 'jpeg', 'bmp');
             $upload->autoSub = false;
             $upload->rootPath = './';
-            $upload->savePath = '/Uploads/'.$dir.'/'.date('Ymd').'/';
+            $upload->savePath = '/Uploads/'.$dir.'/';
             foreach ($files as $key=>$value) {
-                $upload->saveName = date('YmdHis').mt_rand(1000,9999);
+                if ($autoname) {
+                    $upload->saveName = date('YmdHis').mt_rand(1000,9999);
+                }else {
+                    $pathinfo = pathinfo($value['name']);
+                    $upload->saveName = $pathinfo['filename'];
+                }
+
                 $info = $upload->uploadOne($value);
                 if (!$info) {
                     $flag = $upload->getError();
