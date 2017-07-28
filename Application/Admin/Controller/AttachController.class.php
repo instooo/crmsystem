@@ -38,12 +38,53 @@ class AttachController extends CommonController {
         }
         $dirpath = ROOT_PATH.'Uploads/'.$subdir;
         if (!is_dir($dirpath)) {
-            $this->ajaxReturn(array('code'=>-2,'msg'=>'上级目录不存在'), 'JSON');
+            $subarr = explode("/", $subdir);
+            $tempdir = ROOT_PATH.'Uploads';
+            foreach ($subarr as $val) {
+                $tempdir .= '/'.$val;
+                if (DIRECTORY_SEPARATOR == "\\") { //windows os
+                    $tempdir = iconv('utf-8', 'gbk', $tempdir);
+                }
+                if (is_dir($tempdir)) continue;
+                if (!mkdir($tempdir)) {
+                    $this->ajaxReturn(array('code'=>-2,'msg'=>'上级目录初始化失败'), 'JSON');
+                }
+            }
         }
-        if (!mkdir($dirpath.'/'.$dirname)) {
+        if (DIRECTORY_SEPARATOR == "\\") { //windows os
+            $mkdirname = iconv('utf-8', 'gbk', $dirpath.'/'.$dirname);
+        }
+        if (!mkdir($mkdirname)) {
             $this->ajaxReturn(array('code'=>-3,'msg'=>'创建目录失败'), 'JSON');
         }
         $this->ajaxReturn(array('code'=>1,'msg'=>'创建成功'), 'JSON');
+    }
+
+    /**
+     * 重命名目录
+     */
+    public function renameDir() {
+        $old_dir = trim(trim($_POST['old_dir']), "/");
+        $new_dir = trim(trim($_POST['new_dir']), "/");
+        if (!$old_dir || !$new_dir) {
+            $this->ajaxReturn(array('code'=>-1,'msg'=>'参数不全'), 'JSON');
+        }
+        $oldpath = ROOT_PATH.'Uploads/'.$old_dir;
+        $newpath = ROOT_PATH.'Uploads/'.$new_dir;
+        if (DIRECTORY_SEPARATOR == "\\") { //windows os
+            $oldpath = iconv('utf-8', 'gbk', $oldpath);
+            $newpath = iconv('utf-8', 'gbk', $newpath);
+        }
+        if (!is_dir($oldpath)) {
+            $this->ajaxReturn(array('code'=>-2,'msg'=>'修改的目录不存在'), 'JSON');
+        }
+        if (is_dir($newpath)) {
+            $this->ajaxReturn(array('code'=>-3,'msg'=>'文件夹名称已存在'), 'JSON');
+        }
+        if (!rename($oldpath, $newpath)) {
+            $this->ajaxReturn(array('code'=>-3,'msg'=>'文件夹名称修改失败'), 'JSON');
+        }
+        $this->ajaxReturn(array('code'=>1,'msg'=>'修改成功'), 'JSON');
     }
 
     /**
@@ -56,6 +97,9 @@ class AttachController extends CommonController {
             $this->ajaxReturn(array('code'=>-1,'msg'=>'目录参数错误'), 'JSON');
         }
         $dirpath = ROOT_PATH.'Uploads/'.$subdir;
+        if (DIRECTORY_SEPARATOR == "\\") { //windows os
+            $dirpath = iconv('utf-8', 'gbk', $dirpath);
+        }
         if (!is_dir($dirpath)) {
             $this->ajaxReturn(array('code'=>-2,'msg'=>'目录不存在'), 'JSON');
         }
@@ -77,6 +121,9 @@ class AttachController extends CommonController {
         asort($filelist);
         $list = array();
         foreach ($dirlist as $val) {
+            if (DIRECTORY_SEPARATOR == "\\") { //windows os
+                $val = iconv('gbk', 'utf-8', $val);
+            }
             $tmp = array();
             $tmp['isfile'] = 0;
             $tmp['subdir'] = $subdir;
@@ -84,6 +131,9 @@ class AttachController extends CommonController {
             $list[] = $tmp;
         }
         foreach ($filelist as $val) {
+            if (DIRECTORY_SEPARATOR == "\\") { //windows os
+                $val = iconv('gbk', 'utf-8', $val);
+            }
             $tmp = array();
             $tmp['isfile'] = 1;
             $tmp['url'] = '/Uploads/'.$subdir.'/'.$val;

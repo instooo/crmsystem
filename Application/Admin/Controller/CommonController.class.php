@@ -263,6 +263,9 @@ class CommonController extends Controller {
                 if ($autoname) {
                     $upload->saveName = date('YmdHis').mt_rand(1000,9999);
                 }else {
+                    if (DIRECTORY_SEPARATOR == "\\") { //windows os
+                        $value['name'] = iconv('utf-8', 'gbk', $value['name']);
+                    }
                     $pathinfo = pathinfo($value['name']);
                     $upload->saveName = $pathinfo['filename'];
                 }

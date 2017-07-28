@@ -175,6 +175,7 @@
     $(document).on('click', '.add_doc_btn', function () {
         $('.doc_file').trigger('click');
     });
+	//新建目录
 	$(document).on('click', '.add_fold_btn', function () {
 		layer_index = layer.open({
 			type: 1,
@@ -183,29 +184,71 @@
 			area: ['470px', '220px'], //宽高
 			content: $('#add_dir_temp').html()
 		});
+		var lay_con = $('#layui-layer'+layer_index);
+		lay_con.find('.do_savedir_btn').click(function () {
+			var param = {};
+			param.subdir = $('#subdir').val();
+			param.dirname = $(this).parents('.forminfo').find('.input_dirname').val();
+			var load = layer.load(1);
+			$.ajax({
+				type:'post',
+				dataType:'json',
+				data:param,
+				url:"{:U('Attach/createDir')}",
+				success:function (response) {
+					layer.close(load);
+					if (response.code == 1) {
+						layer.msg('保存成功', {icon: 1,time: 1000}, function(){
+							layer.close(layer_index);
+							var subdir = $('#subdir').val();
+							readDir(subdir);
+						});
+					}else {
+						layer.msg(response.msg, {icon: 2,time: 1000});
+					}
+				}
+			});
+		});
 	});
-	$(document).on('click', '.do_savedir_btn', function () {
-		var param = {};
-		param.subdir = $('#subdir').val();
-		param.dirname = $(this).parents('.forminfo').find('.input_dirname').val();
-		var load = layer.load(1);
-		$.ajax({
-			type:'post',
-			dataType:'json',
-			data:param,
-			url:"{:U('Attach/createDir')}",
-			success:function (response) {
-				layer.close(load);
-				if (response.code == 1) {
-					layer.msg('保存成功', {icon: 1,time: 1000}, function(){
+	//重命名目录
+	$(document).on('click', '.rename_btn', function () {
+		layer_index = layer.open({
+			type: 1,
+			title: '新建文件夹',
+			skin: 'layui-layer-rim', //加上边框
+			area: ['470px', '220px'], //宽高
+			content: $('#add_dir_temp').html()
+		});
+		var tr = $(this).parents('tr');
+		var old_dir = tr.attr('data-subdir')+'/'+tr.attr('data-name');
+		var lay_con = $('#layui-layer'+layer_index);
+		lay_con.find('.input_dirname').val(tr.attr('data-name'));
+		lay_con.find('.do_savedir_btn').click(function () {
+			var new_name = lay_con.find('.input_dirname').val();
+			if (new_name == '') {
+				layer.msg('文件夹名称不能为空', {icon: 2,time: 1000});
+				return false;
+			}
+			var load = layer.load(1);
+			var param = {};
+			param.old_dir = old_dir;
+			param.new_dir = tr.attr('data-subdir')+'/'+new_name;
+			$.ajax({
+				type:'post',
+				dataType:'json',
+				data:param,
+				url:"{:U('Attach/renameDir')}",
+				success:function (response) {
+					layer.close(load);
+					if (response.code == 1) {
 						layer.close(layer_index);
 						var subdir = $('#subdir').val();
 						readDir(subdir);
-					});
-				}else {
-					layer.msg(response.msg, {icon: 2,time: 1000});
+					}else {
+						layer.msg(response.msg, {icon: 2,time: 1000});
+					}
 				}
-			}
+			});
 		});
 	});
 	//上传文件
@@ -263,7 +306,7 @@
 					var dir_img = "{:C('STATIC_URL')}/images/f01.png";
 					var file_img = "{:C('STATIC_URL')}/images/f03.png";
 					var tree = subdir.replace("agreement/1", "目录");
-					var dirlist = '<tr><td>'+tree+'</td><td class="act_td"><a href="javascript:;" class="tablelink up_btn">上一级</a></td></tr>';
+					var dirlist = '<tr><td>'+tree+'&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:;" class="tablelink up_btn">上一级</a></td><td></td></tr>';
 					for (var i in response.list) {
 						if (response.list[i].isfile == 1) {
 							dirlist += '<tr data-type="file" data-url="'+response.list[i].url+'" data-subdir="'+response.list[i].subdir+'">' +
@@ -273,7 +316,7 @@
 						}else {
 							dirlist += '<tr data-type="dir" data-subdir="'+response.list[i].subdir+'" data-name="'+response.list[i].name+'">' +
 									'<td class="dirname_td"><img src="'+dir_img+'" />'+response.list[i].name+'</td>' +
-									'<td class="act_td"><a href="javascript:;" class="tablelink del_btn">删除</a></td>' +
+									'<td class="act_td"><a href="javascript:;" class="tablelink del_btn">删除</a>&nbsp;<a href="javascript:;" class="tablelink rename_btn">重命名</a></td>' +
 									'</tr>';
 						}
 					}
