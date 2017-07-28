@@ -309,7 +309,7 @@
 					var dirlist = '<tr><td>'+tree+'&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:;" class="tablelink up_btn">上一级</a></td><td></td></tr>';
 					for (var i in response.list) {
 						if (response.list[i].isfile == 1) {
-							dirlist += '<tr data-type="file" data-url="'+response.list[i].url+'" data-subdir="'+response.list[i].subdir+'">' +
+							dirlist += '<tr data-type="file" data-url="'+response.list[i].url+'" data-subdir="'+response.list[i].subdir+'" data-name="'+response.list[i].name+'">' +
 									'<td><img src="'+file_img+'" />'+response.list[i].name+'</td>' +
 									'<td class="act_td"><a href="javascript:;" class="tablelink del_btn">删除</a>&nbsp;<a href="javascript:;" class="tablelink dl_btn">下载</a></td>' +
 									'</tr>';
@@ -332,6 +332,35 @@
 			}
 		});
 	}
+
+	$(document).on('click', '.del_btn', function () {
+		var tr = $(this).parents('tr');
+		var subdir = $('#subdir').val();
+		var path = subdir + '/' + tr.attr('data-name');
+		var type = tr.attr('data-type');
+		var msg = (type=='dir')?'该目录下所有文件将全部删除，确定要删除该文件夹吗？':'确定要删除该文件吗？';
+		layer_index = layer.confirm(msg, {
+			btn: ['确定','取消']
+		}, function () {
+			layer.close(layer_index);
+			var load = layer.load(1);
+			$.ajax({
+				type:'post',
+				dataType:'json',
+				data:{type:type,path:path},
+				url:"{:U('Attach/delFile')}",
+				success:function (response) {
+					layer.close(load);
+					if (response.code == 1) {
+						var subdir = $('#subdir').val();
+						readDir(subdir);
+					}else {
+						layer.msg(response.msg, {icon: 2,time: 1000});
+					}
+				}
+			});
+		});
+	});
 
 
 

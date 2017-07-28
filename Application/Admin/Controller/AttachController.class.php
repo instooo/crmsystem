@@ -148,4 +148,59 @@ class AttachController extends CommonController {
         ), 'JSON');
     }
 
+    /**
+     * 删除文件或目录
+     */
+    public function delFile() {
+        $type = trim(htmlspecialchars($_POST['type']));
+        $path = trim($_POST['path']);
+        if (!$type || !$path) {
+            $this->ajaxReturn(array('code'=>-1,'msg'=>'参数错误'), 'JSON');
+        }
+        $realpath = ROOT_PATH.'Uploads/'.$path;
+        if (DIRECTORY_SEPARATOR == "\\") { //windows os
+            $realpath = iconv('utf-8', 'gbk', $realpath);
+        }
+        if ($type == 'file') {
+            //删除文件
+            if (!file_exists($realpath)) {
+                $this->ajaxReturn(array('code'=>-2,'msg'=>'删除的文件不存在'), 'JSON');
+            }
+            if (!unlink($realpath)) {
+                $this->ajaxReturn(array('code'=>-3,'msg'=>'文件删除失败'), 'JSON');
+            }
+        }else {
+            //删除目录
+            if (!is_dir($realpath)) {
+                $this->ajaxReturn(array('code'=>-2,'msg'=>'删除的目录不存在'), 'JSON');
+            }
+            if (!$this->deldir($realpath)) {
+                $this->ajaxReturn(array('code'=>-3,'msg'=>'目录删除失败'), 'JSON');
+            }
+        }
+        $this->ajaxReturn(array('code'=>1,'msg'=>'删除成功'), 'JSON');
+    }
+
+    private function deldir($dir) {
+        //先删除目录下的文件：
+        $dh=opendir($dir);
+        while (false  !== ( $file  =  readdir ( $dh ))) {
+            if($file!="." && $file!="..") {
+                $fullpath=$dir."/".$file;
+                if(!is_dir($fullpath)) {
+                    unlink($fullpath);
+                } else {
+                    $this->deldir($fullpath);
+                }
+            }
+        }
+        closedir($dh);
+        //删除当前文件夹：
+        if(rmdir($dir)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }

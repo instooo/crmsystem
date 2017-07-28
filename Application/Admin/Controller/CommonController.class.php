@@ -259,6 +259,9 @@ class CommonController extends Controller {
             $upload->autoSub = false;
             $upload->rootPath = './';
             $upload->savePath = '/Uploads/'.$dir.'/';
+            if (DIRECTORY_SEPARATOR == "\\") { //windows os
+                $upload->savePath = iconv('utf-8', 'gbk', $upload->savePath);
+            }
             foreach ($files as $key=>$value) {
                 if ($autoname) {
                     $upload->saveName = date('YmdHis').mt_rand(1000,9999);
