@@ -61,6 +61,51 @@ class AgreetmentController extends CommonController {
 		if($cid=='' || $act=='' ){
 			echo "参数不全";die;
 		}
+		//查找当前实例是否存在		
+		$map['c_id']=$cid;
+		$result = M('work_case a')
+			->join('crm_user b on a.c_create_uid = b.user_number')			
+			->where($map)
+			->find();
+		if(!$result){
+			die;
+		}		
+		unset($map);
+		if($result['step']==-1){//提交审核
+			$map['w_id']=$result['w_id'];
+			$next = M('workflow_extend')->where($map)->order('e_id asc')->find();
+			//查找下一步的处理人员
+			unset($map);
+			$uidarr = explode('|',$next['uid']);
+			$map['user_number'] = array('in',$uidarr);
+			$user = M('user')->where($map)->select();
+			$redata['nowuser'] = $result['nickname'] ;			
+			$redata['step'] = $result['step'] ;
+			$redata['stepdes'] = "草稿" ;
+			$redata['des'] = $next['des'];
+			$redata['nextuser'] = $user;			
+		}else{
+			unset($map);
+			$nowuid = $this->get_numuid();			
+			//查找下一步处理人
+			$map['step_id']=$result['step']+2;
+			$map['w_id']=$result['w_id'];
+			$next = M('workflow_extend')->where($map)->find();
+			unset($map);
+			$uidarr = explode('|',$next['uid']);
+			$map['user_number'] = array('in',$uidarr);
+			$user = M('user')->where($map)->select();
+			//查找当前人
+			unset($map);
+			$map['user_number'] = $nowuid;
+			$nowuser = M('user')->where($map)->find();
+			$redata['nextuser'] = $user;
+			$redata['des'] = $next['des'];
+			$redata['step'] = $result['step']+1 ;
+			$redata['nowuser'] = $nowuser['nickname'] ;	
+		}
+		$this->assign('redata',$redata);
+		//查找下一步处理人
 		$this->assign('cid',$cid);
 		$this->assign('act',$act);
 		$this->display();

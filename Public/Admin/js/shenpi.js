@@ -71,10 +71,12 @@ $(document).ready(function(){
 			}
 			var len = $(".steps ol li").length-2;
 			var formjson="";
-			var actjson="";				
+			var actjson="";
+			var desjson="";					
 			for(var i=1;i<len;i++){
 				var bb= $(".steps ol li").eq(i+1).find(".set-person").attr('data-uid');	
-				var act= $(".steps ol li").eq(i+1).find(".set-person").attr('data-act');				
+				var act= $(".steps ol li").eq(i+1).find(".set-person").attr('data-act');
+				var des= $(".steps ol li").eq(i+1).find(".set-person").attr('data-extend_tit');				
 				if(bb=='undefined'||!bb){
 					layer.msg('审批流程不能为空', {icon:5,time:1000});
 					return false;
@@ -83,15 +85,20 @@ $(document).ready(function(){
 					layer.msg('操作不能为空', {icon:5,time:1000});
 					return false;
 				}
+				if(des=='undefined'||!des){
+					layer.msg('节点描述不能为空', {icon:5,time:1000});
+					return false;
+				}
 				formjson += "steps"+i+":"+bb + ",";	
-				actjson += "steps"+i+":"+act + ",";		
+				actjson += "steps"+i+":"+act + ",";	
+				desjson += "steps"+i+":"+des + ",";				
 			}
 			if (formjson.length > 0 ) formjson = formjson.substring(0, formjson.length-1);			
 			
 			$.ajax({
 				type:'post',
 				dataType:'json',
-				data:{w_name:w_name,step:formjson,act:actjson},
+				data:{w_name:w_name,step:formjson,act:actjson,des:desjson},
 				url:'/workflow/workflow_add',
 				error:function () {
 					layer.msg('未知错误', {icon:5,time:1000});

@@ -32,9 +32,11 @@ class WorkflowController extends CommonController {
 			$data['w_createtime']=time();
 			//处理流程的几个步骤
 			$steps=I('post.step');
-			$acts=rtrim(I('post.act'),',');			
-			$steps_arr = explode(',',$steps);	
-			$acts_arr = explode(',',$acts);
+			$acts=rtrim(I('post.act'),',');	
+			$des=rtrim(I('post.des'),',');					
+			$steps_arr = explode(',',$steps);
+			$acts_arr = explode(',',$acts);			
+			$dess_arr = explode(',',$des);
 			
             if (!$data['w_name']) {
                 $ret['code'] = -2;
@@ -70,7 +72,12 @@ class WorkflowController extends CommonController {
 				$extend_data[$key]['step_id']=str_replace('steps','',$tmp_ar[0]);
 				$extend_data[$key]['action']=str_replace('user','',rtrim($tmp_ar[1],'|'));
 				$extend_data[$key]['status']=1;
-			}			
+			}
+			foreach($dess_arr as $key=>$val ){
+				$tmp_ar=explode(':',$val);					
+				$extend_data[$key]['step_id']=str_replace('steps','',$tmp_ar[0]);
+				$extend_data[$key]['des']=str_replace('user','',rtrim($tmp_ar[1],'|'));				
+			}					
 			$map['w_id']=$rs;			
 			$extend = M('workflow_extend')->where($map)->find(); 
 			if ($extend) {
@@ -103,7 +110,14 @@ class WorkflowController extends CommonController {
                 $ret['msg'] = '参数不全';
                 break;
             }			
-			$map['w_id']=$data['wid'];			
+			$map['w_id']=$data['wid'];
+			//查看流程中是否有正在执行的流程
+			$result = M('work_case_log')->where($map)->find();
+			if($result){
+				$ret['code'] = -2;
+                $ret['msg'] = '拥有数据，不可以删除';
+                break;
+			}
 			M('workflow')->where($map)->delete(); 
 			$mapa['w_id']=$data['wid'];	
 			M('workflow_extend')->where($map)->delete();					
@@ -114,4 +128,26 @@ class WorkflowController extends CommonController {
         exit(json_encode($ret));		
     }
  
+	//流程的展示
+	public function detail(){
+		$data['wid'] = I('get.wid'); 			
+		if (!$data['wid']) {
+			$ret['code'] = -2;
+			$ret['msg'] = '参数不全';
+			break;
+		}
+		$map['w_id']=$data['wid'];			
+		$result = M('workflow')->where($map)->find(); 
+		if($result){			
+			$extend = M('workflow_extend')->where($map)->order('e_id desc')->select();			
+			foreach($extend as $key=>$val){
+				$extend[$key]['left'] =20+($val['step_id']-1)*180;
+			}			
+		}else{
+			echo "流程不存在";die;
+		}
+		$this->assign('result',$result);
+		$this->assign('extend',$extend);
+		$this->display();
+	}
 }

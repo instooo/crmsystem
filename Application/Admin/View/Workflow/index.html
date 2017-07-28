@@ -41,7 +41,7 @@
             <td>{$vo.w_name}</td>
             <td>{$vo.w_createtime|date='Y-m-d H:i:s',###}</td>
             <td><if condition="$vo['status'] eq 1 "><font color="#21de3b">正常</font><else /> <font color="#de2125">关闭</font></if></td>
-            <td><a onclick='' class="tablelink">查看</a><a class="tablelink" onclick="del_lc({$vo.w_id})"> 删除</a></td>
+            <td><a onclick='openwk({$vo.w_id})' class="tablelink">查看</a><a class="tablelink" onclick="del_lc({$vo.w_id})"> 删除</a></td>
             </tr> 
     		</volist>
         </table>  
@@ -91,4 +91,16 @@
     
 	
 </div>
+<script>
+function openwk(id){
+layer_index = layer.open({
+	type: 2,
+	title: '查看流程',
+	skin: 'layui-layer-rim', //加上边框
+	area: ['60%', '40%'], //宽高
+	shade: 0.5,
+	content: '/workflow/detail/wid/'+id,
+});			
+}
+</script>
 <include file="Index/footer" />
