@@ -1,0 +1,163 @@
+
+<!DOCTYPE html>
+ <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=gbk" />
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=10,chrome=1" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+	<script language="JavaScript" src="{:C('STATIC_URL')}/js/jquery.js"></script>
+    <title></title>
+	<style>
+	.TableBlock {
+    border: 1px #cccccc solid;
+    line-height: 20px;
+    font-size: 9pt;
+    border-collapse: collapse;
+}
+tbody {
+    display: table-row-group;
+    vertical-align: middle;
+    border-color: inherit;
+}
+.TableHeader {
+    COLOR: #383838;
+    FONT-WEIGHT: bold;
+    FONT-SIZE: 9pt;
+    background: #c4de83;
+    line-height: 21px;
+}
+tr {
+    display: table-row;
+    vertical-align: inherit;
+    border-color: inherit;
+}
+.TableBlock .TableHeader td, .TableBlock td.TableHeader {
+    height: 30px;
+    background: #c4de83;
+    border: 1px #9cb269 solid;
+    font-weight: bold;
+    color: #383838;
+    line-height: 23px;
+    padding: 0px;
+    padding-left: 5px;
+}
+
+.TableData,.TableDatat {
+    BACKGROUND: #FFFFFF;
+    COLOR: #000000;
+}
+.TableBlock .TableData td, .TableBlock td.TableData {
+    background: #FFFFFF;
+    border-bottom: 1px #cccccc solid;
+    border-right: 1px #cccccc solid;
+    padding: 3px;
+    height: 30px;
+}
+.TableBlock .TableData td,.TableDatat td, .TableBlock td.TableData, .TableBlock td.TableDatat{
+    background: #FFFFFF;
+    border-bottom: 1px #cccccc solid;
+    border-right: 1px #cccccc solid;
+    padding: 3px;
+    height: 30px;
+}
+	</style>
+</head>
+
+
+<body class="bodycolor"  onload="begin_set();">
+
+<table width="100%" class="TableBlock">
+<tr class="TableHeader">
+  <td colspan="2" align="center"><b>全部经办人</b></td>
+</tr>
+
+<tr class="TableDatat">
+ <td onclick="javascript:add_all();" style="cursor:pointer" align="center" colspan="2">全部添加</td>
+</tr>
+<tr class="TableDatat">
+ <td onclick="javascript:del_all();" style="cursor:pointer" align="center" colspan="2">全部删除</td>
+</tr>
+<volist name="user" id="vo">
+<tr class="TableData">
+  <td title="设为主办人" nowrap class="menulines_op"  width="55" align="center" style="cursor:pointer">
+  <input type="checkbox" id="opbox_admin" value='{$vo.user_number}' data-name="{$vo.nickname}">主办</td>
+  <td title="{$vo.nickname}" datanum='{$vo.user_number}' class="menulines"  width="90%" align="center" style="cursor:pointer">
+  {$vo.nickname}</td>
+</tr>
+</volist>
+</tr>
+</table>
+<ul class="forminfo" style='margin-top:20px; padding:0'>	
+    <li><input name="" type="button" id='next' class="btn btn-primary" value="确定">
+	</li>
+</ul>
+<script>
+var flag = '';
+$(document).on('click', '.TableData',function(){	
+	var check = $(this).find('#opbox_admin').prop("checked");
+	var title=$(this).find('.menulines').attr('title');
+	var datanum=$(this).find('.menulines').attr('datanum');	
+	if(check==false){
+		$(this).find('#opbox_admin').prop("checked",true);		
+		var html = '<div class="user-tags userss" data_uid="'+datanum+'">'+title+'<i class="close">×</i></div>';	
+		$(parent.document).find('.workflow-node-ops .userss').each(function(){
+			var aa = $(this).attr('data_uid');		
+			flag+=aa+'|';
+		})	
+		if(flag.indexOf(datanum)<0){
+			$(parent.document).find('.workflow-node-ops').append(html);
+		}		
+	}else{
+		$(this).find('#opbox_admin').prop("checked",false);		
+		$(parent.document).find('.workflow-node-ops .userss').each(function(){
+			var aa = $(this).attr('data_uid');			
+			if(aa ==datanum ){
+				$(this).remove();
+			}
+		})	
+	}
+});
+function begin_set(){
+	$(parent.document).find('.workflow-node-ops .userss').each(function(){
+		var aa = $(this).attr('data_uid');			
+		$(document).find('.TableData').each(function(){
+			var datanum=$(this).find('.menulines').attr('datanum');	
+			if(aa == datanum){
+				$(this).find('#opbox_admin').prop("checked",true);			
+			}
+		})
+	})	
+}
+$(document).on('click', '#next',function(){	
+	var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+	parent.layer.close(index);
+});
+
+function add_all(){
+	var html = '';		
+	$(document).find('.TableData').each(function(){			
+		$(this).find('#opbox_admin').prop("checked",true);
+		var title=$(this).find('.menulines').attr('title');
+		var datanum=$(this).find('.menulines').attr('datanum');	
+		var tmphtml = '<div class="user-tags userss" data_uid="'+datanum+'">'+title+'<i class="close">×</i></div>';	
+		html +=tmphtml;
+		$(parent.document).find('.workflow-node-ops .userss').each(function(){			
+			$(this).remove();			
+		})			
+		$(parent.document).find('.workflow-node-ops').append(html);
+	})
+}
+function del_all(){
+	$(document).find('.TableData').each(function(){			
+		$(this).find('#opbox_admin').prop("checked",false);		
+	})
+	$(parent.document).find('.workflow-node-ops .userss').each(function(){			
+			$(this).remove();			
+	})	
+	
+	
+}
+
+</script>
+</body>
+</html>

@@ -66,4 +66,46 @@ class RoleController extends CommonController {
 		}
 		return $tree;
 	}
+	
+	//流程节点人员选择
+	public function get_wkrole(){
+		$cid=$_GET['cid'];
+		$map['c_id'] = $cid;
+		$caseresult = M('work_case')->where($map)->find();
+		if($caseresult['c_state']==1){
+			unset($map);
+			$map['w_id'] = $caseresult['w_id'];
+			$map['step_id'] = $caseresult['step']+2;
+			$result = M('workflow_extend')->where($map)->find();
+			$uidarr = explode('|',$result['uid']);
+			$map['user_number'] = array('in',$uidarr);
+			$user = M('user')->where($map)->select();		 
+		}		
+		$this->assign('user',$user);
+		$this->display();
+	}
+	
+	//流程节点人员选择
+	public function get_wkallrole(){
+		$cid=$_GET['cid'];
+		$map['c_id'] = $cid;
+		$caseresult = M('work_case')->where($map)->find();
+		if($caseresult['c_state']==1){
+			unset($map);
+			$map['w_id'] = $caseresult['w_id'];			
+			$result = M('workflow_extend')->where($map)->select();
+			foreach($result as $key=>$val){
+				$uidarr = explode('|',$val['uid']);
+				foreach($uidarr as $v){
+					$uidarrtmp[]=$v;
+				}
+			}	
+			$uidstr = array_unique($uidarrtmp);
+			
+			$map['user_number'] = array('in',$uidstr);
+			$user = M('user')->where($map)->select();		 
+		}		
+		$this->assign('user',$user);
+		$this->display();
+	}
 }
