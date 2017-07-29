@@ -59,6 +59,9 @@
 						<div class="workflow-node-ops">                    
 							<input class="user-tags btn-info" id="chose_user2" type="button" value="选择人员">
 							<div class="managers">经办人：</div>
+							<input type='hidden' name='nextuid' id='nextuid' value="<volist name="redata.nextuser" id="vo">
+								{$vo.user_number},
+								</volist>"/>
 							<volist name="redata.nextuser" id="vo">
 							<div class="user-tags userss" data_uid="{$vo.user_number}">{$vo.nickname}<i class="close">×</i></div>
 							</volist>
@@ -100,10 +103,16 @@ $(document).on("click",'#next',function(){
 	var act = $("#act").val();
 	var work_case = $("#cid").val();
 	var comment = $("#comment").val();
+	////流程接收人
+	var nextuid = $("#nextuid").val();
+	//消息接收人
+	var reuid = $("#remind_others_name").attr('data-uid');
+	if (nextuid.substr(0,1)==','){nextuid=nextuid.substr(1);} 
+	if (reuid.substr(0,1)==','){reuid=reuid.substr(1);} 
 	$.ajax({
 		type:'post',
 		dataType:'json',
-		data:{work_case:work_case,act:act,comment:comment},
+		data:{work_case:work_case,act:act,comment:comment,nextuid:nextuid,reuid:reuid},
 		url:"{:U('Agreetment/step_go')}",
 		success:function (response) {  
 			var index = parent.layer.getFrameIndex(window.name); //获取窗口索引

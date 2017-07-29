@@ -128,6 +128,7 @@ class workflow{
 			$data['c_id'] = $data['c_id'];//添加合同时候，选择哪种流程
 			$data['act'] = $data['act'];//用户id
 			$data['comment'] = $data['comment'];//用户id
+			$data['nextuid'] = rtrim($data['nextuid'],',');				
 			if( $data['uid']=='' || $data['c_id']==''|| $data['act']==''){
 				$ret['code'] = '-40';
 				$ret['msg'] = '参数不全';
@@ -140,7 +141,7 @@ class workflow{
 				$ret['code'] = '-30';
 				$ret['msg'] = '无当前实例';
 				break;
-			}			
+			}  
 			if($caseresult['c_state']==2){
 				$ret['code'] = '-31';
 				$ret['msg'] = '该流程已完成';
@@ -170,11 +171,16 @@ class workflow{
 					$extendmap['step_id'] = 1;
 					$extendresult = M ('workflow_extend')->where($extendmap)->find();
 					
+					if(strpos($extendresult['uid'],$data['nextuid'])===false){
+						$ret['code'] = '-1';
+						$ret['msg'] = '账号不在流程中';
+						break;
+					}
 					
 					$adddata['c_id']=$data['c_id'];
 					$adddata['e_id']=$extendresult['e_id'];
 					$adddata['w_id']=$caseresult['w_id'];
-					$adddata['uid']=$extendresult['uid'];
+					$adddata['uid']=$data['nextuid'];
 					$adddata['step']	=1;
 					$adddata['st_status']=0;
 					$adddata['st_create_time']=time();				
@@ -239,7 +245,11 @@ class workflow{
 							$extendmap['w_id'] = $caseresult['w_id'];
 							$extendmap['step_id']=$nowstep+1;
 							$nextresult = M ('workflow_extend')->where($extendmap)->order('step_id desc')->find();							
-							
+							if(strpos($nextresult['uid'],$data['nextuid'])===false){
+								$ret['code'] = '-1';
+								$ret['msg'] = '账号不在流程中';
+								break;
+							}
 							$adddata['c_id']=$data['c_id'];
 							$adddata['e_id']=$nextresult['e_id'];
 							$adddata['w_id']=$caseresult['w_id'];

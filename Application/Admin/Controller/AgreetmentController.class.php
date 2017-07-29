@@ -46,10 +46,13 @@ class AgreetmentController extends CommonController {
 	//获取流程状态
     public function step_go()
     {
+		//print_r($_POST);DIE;
 		$data['uid'] = $this->get_numuid();	
 		$data['c_id'] = $_POST['work_case'];
 		$data['act'] = $_POST['act'];
-		$data['comment'] = $_POST['comment'];		
+		$data['comment'] = $_POST['comment'];
+		$data['nextuid'] = $_POST['nextuid'];	
+		$data['reuid'] = $_POST['reuid'];	
 		$workcase = new workflow();	
 		$result = $workcase->doStep($data);
 		exit(json_encode($result));

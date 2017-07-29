@@ -106,7 +106,15 @@ $(document).on('click', '.TableData',function(){
 		})	
 		if(flag.indexOf(datanum)<0){
 			$(parent.document).find('.workflow-node-ops').append(html);
-		}		
+		}	
+		//给隐藏域赋值内容
+		var data_uid = $(parent.document).find('#nextuid').val();
+		
+		if(data_uid.indexOf(datanum)<0){
+			data_uid +=','+datanum;
+			if (data_uid.substr(0,1)==','){data_uid=data_uid.substr(1);} 
+			$(parent.document).find('#nextuid').val(data_uid);			
+		}	
 	}else{
 		$(this).find('#opbox_admin').prop("checked",false);		
 		$(parent.document).find('.workflow-node-ops .userss').each(function(){
@@ -115,6 +123,14 @@ $(document).on('click', '.TableData',function(){
 				$(this).remove();
 			}
 		})	
+		//给隐藏域赋值内容
+		var data_uid = $(parent.document).find('#nextuid').val();
+		if(data_uid.indexOf(datanum)>=0){
+			data_uid = data_uid.replace(datanum, "");
+			data_uid = data_uid.replace(',,', ",");
+			if (data_uid.substr(0,1)==','){data_uid=data_uid.substr(1);} 			
+			$(parent.document).find('#nextuid').val(data_uid);;			
+		}	
 	}
 });
 function begin_set(){
@@ -134,17 +150,20 @@ $(document).on('click', '#next',function(){
 });
 
 function add_all(){
-	var html = '';		
+	var html = '';	
+	var tol_uid='';
 	$(document).find('.TableData').each(function(){			
 		$(this).find('#opbox_admin').prop("checked",true);
 		var title=$(this).find('.menulines').attr('title');
 		var datanum=$(this).find('.menulines').attr('datanum');	
 		var tmphtml = '<div class="user-tags userss" data_uid="'+datanum+'">'+title+'<i class="close">×</i></div>';	
 		html +=tmphtml;
+		tol_uid+=datanum+',';
 		$(parent.document).find('.workflow-node-ops .userss').each(function(){			
 			$(this).remove();			
 		})			
 		$(parent.document).find('.workflow-node-ops').append(html);
+		$(parent.document).find('#nextuid').val(tol_uid);
 	})
 }
 function del_all(){
@@ -154,8 +173,7 @@ function del_all(){
 	$(parent.document).find('.workflow-node-ops .userss').each(function(){			
 			$(this).remove();			
 	})	
-	
-	
+	$(parent.document).find('#nextuid').val('');
 }
 
 </script>
