@@ -72,7 +72,7 @@ class RoleController extends CommonController {
 		$cid=$_GET['cid'];
 		$map['c_id'] = $cid;
 		$caseresult = M('work_case')->where($map)->find();
-		if($caseresult['c_state']==1){
+		if($caseresult['c_state']!=2){
 			unset($map);
 			$map['w_id'] = $caseresult['w_id'];
 			$map['step_id'] = $caseresult['step']+2;
@@ -87,24 +87,46 @@ class RoleController extends CommonController {
 	
 	//流程节点人员选择
 	public function get_wkallrole(){
+		$nowuid = $this->get_numuid();	
 		$cid=$_GET['cid'];
+		$act=$_GET['act'];
 		$map['c_id'] = $cid;
 		$caseresult = M('work_case')->where($map)->find();
-		if($caseresult['c_state']==1){
+		if($caseresult['c_state']!=2 && $act!='nopass'  ){
 			unset($map);
-			$map['w_id'] = $caseresult['w_id'];			
-			$result = M('workflow_extend')->where($map)->select();
+			$map['w_id'] = $caseresult['w_id'];	
+			$map['step_id'] = array('lt',$caseresult['step']+3);		
+			$result = M('workflow_extend')->where($map)->select();			
 			foreach($result as $key=>$val){
 				$uidarr = explode('|',$val['uid']);
 				foreach($uidarr as $v){
-					$uidarrtmp[]=$v;
+					if($nowuid!=$v){
+						$uidarrtmp[]=$v;
+					}					
 				}
 			}	
-			$uidstr = array_unique($uidarrtmp);
-			
+			$uidarrtmp[]=$caseresult['create_uid'];
+			$uidstr = array_unique($uidarrtmp);			
 			$map['user_number'] = array('in',$uidstr);
 			$user = M('user')->where($map)->select();		 
-		}		
+		}else if($caseresult['c_state']!=2 && $act=='nopass' ){
+			unset($map);
+			$map['w_id'] = $caseresult['w_id'];	
+			$map['step_id'] = array('lt',$caseresult['step']+2);		
+			$result = M('workflow_extend')->where($map)->select();			
+			foreach($result as $key=>$val){
+				$uidarr = explode('|',$val['uid']);
+				foreach($uidarr as $v){
+					if($nowuid!=$v){
+						$uidarrtmp[]=$v;
+					}					
+				}
+			}	
+			$uidarrtmp[]=$caseresult['create_uid'];
+			$uidstr = array_unique($uidarrtmp);			
+			$map['user_number'] = array('in',$uidstr);
+			$user = M('user')->where($map)->select();		 
+		}			
 		$this->assign('user',$user);
 		$this->display();
 	}
