@@ -1,0 +1,305 @@
+<style>
+    /*列表start*/
+    tr{color: #666;font-size: 15px;}
+    .tr_summary{border-bottom: 1px dashed #ccc;height: 35px;line-height: 35px;}
+    .tr_summary .txt_all{font-size: 15px;font-weight: bold;}
+    .tr_summary .txt_no{font-size: 15px;font-weight: bold;color: red;}
+    .tr_list{border-bottom: 1px dotted #ccc;height: 48px;line-height: 48px;}
+    .tr_list .tr_list_td_r{text-align: right;}
+    .tr_list img{vertical-align:middle;}
+    .tr_detail{border-bottom: 1px solid #ccc;height: 40px;line-height: 40px;display: none;}
+    .payment-type-plan{width: 60px;height: 20px;line-height: 20px;color: #f3ab6f;background: #fee7d1;display: inline-block;padding: 1px 10px;}
+    .payment-type-record{width: 60px;height: 20px;line-height: 20px;color: #5ea5db;background: #c3e4fd;display: inline-block;padding: 1px 10px;}
+    .payment-type-invoice{width: 60px;height: 20px;line-height: 20px;color: #95c566;background: #d2efb5;display: inline-block;padding: 1px 10px;}
+    .money_count_wrapper{color: #666;font-weight: bold;}
+    .cpayment-stage-add{display: block;width: 150px;height: 36px;line-height: 36px;border: 1px solid #ddd;color: #343d47 !important;border-radius: 3px;  position: relative;  text-align: center;margin-bottom: 5px;cursor: pointer;box-sizing: border-box;margin-top: 20px;}
+    .cpayment-stage-add img{vertical-align:middle;}
+    /*列表end*/
+    .forminfo .plan,.forminfo .record,.forminfo .invoice{display: none;}
+</style>
+<div class="dynamic-detail-body tablist">
+    <div style="background: #eaedf2;padding: 20px;">
+        <table class="filetable" id="moneylist">
+            <tr class="tr_summary"><td colspan="5"><span class="txt_all">共{$all_plan_sum|round=###,2}元/</span><span class="txt_no">未收款{$all_no_sum|round=###,2}元</span></td></tr>
+            <volist name="moneylogtree" id="vo">
+                <tr class="tr_list" data-id="{$vo.period}" data-json="{$vo.json}">
+                    <td class="tr_list_td_l" colspan="2">第{$vo.period}期&nbsp;&nbsp;<img class="arrow_ud_img up" src="{:C('STATIC_URL')}/images/arrow_up2.png"></td>
+                    <td class="tr_list_td_r" colspan="3">计划 {$vo.plan_sum}元&nbsp;&nbsp;实际 {$vo.record_sum}元&nbsp;&nbsp;开票 {$vo.invoice_sum}元&nbsp;&nbsp;<img class="add_img" src="{:C('STATIC_URL')}/images/contract_add.png"></td>
+                </tr>
+                <if condition="$vo['child']">
+                    <volist name="vo.child" id="vv">
+                        <tr class="tr_detail" data-pid="{$vo.period}" data-json="{$vv.json}">
+                            <td>
+                                <eq name="vv.type" value="1"><span class="payment-type-plan">计划</span></eq>
+                                <eq name="vv.type" value="2"><span class="payment-type-record">实际</span></eq>
+                                <eq name="vv.type" value="3"><span class="payment-type-invoice">开票</span></eq>
+                            </td>
+                            <td><eq name="vv.type" value="1">{$vv.plan_time|date="Y-m-d",###}<else />{$vv.finish_time|date="Y-m-d",###}</eq></td>
+                            <td>收款：<span class="money_count_wrapper">{$vv.money|round=###,2}</span>元</td>
+                            <td>{$moneylogType[$vv['type']][$vv['status']]}</td>
+                            <td><img class="edit_open" src="{:C('STATIC_URL')}/images/edit_pen.png">&nbsp;&nbsp;<img class="delete_open" src="{:C('STATIC_URL')}/images/delete.png"></td>
+                        </tr>
+                    </volist>
+                </if>
+            </volist>
+            <!--
+            <tr class="tr_list" data-id="1">
+                <td class="tr_list_td_l" colspan="2">第1期&nbsp;&nbsp;<img class="arrow_ud_img up" src="{:C('STATIC_URL')}/images/arrow_up2.png"></td>
+                <td class="tr_list_td_r" colspan="3">计划 0.00元&nbsp;&nbsp;实际 0.00元&nbsp;&nbsp;开票 0.00元&nbsp;&nbsp;<img class="add_img" src="{:C('STATIC_URL')}/images/contract_add.png"></td>
+            </tr>
+            <tr class="tr_detail" data-pid="1">
+                <td><span class="payment-type-plan">计划</span></td>
+                <td>2017-07-29</td>
+                <td>收款：<span class="money_count_wrapper">10.00</span>元</td>
+                <td>未回款</td>
+                <td><img class="edit_open" src="{:C('STATIC_URL')}/images/edit_pen.png">&nbsp;&nbsp;<img class="delete_open" src="{:C('STATIC_URL')}/images/delete.png"></td>
+            </tr>
+            <tr class="tr_detail" data-pid="1">
+                <td><span class="payment-type-record">实际</span></td>
+                <td>2017-07-29</td>
+                <td>收款：<span class="money_count_wrapper">10.00</span>元</td>
+                <td>未开票</td>
+                <td><img class="edit_open" src="{:C('STATIC_URL')}/images/edit_pen.png">&nbsp;&nbsp;<img class="delete_open" src="{:C('STATIC_URL')}/images/delete.png"></td>
+            </tr>
+            <tr class="tr_detail" data-pid="1">
+                <td><span class="payment-type-invoice">开票</span></td>
+                <td>2017-07-29</td>
+                <td>收款：<span class="money_count_wrapper">10.00</span>元</td>
+                <td>未回款</td>
+                <td><img class="edit_open" src="{:C('STATIC_URL')}/images/edit_pen.png">&nbsp;&nbsp;<img class="delete_open" src="{:C('STATIC_URL')}/images/delete.png"></td>
+            </tr>
+            -->
+        </table>
+        <a class="cpayment-stage-add" href="javascript:;"><img src="{:C('STATIC_URL')}/images/contract_add.png">&nbsp;增加回款期次</a>
+    </div>
+</div>
+
+<div id="add_moneylog_temp" style="display: none">
+    <form class="add_log_form" method="post" action="{:U('Agreetment/addMoneylog')}">
+    <ul class="forminfo" style="padding: 30px">
+        <input type="hidden" name="logid" class="input_logid" value="">
+        <input type="hidden" name="agree_id" class="input_agree_id" value="{$agreeinfo.id}">
+        <li><label>期次&nbsp;</label><input name="period" type="text" class="dfinput input_period" style="width: 230px" readonly /></li>
+        <li class="for_add"><label>类型&nbsp;</label><select name="select_type" class="dfinput input_select_type" style="width: 230px"><option value="">选择类型</option><option value="plan">回款计划</option><option value="record">回款记录</option><option value="invoice">开票记录</option></select></li>
+        <li class="special invoice"><label>票据内容&nbsp;</label><input name="invoice_title" type="text" class="dfinput input_invoice_title" style="width: 230px" /></li>
+        <li><label>金额&nbsp;</label><input name="money" type="text" class="dfinput input_money" style="width: 230px" /></li>
+        <li class="special plan"><label>计划回款日期&nbsp;</label><input name="plan_time" type="text" class="dfinput dfinput_datetime input_plan_time" style="width: 230px" readonly /></li>
+        <li class="special record"><label>实际回款日期&nbsp;</label><input name="pay_time" type="text" class="dfinput dfinput_datetime input_pay_time" style="width: 230px" readonly /></li>
+        <li class="special invoice"><label>开票日期&nbsp;</label><input name="invoice_time" type="text" class="dfinput dfinput_datetime input_invoice_time" style="width: 230px" readonly /></li>
+        <li class="special invoice"><label>发票类型&nbsp;</label><select name="invoice_type" class="dfinput input_invoice_type" style="width: 230px"><option value="增值税">增值税</option><option value="普通国税">普通国税</option><option value="普通地税">普通地税</option></select></li>
+        <li class="special invoice"><label>发票号码&nbsp;</label><input name="invoice_num" type="text" class="dfinput input_invoice_num" style="width: 230px" /></li>
+        <li class="special record"><label>付款方式&nbsp;</label><select name="pay_type" class="dfinput input_pay_type" style="width: 230px"><option value="月结">月结</option><option value="季结">季结</option><option value="年结">年结</option></select></li>
+        <li><label>状态&nbsp;</label><select name="status" class="dfinput input_status" style="width: 230px"></select></li>
+        <li><label>责任人&nbsp;</label><input name="user" type="text" class="dfinput input_user" style="width: 230px" readonly value="{$agreeinfo.nickname}" /></li>
+        <li><label>备注&nbsp;</label><textarea name="remarks" class="dfinput input_remarks" style="width: 230px;height: 50px;"></textarea></li>
+        <li><label>&nbsp;</label><input name="submit" type="button" class="btn do_savelog_btn" value="保存"/></li>
+    </ul>
+    </form>
+</div>
+
+<script>
+    $(function () {
+        var layer_index;
+        //添加回款期次
+        $(document).on('click', '.cpayment-stage-add', function () {
+            var load = layer.load(1);
+            $.ajax({
+                type:'post',
+                dataType:'json',
+                data:{select_type:'summary',agree_id:"{$agreeinfo.id}"},
+                url:"{:U('Agreetment/addMoneylog')}",
+                success:function (response) {
+                    layer.close(load);
+                    if (response.code == 1) {
+                        var arrow_up2 = "{:C('STATIC_URL')}/images/arrow_up2.png";
+                        var contract_add = "{:C('STATIC_URL')}/images/contract_add.png";
+                        var period = response.data.period;
+                        var periodHtml = '<tr class="tr_list" data-id="'+period+'">' +
+                                '<td class="tr_list_td_l" colspan="2">第'+period+'期&nbsp;&nbsp;<img class="arrow_ud_img up" src="'+arrow_up2+'"></td> ' +
+                                '<td class="tr_list_td_r" colspan="3">计划 0.00元&nbsp;&nbsp;实际 0.00元&nbsp;&nbsp;开票 0.00元&nbsp;&nbsp;<img class="add_img" src="'+contract_add+'"></td> ' +
+                                '</tr>';
+                        $('#moneylist').append(periodHtml);
+                    }else {
+                        layer.msg(response.msg, {icon: 2,time: 1000});
+                    }
+                }
+            });
+        });
+        //添加回款详情
+        $(document).on('click', '.tr_list .add_img', function () {
+            layer_index = layer.open({
+                type: 1,
+                title: '添加回款详情',
+                skin: 'layui-layer-rim', //加上边框
+                area: ['600px', '500'], //宽高
+                content: $('#add_moneylog_temp').html()
+            });
+            var lay_con = $('#layui-layer'+layer_index);
+            var tr = $(this).parents('tr');
+            lay_con.find('.input_period').val(tr.attr('data-id'));
+            lay_con.find('.do_savelog_btn').click(doAddMoneylog);
+        });
+        //选择日期
+        $(document).on('click', '.dfinput_datetime', function () {
+            laydate({format: 'YYYY-MM-DD',istime:false});
+        });
+        function doAddMoneylog() {
+            var load = layer.load(1);
+            $('#layui-layer'+layer_index+' .add_log_form').ajaxSubmit({
+                type:'post',
+                dataType:'json',
+                url:"{:U('Agreetment/addMoneylog')}",
+                error:function () {
+                    layer.close(load);
+                },
+                success:function (response) {
+                    layer.close(load);
+                    if (response.code == 1) {
+                        layer.msg('保存成功', {icon: 1,time: 1000}, function(){
+                            layer.close(layer_index);
+                        });
+                    }else {
+                        layer.msg(response.msg, {icon: 2,time: 1000});
+                    }
+                }
+            });
+        }
+        //编辑回款详情
+        $(document).on('click', '.tr_detail .edit_open', function () {
+            var tr = $(this).parents('tr');
+            if (!tr || tr == '') return false;
+            var json = eval('(' + tr.attr('data-json') + ')');
+            var title = {1:'回款计划',2:'回款记录',3:'开票记录'};
+            var height = {1:'520px',2:'580px',3:'680px'};
+            var _class = {1:'plan',2:'record',3:'invoice'};
+            var options = {
+                1:'<option value="0">未回款</option><option value="1">已回款</option>',
+                2:'<option value="0">未开票</option><option value="1">已开票</option>',
+                3:'<option value="0">未回款</option><option value="1">已回款</option>'
+            };
+            layer_index = layer.open({
+                type: 1,
+                title: '编辑'+title[json.type],
+                skin: 'layui-layer-rim', //加上边框
+                area: ['600px', height[json.type]], //宽高
+                content: $('#add_moneylog_temp').html()
+            });
+            var lay_con = $('#layui-layer'+layer_index);
+            lay_con.find('.input_status').html(options[json.type]);
+            lay_con.find('li.special').each(function () {
+                if ($(this).hasClass(_class[json.type])) $(this).show();
+                else $(this).hide();
+            });
+            lay_con.find('.for_add').hide();
+            lay_con.find('.input_logid').val(json.id);
+            lay_con.find('.input_period').val(json.period);
+            lay_con.find('.input_money').val(json.money);
+            lay_con.find('.input_status').val(json.status);
+            lay_con.find('.input_remarks').val(json.remarks);
+            if (json.type == 1) {
+                lay_con.find('.input_plan_time').val(date_formate(json.plan_time, false));
+            }else if (json.type == 2) {
+                lay_con.find('.input_pay_time').val(date_formate(json.finish_time, false));
+                lay_con.find('.input_pay_type').val(json.pay_type);
+            }else if (json.type == 3) {
+                lay_con.find('.input_invoice_time').val(date_formate(json.finish_time, false));
+                lay_con.find('.input_invoice_title').val(json.invoice_title);
+                lay_con.find('.input_invoice_type').val(json.invoice_type);
+                lay_con.find('.input_invoice_num').val(json.invoice_num);
+            }
+            lay_con.find('.do_savelog_btn').click(doEditMoneylog);
+        });
+        function doEditMoneylog() {
+            var load = layer.load(1);
+            $('#layui-layer'+layer_index+' .add_log_form').ajaxSubmit({
+                type:'post',
+                dataType:'json',
+                url:"{:U('Agreetment/editMoneylog')}",
+                error:function () {
+                    layer.close(load);
+                },
+                success:function (response) {
+                    layer.close(load);
+                    if (response.code == 1) {
+                        layer.msg('保存成功', {icon: 1,time: 1000}, function(){
+                            layer.close(layer_index);
+                        });
+                    }else {
+                        layer.msg(response.msg, {icon: 2,time: 1000});
+                    }
+                }
+            });
+        }
+
+        /*
+         <tr class="tr_detail" data-pid="{$vo.period}" data-json="{$vv.json}">
+         <td>
+         <eq name="vv.type" value="1"><span class="payment-type-plan">计划</span></eq>
+         <eq name="vv.type" value="2"><span class="payment-type-record">实际</span></eq>
+         <eq name="vv.type" value="3"><span class="payment-type-invoice">开票</span></eq>
+         </td>
+         <td><eq name="vv.type" value="1">{$vv.plan_time|date="Y-m-d",###}<else />{$vv.finish_time|date="Y-m-d",###}</eq></td>
+         <td>收款：<span class="money_count_wrapper">{$vv.money|round=###,2}</span>元</td>
+         <td>{$moneylogType[$vv['type']][$vv['status']]}</td>
+         <td><img class="edit_open" src="{:C('STATIC_URL')}/images/edit_pen.png">&nbsp;&nbsp;<img class="delete_open" src="{:C('STATIC_URL')}/images/delete.png"></td>
+         </tr>
+        * */
+        function createDetailHtml(data) {
+            var payment_type = {
+                1:'<span class="payment-type-plan">计划</span>',
+                2:'<span class="payment-type-record">实际</span>',
+                3:'<span class="payment-type-invoice">开票</span>',
+            };
+        }
+        
+        //选择类型
+        $(document).on('change', '.input_select_type', function () {
+            var forminfo = $(this).parents('.forminfo');
+            var value = $(this).val();
+            if (value == '') {
+                forminfo.find('.special').hide();
+                return false;
+            }
+            var options = {
+                plan:'<option value="0">未回款</option><option value="1">已回款</option>',
+                record:'<option value="0">未开票</option><option value="1">已开票</option>',
+                invoice:'<option value="0">未回款</option><option value="1">已回款</option>'
+            };
+            var height = {plan:'520px',record:'580px',invoice:'680px'};
+            forminfo.find('.input_status').html(options[value]);
+            forminfo.find('li.special').each(function () {
+                if ($(this).hasClass(value)) $(this).show();
+                else $(this).hide();
+            });
+            layer.style(layer_index, {height:height[value]});
+        });
+        
+       $('.tr_list .add_img').hover(function () {
+           $(this).attr('src', "{:C('STATIC_URL')}/images/contract_add_hover.png");
+       }, function () {
+           $(this).attr('src', "{:C('STATIC_URL')}/images/contract_add.png");
+       });
+        $('.tr_detail .edit_open').hover(function () {
+            $(this).attr('src', "{:C('STATIC_URL')}/images/edit_pen_blue.png");
+        }, function () {
+            $(this).attr('src', "{:C('STATIC_URL')}/images/edit_pen.png");
+        });
+        $('.tr_detail .delete_open').hover(function () {
+            $(this).attr('src', "{:C('STATIC_URL')}/images/delete_blue.png");
+        }, function () {
+            $(this).attr('src', "{:C('STATIC_URL')}/images/delete.png");
+        });
+        $('.tr_list .tr_list_td_l').click(function () {
+            var arrow_ud_img = $(this).find('.arrow_ud_img');
+            var tr = $(this).parents('tr');
+            var tr_detail = tr.siblings('tr[data-pid="'+$(this).parents('tr').attr('data-id')+'"]');
+            if (arrow_ud_img.hasClass('up')) {
+                arrow_ud_img.removeClass('up').attr('src', "{:C('STATIC_URL')}/images/arrow_down2.png");
+                tr_detail.show();
+            }else {
+                arrow_ud_img.addClass('up').attr('src', "{:C('STATIC_URL')}/images/arrow_up2.png");
+                tr_detail.hide();
+            }
+        });
+    });
+</script>

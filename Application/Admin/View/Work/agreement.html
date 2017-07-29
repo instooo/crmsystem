@@ -228,6 +228,7 @@
 	//查看合同状态
 	$(document).on('click', '.td_agree_name', function (){
 	     var cid = $(this).attr('data-cid');
+        var agree_id = $(this).parents('tr').attr('data-id');
 		 layer_index = layer.open({
 			type: 2,
 			title: '合同详情',
@@ -235,7 +236,7 @@
 			area: ['60%', '98%'],
 			shade: 0.1,
 			scrollbar: false,
-			content: '/Agreetment/detail/cid/'+cid,
+			content: '/Agreetment/detail/cid/'+cid+'/agree_id/'+agree_id,
 			end: function () {
 				location.reload() 
 			}

@@ -12,15 +12,23 @@ use \Common\Vendor\Workflow\workflow;
 
 class AgreetmentController extends CommonController {
     public $partnerConfig;
+    public $moneylogType;
 
     public function _initialize() {
         parent::_initialize();
         $this->partnerConfig = include(CONF_PATH.'partner.config.php');
+        $this->moneylogType = array(
+            1   =>  array(0=>'未回款',1=>'已回款'),//回款计划
+            2   =>  array(0=>'未开票',1=>'已开票'),//实际回款记录
+            3   =>  array(0=>'未回款',1=>'已回款'),//开票记录
+        );
+        $this->assign('moneylogType', $this->moneylogType);
     }
 	
 	public function detail(){
 		$cid = $_GET['cid'];
-		if($cid==''){
+		$agree_id= $_GET['agree_id'];
+		if($cid=='' || $agree_id == ''){
 			echo "参数不全";die;
 		}else{
 			$nowuid = $this->get_numuid();	
@@ -38,7 +46,22 @@ class AgreetmentController extends CommonController {
 
 			
 			$this->assign('result',$result);	
-			$this->assign('work_case',$work_case);	
+			$this->assign('work_case',$work_case);
+
+            //当前合同信息
+            $agreeinfo = M('agreement a')
+                ->field('a.*,u.id as uid,u.username,u.nickname')
+                ->join('left join crm_user u on u.user_number=a.owner')
+                ->where(array('a.id'=>$agree_id))->find();
+            $this->assign('agreeinfo',$agreeinfo);
+
+            //回款记录
+            $moneylog = $this->getMoneyLog($agree_id);
+            $this->assign('moneylogtree',$moneylog['moneylogtree']);
+            $this->assign('all_plan_sum',$moneylog['all_plan_sum']);
+            $this->assign('all_record_sum',$moneylog['all_record_sum']);
+            $this->assign('all_invoice_sum',$moneylog['all_invoice_sum']);
+            $this->assign('all_no_sum',$moneylog['all_no_sum']);
 		}
 		$this->display();
 	}
@@ -140,4 +163,223 @@ class AgreetmentController extends CommonController {
 		$this->assign('act',$act);
 		$this->display();
 	}
+
+    /**
+     * 查询回款记录
+     * @param $agree_id
+     * @return array
+     */
+    public function getMoneyLog($agree_id) {
+        $moneylog = M('money_log')->where(array('agree_id'=>$agree_id))->order('period asc,addtime asc')->select();
+        $moneylogtree = array();
+        $all_plan_sum = 0;
+        $all_record_sum = 0;
+        $all_invoice_sum = 0;
+        foreach ($moneylog as $val) {
+            if ($val['type'] == 0) {
+                $moneylogtree[$val['period']] = $val;
+                $moneylogtree[$val['period']]['plan_sum'] = 0;
+                $moneylogtree[$val['period']]['record_sum'] = 0;
+                $moneylogtree[$val['period']]['invoice_sum'] = 0;
+                $moneylogtree[$val['period']]['json'] = htmlspecialchars(json_encode($val));
+            }else {
+                $temp = $val;
+                if ($val['type'] == 1) {
+                    $temp['plan_sum'] += $val['money'];
+                    $all_plan_sum += $val['money'];
+                }elseif ($val['type'] == 2) {
+                    $temp['record_sum'] += $val['money'];
+                    $all_record_sum += $val['money'];
+                }elseif ($val['type'] == 3) {
+                    $temp['invoice_sum'] += $val['money'];
+                    $all_invoice_sum += $val['money'];
+                }
+                $temp['json'] = htmlspecialchars(json_encode($temp));
+                $moneylogtree[$val['period']]['child'][] = $temp;
+            }
+        }
+        $all_no_sum = $all_plan_sum - $all_record_sum;
+        $all_no_sum = $all_no_sum<0?0:$all_no_sum;
+        return array(
+            'moneylogtree'  =>  $moneylogtree,
+            'all_plan_sum'  =>  $all_plan_sum,
+            'all_record_sum'  =>  $all_record_sum,
+            'all_invoice_sum'  =>  $all_invoice_sum,
+            'all_no_sum'  =>  $all_no_sum
+        );
+    }
+
+    /**
+     * 添加回款记录
+     */
+    public function addMoneylog() {
+        $agree_id = intval(trim($_POST['agree_id']));
+        if (!$agree_id) {
+            $this->ajaxReturn(array('code'=>-1,'msg'=>'合同参数错误'), 'JSON');
+        }
+        $agreeinfo = M('agreement a')
+            ->field('a.*,u.id as uid,u.username')
+            ->join('left join crm_user u on u.user_number=a.owner')
+            ->where(array('a.id'=>$agree_id))->find();
+        if (!$agreeinfo) {
+            $this->ajaxReturn(array('code'=>-2,'msg'=>'合同不存在'), 'JSON');
+        }
+        //查询所有回款期次
+        $lmap = array(
+            'agree_id'  =>  $agreeinfo['id'],
+            'type'  =>  0
+        );
+        $money_log = M('money_log');
+        $periodinfo = M('money_log')->where($lmap)->order('period desc')->select();
+        $data = array();
+        $data['user_id'] = $agreeinfo['uid'];
+        $data['agree_id'] = $agreeinfo['id'];
+        $data['addtime'] = time();
+        $select_type = trim($_POST['select_type']);
+        if ($select_type == 'summary') {
+            //添加回款期次
+            $data['money'] = 0;
+            $data['period'] = $periodinfo[0]['period']?$periodinfo[0]['period']+1:1;
+            $data['type'] = 0;
+            $data['status'] = 0;
+        }elseif ($select_type == 'plan') {
+            //添加回款计划
+            if (!$periodinfo) {
+                $this->ajaxReturn(array('code'=>-3,'msg'=>'该回款期次不存在'), 'JSON');
+            }
+            $planlog = $money_log->where(array('agree_id'  =>  $agreeinfo['id'],'type'=>1))->find();
+            if ($planlog) {
+                $this->ajaxReturn(array('code'=>-4,'msg'=>'已经添加过回款计划'), 'JSON');
+            }
+
+            $data['money'] = $_POST['money'];
+            $data['period'] = $_POST['period'];
+            $data['type'] = 1;
+            $data['plan_time'] = strtotime($_POST['plan_time']);
+            $data['status'] = $_POST['status'];
+            $data['remarks'] = trim($_POST['remarks']);
+            if (!is_numeric($data['money']) || !is_numeric($data['period']) || !$data['plan_time'] || !is_numeric($data['status'])) {
+                $this->ajaxReturn(array('code'=>-5,'msg'=>'请填写完整的数据'), 'JSON');
+            }
+
+            //更新回款总额
+            $save = array();
+            $save['money'] = $data['money'];
+            $money_log->where(array('agree_id'=>$agreeinfo['id'],'type'=>0))->save($save);
+        }elseif ($select_type == 'record') {
+            //添加回款记录
+            if (!$periodinfo) {
+                $this->ajaxReturn(array('code'=>-3,'msg'=>'该回款期次不存在'), 'JSON');
+            }
+            $data['money'] = $_POST['money'];
+            $data['period'] = $_POST['period'];
+            $data['type'] = 2;
+            $data['finish_time'] = strtotime($_POST['pay_time']);
+            $data['status'] = $_POST['status'];
+            $data['pay_type'] = $_POST['pay_type'];
+            $data['remarks'] = trim($_POST['remarks']);
+            if (!is_numeric($data['money']) || !is_numeric($data['period']) || !$data['finish_time'] || !is_numeric($data['status']) || !$data['pay_type']) {
+                $this->ajaxReturn(array('code'=>-5,'msg'=>'请填写完整的数据'), 'JSON');
+            }
+        }elseif ($select_type == 'invoice') {
+            //添加开票记录
+            if (!$periodinfo) {
+                $this->ajaxReturn(array('code'=>-3,'msg'=>'该回款期次不存在'), 'JSON');
+            }
+            $data['money'] = $_POST['money'];
+            $data['period'] = $_POST['period'];
+            $data['type'] = 3;
+            $data['finish_time'] = strtotime($_POST['invoice_time']);
+            $data['status'] = $_POST['status'];
+            $data['invoice_title'] = trim($_POST['invoice_title']);
+            $data['invoice_type'] = trim($_POST['invoice_type']);
+            $data['invoice_num'] = trim($_POST['invoice_num']);
+            $data['remarks'] = trim($_POST['remarks']);
+            if (!is_numeric($data['money'])
+                || !is_numeric($data['period'])
+                || !$data['finish_time']
+                || !is_numeric($data['status'])
+                || !$data['invoice_title']
+                || !$data['invoice_type']
+                || !$data['invoice_num']) {
+                $this->ajaxReturn(array('code'=>-5,'msg'=>'请填写完整的数据'), 'JSON');
+            }
+        }else {
+            $this->ajaxReturn(array('code'=>-6,'msg'=>'回款类型未知'), 'JSON');
+        }
+        $rs = $money_log->add($data);
+        if (!$rs) {
+            $this->ajaxReturn(array('code'=>-500,'msg'=>'数据保存失败'), 'JSON');
+        }
+        $data['id'] = $rs;
+        $data['json'] = htmlspecialchars(json_encode($data));
+        //返回最新回款数据
+        $summap = array();
+        $summap['period'] = array('in', array(1,2,3));
+        $summap['agree_id'] = $agreeinfo['id'];
+        $sum_data = $money_log->field('sum(money) as sum_money,period')->where($summap)->group('period')->order('period asc')->select();
+        $sum_data = array_column($sum_data, 'sum_money', 'period');
+        $info_data = $data;
+        $this->ajaxReturn(array('code'=>1,'msg'=>'保存成功','sum_data'=>$sum_data,'info_data'=>$info_data), 'JSON');
+    }
+
+    /**
+     * 编辑回款记录
+     */
+    public function editMoneylog() {
+        $logid = intval($_POST['logid']);
+        if (!$logid) {
+            $this->ajaxReturn(array('code'=>-1,'msg'=>'参数错误'), 'JSON');
+        }
+        $money_log = M('money_log');
+        $loginfo = $money_log->where(array('id'=>$logid))->find();
+        if (!$loginfo) {
+            $this->ajaxReturn(array('code'=>-2,'msg'=>'要修改的记录不存在'), 'JSON');
+        }
+        $data = array();
+        if ($loginfo['type'] == 1) {
+            //回款计划
+            $data['money'] = $_POST['money'];
+            $data['plan_time'] = strtotime($_POST['plan_time']);
+            $data['status'] = $_POST['status'];
+            $data['remarks'] = trim($_POST['remarks']);
+            if (!is_numeric($data['money']) || !$data['plan_time'] || !$data['status']) {
+                $this->ajaxReturn(array('code'=>-3,'msg'=>'请填写完整的数据'), 'JSON');
+            }
+        }elseif ($loginfo['type'] == 2) {
+            $data['money'] = $_POST['money'];
+            $data['finish_time'] = strtotime($_POST['pay_time']);
+            $data['status'] = $_POST['status'];
+            $data['pay_type'] = $_POST['pay_type'];
+            $data['remarks'] = trim($_POST['remarks']);
+            if (!is_numeric($data['money']) || !$data['finish_time'] || !$data['status'] || !$data['pay_type']) {
+                $this->ajaxReturn(array('code'=>-3,'msg'=>'请填写完整的数据'), 'JSON');
+            }
+        }elseif ($loginfo['type'] == 3) {
+            $data['money'] = $_POST['money'];
+            $data['finish_time'] = strtotime($_POST['invoice_time']);
+            $data['status'] = $_POST['status'];
+            $data['invoice_title'] = trim($_POST['invoice_title']);
+            $data['invoice_type'] = trim($_POST['invoice_type']);
+            $data['invoice_num'] = trim($_POST['invoice_num']);
+            $data['remarks'] = trim($_POST['remarks']);
+            if (!is_numeric($data['money'])
+                || !$data['finish_time']
+                || !$data['status']
+                || !$data['invoice_title']
+                || !$data['invoice_type']
+                || !$data['invoice_num']) {
+                $this->ajaxReturn(array('code'=>-3,'msg'=>'请填写完整的数据'), 'JSON');
+            }
+        }else {
+            $this->ajaxReturn(array('code'=>-4,'msg'=>'回款类型未知'), 'JSON');
+        }
+        $rs = $money_log->where(array('id'=>$logid))->save($data);
+        if (false === $rs) {
+            $this->ajaxReturn(array('code'=>-500,'msg'=>'数据保存失败'), 'JSON');
+        }
+        $loginfo = array_merge($loginfo, $data);
+        $loginfo['json'] = htmlspecialchars(json_encode($loginfo));
+        $this->ajaxReturn(array('code'=>1,'msg'=>'数据保存成功','data'=>$loginfo), 'JSON');
+    }
 }
