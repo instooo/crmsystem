@@ -6,71 +6,8 @@
 namespace Common\Vendor\Workflow;
 use \Common\Vendor\Workflow\caselog;
 
-class workflow{	
-	
-	//获取单个实例的具体信息
-	public function onecase($data){
-		$map['c_id']=$data['c_id'];
-		$result['info'] = M('work_case a')			
-			->where($map)			
-			->find();
-		$result['history'] = M('work_case_log')			
-			->where($map)
-			->order('log_id desc')
-			->select();
-		return $result;
-	}
-	
-	//获取当前用户拥有实例列表
-	public function caselist($data){
-		$ret = array('code'=>-1,'msg'=>'');
-        do{	
-			$type = $data['type'];
-			$nowuid = $data['user'];
-			if($type == 'mine'){//完成的实例
-				$map['a.c_create_uid'] = $nowuid;				
-				$result = M('work_case a')
-						  ->join('crm_work_case_log b on b.c_id=a.c_id and a.step=b.step')
-						  ->where($map)			
-						  ->select();				
-			}else if($type == 'done'){//已完成的审核
-				//查找审核过的合同
-				$map['a.uid'] = $nowuid;
-				$map['a.step'] = array('not in',array(-1,0));		
-				$result_tmp = M('work_case_log a')
-						  ->field('a.c_id')									  
-						  ->where($map)			
-						  ->select();				
-				if(!$result_tmp){
-					break;
-				}
-				//查找合同的状态		  
-				$c_idarr = array_column($result_tmp,'c_id');				
-				$mapnew['a.c_id'] = array('in',$c_idarr);				
-				$result = M('work_case_log a')						 
-						  ->join('crm_work_case b on b.c_id=a.c_id and a.step=b.step')
-						  ->where($mapnew)			
-						  ->select();				
-				
-			}else if($type == 'doing'){//正在进行的实例
-				$map['a.uid'] = array('like','%'.$nowuid.'%');
-				$map['a.st_status'] = array('in',array(0));				
-				$result = M('work_case_step a')	
-						  ->join('crm_work_case b on a.c_id=b.c_id')
-						  ->join('crm_work_case_log c on c.c_id=a.c_id and b.step=c.step')
-						  ->where($map)			
-						  ->select();				
-			}
-			if($result){
-				$ret['code'] = '1';
-				$ret['msg'] = '获得数据';
-				$ret['data'] = $result;
-			}	
-			break;
-		}while(0);
-		return $ret;		
-	}	
-	
+class workflow{		
+
 	//添加实例	
 	public function addCase($data){
 		$ret = array('code'=>-1,'msg'=>'');
@@ -405,5 +342,90 @@ class workflow{
 		return $ret;
 	}
 	
+	//获取每步流程的具体信息
+	public function get_step_info($data){
+		$ret = array('code'=>-1,'msg'=>'');
+        do{	
+			$cid = $data['cid'];
+			$act = $data['act'];
+			if($cid=='' || $act=='' ){
+				$ret['code'] = '-1';
+				$ret['msg'] = '参数不全';
+				break;				
+			}
+			//查找当前实例是否存在		
+			$map['c_id']=$cid;
+			$result = M('work_case a')
+				->join('crm_user b on a.c_create_uid = b.user_number')			
+				->where($map)
+				->find();
+			if(!$result){
+				$ret['code'] = '-2';
+				$ret['msg'] = '实例不存在';
+				break;	
+			}	
+			if($act=="nopass"){
+				unset($map);
+				$nowuid = $this->get_numuid();				
+				$map['user_number'] = $nowuid;
+				$nowuser = M('user')->where($map)->find();
+				
+				$redata['nowuser'] = $nowuser['nickname'] ;
+				$redata['step'] = $result['step']+1 ;				
+				$redata['flag'] = 'nopass';
+			}else{		
+				unset($map);
+				if($result['step']==-1){//提交审核
+					$map['w_id']=$result['w_id'];
+					$next = M('workflow_extend')->where($map)->order('e_id asc')->find();
+					//查找下一步的处理人员
+					unset($map);
+					$uidarr = explode('|',$next['uid']);
+					$map['user_number'] = array('in',$uidarr);
+					$user = M('user')->where($map)->select();
+					
+					$redata['nowuser'] = $result['nickname'] ;			
+					$redata['step'] = $result['step'] ;
+					$redata['stepdes'] = "草稿" ;
+					$redata['des'] = $next['des'];
+					$redata['nextuser'] = $user;
+					$redata['flag'] = 'first';				
+				}else{
+					unset($map);
+					$nowuid = $this->get_numuid();				
+					$map['user_number'] = $nowuid;
+					$nowuser = M('user')->where($map)->find();
+					//查找最大步骤
+					unset($map);
+					$map['w_id']=$result['w_id'];
+					$max = M('workflow_extend')->where($map)->order('step_id desc')->find();
+					if(($result['step']+1) >=$max['step_id'] )
+					{
+						$redata['nowuser'] = $nowuser['nickname'] ;
+						$redata['step'] = $result['step']+1 ;				
+						$redata['flag'] = 'last';	
+					}else{
+						//查找下一步处理人
+						unset($map);
+						$map['step_id']=$result['step']+2;
+						$map['w_id']=$result['w_id'];
+						$next = M('workflow_extend')->where($map)->find();
+						unset($map);
+						$uidarr = explode('|',$next['uid']);
+						$map['user_number'] = array('in',$uidarr);
+						$user = M('user')->where($map)->select();
+						//查找当前人				
+						$redata['nextuser'] = $user;
+						$redata['des'] = $next['des'];
+						$redata['step'] = $result['step']+1 ;
+						$redata['nowuser'] = $nowuser['nickname'] ;	
+						$redata['flag'] = 'middle';	
+					}
+				
+				}	
+			}
+		}while(0);
+		return $ret;
+	}
 }
 ?>
