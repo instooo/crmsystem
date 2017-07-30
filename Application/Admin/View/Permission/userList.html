@@ -18,14 +18,6 @@
 
         <ul class="toolbar">
             <li class="add_btn"><span><img src="{:C('STATIC_URL')}/images/t01.png"/></span>添加</li>
-            <li class="click"><span><img src="{:C('STATIC_URL')}/images/t02.png"/></span>修改</li>
-            <li><span><img src="{:C('STATIC_URL')}/images/t03.png"/></span>删除</li>
-            <li><span><img src="{:C('STATIC_URL')}/images/t04.png"/></span>统计</li>
-        </ul>
-
-
-        <ul class="toolbar1">
-            <li><span><img src="{:C('STATIC_URL')}/images/t05.png"/></span>设置</li>
         </ul>
 
     </div>
@@ -48,7 +40,7 @@
                     <td class="td_username">{$vo.username}</td>
                     <td class="td_nickname">{$vo.nickname}</td>
                     <td class="td_role" data-roleid="{$vo.role_id}">{$vo.rolename}</td>
-                    <td><a href="javascript:;" class="tablelink edit_btn">修改</a><!--<a href="javascript:;" class="tablelink dele_btn"> 删除</a>--></td>
+                    <td><a href="javascript:;" class="tablelink edit_btn">修改</a>&nbsp;<a href="javascript:;" class="tablelink partner_btn">客户设置</a><!--<a href="javascript:;" class="tablelink dele_btn"> 删除</a>--></td>
                 </tr>
             </volist>
             </tbody>
@@ -72,6 +64,26 @@
             <li><label>&nbsp;</label><input name="submit" type="button" class="btn do_save_btn" value="保存"/></li>
         </ul>
     </div>
+    <style>
+        .p_list{width: 300px;height: 100px;padding: 10px;border: solid 1px #bac8d5;border-radius: 3px;overflow-y: scroll}
+    </style>
+    <div id="partner_temp" style="display: none">
+        <form class="add_partner_form" method="post" action="{:U('Permission/editUserPartner')}">
+            <ul class="forminfo" style="padding: 20px;">
+                <input type="hidden" name="user_id" class="input_id" value="">
+                <li><label>用户名</label><input name="username" type="text" class="dfinput input_username" readonly style="width: 200px" /></li>
+                <li><label>可见客户</label><a href="javascript:;" class="tablelink selectall" style="line-height: 34px;">全选</a></li>
+                <li>
+                    <dl class="p_list">
+                        <volist name="partnerlist" id="vo">
+                            <dd><input type="checkbox" name="partner_id[]" value="{$vo.id}">{$vo.partner_name}</dd>
+                        </volist>
+                    </dl>
+                </li>
+                <li><label>&nbsp;</label><input name="submit" type="button" class="btn save_partner" value="保存"/></li>
+            </ul>
+        </form>
+    </div>
 
 
 </div>
@@ -79,6 +91,69 @@
 <script>
     $(function () {
         var layer_index;
+        //设置可见客户
+        $(document).on('click', '.partner_btn', function () {
+            var tr = $(this).parents('tr');
+            $.ajax({
+                type:'get',
+                dataType:'json',
+                data:{user_id:tr.find('.td_id').html()},
+                url:"{:U('Permission/editUserPartner')}",
+                success:function (response) {
+                    if (response.code == 1) {
+                        layer_index = layer.open({
+                            type: 1,
+                            title: '编辑可见客户',
+                            skin: 'layui-layer-rim',
+                            area: ['365px', '380px'],
+                            content: $('#partner_temp').html()
+                        });
+                        var layer_con = $('#layui-layer'+layer_index);
+                        layer_con.find('.input_id').val(tr.find('.td_id').html());
+                        layer_con.find('.input_username').val(tr.find('.td_nickname').html());
+                        if (response.data.json) {
+                            for (var i in response.data.json) {
+                                layer_con.find('input[type="checkbox"][name="partner_id[]"][value="'+response.data.json[i]+'"]').prop('checked', true);
+                            }
+                        }
+                        layer_con.find('.save_partner').click(function () {
+                            doEditUserPartner(layer_con);
+                        });
+                    }
+                }
+            });
+        });
+        function doEditUserPartner(layer_con) {
+            var load = layer.load(1);
+            layer_con.find('.add_partner_form').ajaxSubmit({
+                type:'post',
+                dataType:'json',
+                url:"{:U('Permission/editUserPartner')}",
+                error:function () {
+                    layer.close(load);
+                },
+                success:function (response) {
+                    layer.close(load);
+                    if (response.code == 1) {
+                        layer.msg('保存成功', {icon: 1,time: 1000}, function(){
+                            layer.close(layer_index);
+                        });
+                    }else {
+                        layer.msg(response.msg, {icon: 2,time: 1000});
+                    }
+                }
+            });
+        }
+        $(document).on('click', '.forminfo .selectall', function () {
+            if ($(this).hasClass('all')) {
+                $(this).removeClass('all');
+                $(this).parents('.forminfo').find('input[type="checkbox"][name="partner_id[]"]').prop('checked', false);
+            }else {
+                $(this).addClass('all');
+                $(this).parents('.forminfo').find('input[type="checkbox"][name="partner_id[]"]').prop('checked', true);
+            }
+        });
+        
         $(document).on('click', '.edit_btn', function () {
             layer_index = layer.open({
                 type: 1,
@@ -171,6 +246,11 @@
                     }
                 }
             });
+        });
+        
+        //编辑用户可见客户
+        $(document).on('click', '.partner_btn', function () {
+            
         });
         
     });

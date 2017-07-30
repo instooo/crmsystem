@@ -24,7 +24,7 @@ class WorkController extends CommonController {
     public function partner() {
 		//查找自己拥有客户
 		$nowuid = $this->get_numuid();
-		$map['owner'] = $nowuid;	
+		$map['owner'] = array('in', $this->getUserPartner($nowuid));
 		
         $fieldlist = $this->getFieldList('partner');
         $klist = array_keys($fieldlist);
@@ -172,7 +172,7 @@ class WorkController extends CommonController {
 		
 		
 		$nowuid = $this->get_numuid();
-		$map['a.c_create_uid'] = $nowuid;	
+		$map['a.c_create_uid'] = $nowuid;
 		
         $datalist = M('agreement p')
             ->field('p.*,u.id as user_id,u.nickname,t.partner_name,a.*,b.*')

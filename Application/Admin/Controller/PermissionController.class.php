@@ -301,6 +301,11 @@ class PermissionController extends CommonController {
 
         $rolelist = M('role')->select();
         $this->assign('rolelist' ,$rolelist);
+
+        //客户列表
+        $partnerlist = M('partner')->select();
+        $this->assign('partnerlist' ,$partnerlist);
+
         $this->display();
     }
 
@@ -505,6 +510,46 @@ class PermissionController extends CommonController {
             $tree = D('Node')->getChildNode(0,$menulist);
             $this->assign('tree', $tree);
             $this->display();
+        }
+    }
+
+    /**
+     * 编辑用户可见客户
+     */
+    public function editUserPartner() {
+        if (IS_POST) {
+            $user_id = intval($_POST['user_id']);
+            $partner_id = $_POST['partner_id'];
+            if (!$user_id) {
+                $this->ajaxReturn(array('code'=>-1,'msg'=>'参数不全'), 'JSON');
+            }
+            $data = array();
+            if (is_array($partner_id) && count($partner_id) > 0) {
+                $data['partners'] = implode(',', $partner_id);
+            }else {
+                $data['partners'] = '';
+            }
+            if (false === M('user_partner')->where(array('userid'=>$user_id))->save($data)) {
+                $this->ajaxReturn(array('code'=>-2,'msg'=>'保存失败'), 'JSON');
+            }
+            $this->ajaxReturn(array('code'=>1,'msg'=>'保存成功'), 'JSON');
+        }else {
+            $user_id = intval($_GET['user_id']);
+            if (!$user_id) {
+                $this->ajaxReturn(array('code'=>-1,'msg'=>'参数不全'), 'JSON');
+            }
+            $user_partner = M('user_partner');
+            $data = $user_partner->where(array('userid'=>$user_id))->find();
+            if (!$data) {
+                $data = array();
+                $data['userid'] = $user_id;
+                $data['partners'] = '';
+                $user_partner->add($data);
+            }
+            if ($data['partners']) {
+                $data['json'] = explode(',', $data['partners']);
+            }
+            $this->ajaxReturn(array('code'=>1,'msg'=>'获取成功','data'=>$data), 'JSON');
         }
     }
 }

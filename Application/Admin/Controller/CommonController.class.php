@@ -461,5 +461,23 @@ class CommonController extends Controller {
         $this->ajaxReturn($return_data, 'JSON');
     }
 
+    /**
+     * 获取用户可见客户
+     * @param $user_id
+     * @return array
+     */
+    public function getUserPartner($user_id) {
+        $user_partner = M('user_partner')->where(array('userid'=>$user_id))->find();
+        $result = array($user_id);
+        if ($user_partner['partners']) {
+            $array = explode(',' ,$user_partner['partners']);
+            foreach ($array as $val) {
+                if ($user_id == $val) continue;
+                $result[] = $val;
+            }
+        }
+        return $result;
+    }
+
 
 }
