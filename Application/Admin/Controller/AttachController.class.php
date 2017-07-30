@@ -10,6 +10,10 @@ namespace Admin\Controller;
 
 class AttachController extends CommonController {
 
+    public function test() {
+        dump(iconv_get_encoding('all'));
+    }
+
 
     /**
      * 上传合同文档

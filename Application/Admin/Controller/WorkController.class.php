@@ -368,6 +368,11 @@ class WorkController extends CommonController {
 		$recase = $workcase->addCase($data);
 		$adddata['e_id'] = $recase['data']['c_id'];
 		//添加合同
+        if (!is_numeric($adddata['total_money']) || !is_numeric($adddata['workflow'])) {
+            $return_data['code'] = -2;
+            $return_data['msg'] = '您输入的数据不合法';
+            $this->ajaxReturn($return_data,'JSON');
+        }
         $this->addData($adddata);	
     }
 
