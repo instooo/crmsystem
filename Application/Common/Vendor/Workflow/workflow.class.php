@@ -14,10 +14,18 @@ class workflow{
 		$result['info'] = M('work_case a')			
 			->where($map)			
 			->find();
-		$result['history'] = M('work_case_log')			
+			
+		//查找所有的用户
+		$userinfo = M('user')->select();
+		$userinfo = array_column($userinfo,'user_number');
+		//查看当前实例的具体情况
+		$log = M('work_case_log')			
 			->where($map)
 			->order('log_id desc')
-			->select();
+			->select();	
+
+		print_r($log);
+		$result['history'] = $log;
 		return $result;
 	}
 	//添加实例	

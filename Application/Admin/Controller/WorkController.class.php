@@ -22,12 +22,17 @@ class WorkController extends CommonController {
      * 客户管理
      */
     public function partner() {
+		//查找自己拥有客户
+		$nowuid = $this->get_numuid();
+		$map['owner'] = $nowuid;	
+		
         $fieldlist = $this->getFieldList('partner');
         $klist = array_keys($fieldlist);
 
         $count = M('partner p')
             ->field('p.*,u.id,u.nickname')
-            ->join('left join crm_user u on u.id=p.owner')
+			->where($map)
+            ->join('left join crm_user u on u.user_number=p.owner')
             ->count();
         $page = new \Think\Page($count, 20);
         $page->setConfig('prev', '&nbsp;');
@@ -35,8 +40,9 @@ class WorkController extends CommonController {
 
         $datalist = M('partner p')
             ->field('p.*,u.id as user_id,u.nickname')
-            ->join('left join crm_user u on u.id=p.owner')
+            ->join('left join crm_user u on u.user_number=p.owner')
             ->order('p.id desc')
+			->where($map)
             ->limit("{$page->firstRow},{$page->listRows}")
             ->select();
 
@@ -203,7 +209,9 @@ class WorkController extends CommonController {
         $this->assign('list', $list);
 
         //查询客户
-        $partnerlist = M('partner')->select();
+		$nowuid = $this->get_numuid();
+		$pmap['owner'] = $nowuid;	
+        $partnerlist = M('partner')->where($pmap)->select();	
         $this->assign('partnerlist', $partnerlist);
 		//查询流程
         $workflow = M('workflow')->select();			
@@ -265,7 +273,9 @@ class WorkController extends CommonController {
         $this->assign('list', $list);
 
         //查询客户
-        $partnerlist = M('partner')->select();
+		$nowuid = $this->get_numuid();
+		$pmap['owner'] = $nowuid;	
+        $partnerlist = M('partner')->where($pmap)->select();	
         $this->assign('partnerlist', $partnerlist);
 		//查询流程
         $workflow = M('workflow')->select();			
@@ -335,7 +345,9 @@ class WorkController extends CommonController {
 		$this->assign('pagebar', $page->show());
 		$this->assign('list', $list);
 		//查询客户
-        $partnerlist = M('partner')->select();
+		$nowuid = $this->get_numuid();
+		$pmap['owner'] = $nowuid;	
+        $partnerlist = M('partner')->where($pmap)->select();	
         $this->assign('partnerlist', $partnerlist);
 		//查询流程
         $workflow = M('workflow')->select();			
