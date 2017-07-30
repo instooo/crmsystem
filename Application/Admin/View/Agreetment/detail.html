@@ -74,9 +74,9 @@
 					<volist name="vo['sub']" id='v'>
 					<div class="remark-sub-list" style="padding-left:25px">
 						<span class="remark-sub-list-name">
-							<a target="_blank" style='color: #017dbe;'>{$v.re_user}</a>回复：					
+							<a target="_blank" style='color: #017dbe;'>{$v.user}</a>回复：					
 							<if condition="$v['uid'] neq $v['re_uid']" >							
-								回复：<a target="_blank" style='color: #017dbe;'>{$v.user}</a>  
+								回复：<a target="_blank" style='color: #017dbe;'>{$v.re_user}</a>  
 							</if>
 						</span>
 						<br>

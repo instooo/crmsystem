@@ -33,19 +33,30 @@ class MessageController extends CommonController {
 				$logdata['w_id']=$result['w_id'];			
 				$logdata['step']=$result['step'];
 				$logdata['pid']	=$result['log_id'];
-				$logdata['uid']	=$result['uid'];
-				$logdata['re_uid']	=$uid;		
+				$logdata['uid']	=$uid;		
+				$logdata['re_uid']	=$result['uid'];
 				$logdata['act_id']=1;
 				$logdata['create_time']=time();
 				$logdata['des']='';
 				$logdata['status']=1;
-				$logdata['comment']=$_POST['comment'];	
+				$logdata['comment']=$_POST['comment'];
+				//
+				//print_r($logdata);die;
 				$workcase = new caselog();	
-				$result = $workcase->addCaselog($logdata);
-				if($result){
-					$redata['state']=1;
-					$redata['msg']=1;
-				}
+				$workcase->addCaselog($logdata);	
+
+				//发送消息
+				$data['uid'] = $this->get_numuid();	
+				$data['c_id'] = $result['c_id'];					
+				$data['comment'] = $_POST['comment'];				
+				$data['reuid'] = $result['uid'];
+				
+				$messagelog = new messagelog();	
+				$result = $messagelog->addMessagelog($data);
+				
+								
+				$redata['state']=1;
+				$redata['msg']=1;
 				exit(json_encode($redata));
 			}else{
 				

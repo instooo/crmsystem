@@ -19,17 +19,17 @@ class messagelog{
 			$logdata['createtime']=time();
 			$logdata['updatetime']=0;		
 			$logdata['status']=0;
-			$logdata['message']=$data['comment'];	
+			$logdata['message']=$data['comment'];				
 			M('message_log')->add($logdata);	
 		}	
 	}
 	
 	//未读消息条数
-	public function get_message_count(){
+	public function get_message_count(){		
 		$nowuid = $this->get_num_uid();				
 		$map['reuid'] = $nowuid;
 		$map['status'] = 0;
-		$count = M('message_log')->where($map)->count();	
+		$count = M('message_log')->where($map)->count();		
 		return $count;
 	}
 
@@ -40,7 +40,8 @@ class messagelog{
 			$userinfoarr[$val['user_number']]=$val;
 		}	
 		$nowuid = $this->get_num_uid();				
-		$map['reuid'] = $nowuid;		
+		$map['reuid'] = $nowuid;
+	
 		$list = M('message_log a')
 				->field('a.*,b.*,b.id as aid,a.id')
 				->join('crm_agreement b on a.c_id=b.e_id')
@@ -50,7 +51,7 @@ class messagelog{
 		$tmp_arr = array();
 		foreach ($list as $key=>$val){
 			$tmp_arr[$key]=$val;
-			$tmp_arr[$key]['send'] = $userinfoarr[$val['reuid']]['nickname'];
+			$tmp_arr[$key]['send'] = $userinfoarr[$val['uid']]['nickname'];
 		}
 		return $tmp_arr;
 	}
