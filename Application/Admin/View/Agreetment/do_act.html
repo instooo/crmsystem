@@ -11,18 +11,18 @@
 
 
 <div class="work-prcs-title" style="margin-bottom: 10px;font-weight: normal;border-radius: 4px;-webkit-border-radius: 4px;">
-	<if condition="$redata['step'] eq -1">
-		当前步骤为<font color="red">{$redata.stepdes}</font>中,处理人<font color="red">				
+	<if condition="$redata['data']['step'] eq -1">
+		当前步骤为<font color="red">{$redata.data.stepdes}</font>中,处理人<font color="red">				
 				<div self_type="self" style="display:inline;">
-					{$redata.nowuser}                   
+					{$redata.data.nowuser}                   
 				</div>
 				<div style="display:inline;">					               
 				</div>
 			</font>
 	<else/>
-		当前步骤为<font color="red">第{$redata.step}步</font>中,处理人<font color="red">				
+		当前步骤为<font color="red">第{$redata.data.step}步</font>中,处理人<font color="red">				
 				<div self_type="self" style="display:inline;">
-					{$redata.nowuser}                   
+					{$redata.data.nowuser}                   
 				</div>
 				<div style="display:inline;">					               
 				</div>
@@ -30,13 +30,13 @@
 	</if>
 </div>
 
-<if condition='$redata.flag eq nopass'>
+<if condition='$redata.data.flag eq nopass'>
 <div class="work-prcs-block">
     	<div class="work-prcs-title " style='margin-bottom:10px;'>
     	 操作：<font color="red">	不通过</font>
          </div>	
  </div>
-<elseif condition='$redata.flag neq last'/>
+<elseif condition='$redata.data.flag neq last'/>
 <div class="work-prcs-block">
     	<div class="work-prcs-title">
     	   请选择下一步骤           
@@ -45,7 +45,7 @@
     		<div class="workflow-procs-nodes-wrap">
                 <ul id="workPrcsData" class="workflow-procs-nodes">
 				<li class="workflow-node active">
-				<a href="#">{$redata.des}  </a>
+				<a href="#">{$redata.data.des}  </a>
                 <ol></ol>
                 </li>			
 				</ul>
@@ -59,10 +59,10 @@
 						<div class="workflow-node-ops">                    
 							<input class="user-tags btn-info" id="chose_user2" type="button" value="选择人员">
 							<div class="managers">经办人：</div>
-							<input type='hidden' name='nextuid' id='nextuid' value="<volist name="redata.nextuser" id="vo">
+							<input type='hidden' name='nextuid' id='nextuid' value="<volist name="redata.data.nextuser" id="vo">
 								{$vo.user_number},
 								</volist>"/>
-							<volist name="redata.nextuser" id="vo">
+							<volist name="redata.data.nextuser" id="vo">
 							<div class="user-tags userss" data_uid="{$vo.user_number}">{$vo.nickname}<i class="close">×</i></div>
 							</volist>
 						</div>

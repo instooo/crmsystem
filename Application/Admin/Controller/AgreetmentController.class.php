@@ -28,7 +28,7 @@ class AgreetmentController extends CommonController {
 	public function detail(){
 		$cid = $_GET['cid'];
 		$agree_id= $_GET['agree_id'];
-		if($cid=='' || $agree_id == ''){
+		if($cid=='' || $agree_id == ''){		
 			echo "参数不全";die;
 		}else{
 			$nowuid = $this->get_numuid();	
@@ -81,33 +81,16 @@ class AgreetmentController extends CommonController {
 		exit(json_encode($result));
 	}
 	
-	public function do_act(){
-		$cid = $_GET['cid'];
-		$act = $_GET['act'];
+	public function do_act(){		
 		$data['cid'] = $_GET['cid'];
 		$data['act'] = $_GET['act'];
 		$workcase = new workflow();	
-		$redata = $workcase->get_step_info($data);
-		
-		
-		if($cid=='' || $act=='' ){
-			echo "参数不全";die;
-		}
-		//查找当前实例是否存在		
-		$map['c_id']=$cid;
-		$result = M('work_case a')
-			->join('crm_user b on a.c_create_uid = b.user_number')			
-			->where($map)
-			->find();
-		if(!$result){
-			die;
-		}		
-		
+		$redata = $workcase->get_step_info($data);				
 		
 		$this->assign('redata',$redata);
 		//查找下一步处理人
-		$this->assign('cid',$cid);
-		$this->assign('act',$act);
+		$this->assign('cid',$data['cid']);
+		$this->assign('act',$data['act']);
 		$this->display();
 	}
 

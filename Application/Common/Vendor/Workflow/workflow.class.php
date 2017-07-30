@@ -8,6 +8,18 @@ use \Common\Vendor\Workflow\caselog;
 
 class workflow{		
 
+	//获取单个实例的具体信息
+	public function onecase($data){
+		$map['c_id']=$data['c_id'];
+		$result['info'] = M('work_case a')			
+			->where($map)			
+			->find();
+		$result['history'] = M('work_case_log')			
+			->where($map)
+			->order('log_id desc')
+			->select();
+		return $result;
+	}
 	//添加实例	
 	public function addCase($data){
 		$ret = array('code'=>-1,'msg'=>'');
@@ -373,6 +385,10 @@ class workflow{
 				$redata['nowuser'] = $nowuser['nickname'] ;
 				$redata['step'] = $result['step']+1 ;				
 				$redata['flag'] = 'nopass';
+				$ret['code'] = '1';
+				$ret['msg'] = 'success';
+				$ret['data'] =$redata;
+				break;				
 			}else{		
 				unset($map);
 				if($result['step']==-1){//提交审核
@@ -389,7 +405,11 @@ class workflow{
 					$redata['stepdes'] = "草稿" ;
 					$redata['des'] = $next['des'];
 					$redata['nextuser'] = $user;
-					$redata['flag'] = 'first';				
+					$redata['flag'] = 'first';	
+					$ret['code'] = '1';
+					$ret['msg'] = 'success';
+					$ret['data'] =$redata;
+					break;	
 				}else{
 					unset($map);
 					$nowuid = $this->get_numuid();				
@@ -403,7 +423,11 @@ class workflow{
 					{
 						$redata['nowuser'] = $nowuser['nickname'] ;
 						$redata['step'] = $result['step']+1 ;				
-						$redata['flag'] = 'last';	
+						$redata['flag'] = 'last';
+						$ret['code'] = '1';
+						$ret['msg'] = 'success';
+						$ret['data'] =$redata;
+				break;		
 					}else{
 						//查找下一步处理人
 						unset($map);
@@ -419,7 +443,11 @@ class workflow{
 						$redata['des'] = $next['des'];
 						$redata['step'] = $result['step']+1 ;
 						$redata['nowuser'] = $nowuser['nickname'] ;	
-						$redata['flag'] = 'middle';	
+						$redata['flag'] = 'middle';
+						$ret['code'] = '1';
+						$ret['msg'] = 'success';
+						$ret['data'] =$redata;
+						break;		
 					}
 				
 				}	
