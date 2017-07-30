@@ -30,13 +30,13 @@
 	</if>
 </div>
 
-<if condition='$redata.data.flag eq nopass'>
+<if condition="$redata['data']['flag'] eq nopass">
 <div class="work-prcs-block">
     	<div class="work-prcs-title " style='margin-bottom:10px;'>
     	 操作：<font color="red">	不通过</font>
          </div>	
  </div>
-<elseif condition='$redata.data.flag neq last'/>
+<elseif condition="$redata['data']['flag'] neq last"/>
 <div class="work-prcs-block">
     	<div class="work-prcs-title">
     	   请选择下一步骤           
@@ -105,10 +105,28 @@ $(document).on("click",'#next',function(){
 	var comment = $("#comment").val();
 	////流程接收人
 	var nextuid = $("#nextuid").val();
+	
 	//消息接收人
 	var reuid = $("#remind_others_name").attr('data-uid');
-	if (nextuid.substr(0,1)==','){nextuid=nextuid.substr(1);} 
-	if (reuid.substr(0,1)==','){reuid=reuid.substr(1);} 
+	if(nextuid=='undefined' || nextuid==''||!nextuid){
+		
+	}else{
+		if(nextuid==''||!nextuid){
+			layer_index = layer.open({
+			type: 1,
+			title: '请选择下一步流程'
+		});	
+		}
+		if (nextuid.substr(0,1)==','){nextuid=nextuid.substr(1);} 
+	}
+	if(reuid=='undefined' || reuid==''||!reuid){
+		layer_index = layer.open({
+			type: 1,
+			title: '消息接收人不能为空'
+		});	
+	}else{
+		if (reuid.substr(0,1)==','){reuid=reuid.substr(1);} 
+	}
 	$.ajax({
 		type:'post',
 		dataType:'json',

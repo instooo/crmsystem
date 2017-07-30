@@ -10,8 +10,17 @@ use Think\Model;
 use Think\Think;
 use \Common\Vendor\Workflow\workflow;
 use \Common\Vendor\Workflow\caselog;
+use \Common\Vendor\Workflow\messagelog;
 
 class MessageController extends CommonController {
+	
+	//我的消息列表
+	public function message_list(){
+		$messagelog = new messagelog();	
+		$list = $messagelog->get_message_list();		
+		$this->assign('list',$list);
+		$this->display();
+	}
 	
 	public function replay(){		
 		if(IS_POST){
@@ -52,4 +61,10 @@ class MessageController extends CommonController {
 		
 	}
 
+	//读取消息
+	public function readmessage(){
+		$id = $_POST['id'];
+		$messagelog = new messagelog();	
+		$list = $messagelog->readmessage($id);	
+	}
 }

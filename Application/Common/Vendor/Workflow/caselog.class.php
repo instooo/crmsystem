@@ -20,10 +20,6 @@ class caselog{
 		$logdata['status']=$data['status'];
 		$logdata['comment']=$data['comment'];			
 		M('work_case_log')->add($logdata);
-	}
-	//添加消息记录
-	public function addMessagelog(){
-		
-	}
+	}	
 }
 ?>

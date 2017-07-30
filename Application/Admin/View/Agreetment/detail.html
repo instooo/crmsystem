@@ -63,28 +63,31 @@
 				<div class="dynamic-replay-self-info">
 					<span class="crm-image-show-client" style="width: 40px; height: 40px; line-height: 40px; background-color: rgb(92, 179, 137);"></span>
 					<div class="dynamic-self-info">
-						<span class="dynamic-self-name">{$vo.uid}:{$vo.des}</span>
+						<span class="dynamic-self-name"><a target="_blank" style='color: #017dbe;'>{$vo.user}</a>  :{$vo.des}</span>
 					</div>
 					<div class="dynamic-self-mess">
 						<span class="dynamic-normal-content">{$vo.comment}</span>
 					</div>
 					<div class="dynamic-self-time">
 
-					{$vo.create_time|date='Y-m-d H:i:s',###}<a href="javascript:void(0);" class="remake-list-time-rpl" onclick="reply_sign({$vo.log_id});">回复</a>
+					<font color='#999'>{$vo.create_time|date='Y年m月d日 H:i:s',###}</font><a href="javascript:void(0);" class="remake-list-time-rpl" onclick="reply_sign({$vo.log_id});">回复</a>
+					<volist name="vo['sub']" id='v'>
 					<div class="remark-sub-list" style="padding-left:25px">
 						<span class="remark-sub-list-name">
-							<a target="_blank">邓小龙</a>  
-						回复：
+							<a target="_blank" style='color: #017dbe;'>{$v.re_user}</a>回复：					
+							<if condition="$v['uid'] neq $v['re_uid']" >							
+								回复：<a target="_blank" style='color: #017dbe;'>{$v.user}</a>  
+							</if>
 						</span>
 						<br>
 						<div class="content">
-							萨达干撒嘎嘎按规定撒gas
+							{$v.comment}
 						</div>
-						<div class="remake-list-time">2017-07-27 14:55:50&nbsp;
-							<a href="javascript:void(0);" class="remake-list-time-rpl" onclick="reply_sign('102');">回复</a>
+						<div class="remake-list-time"><font color='#999'>{$v.create_time|date='Y年m月d日 H:i:s',###}</font>&nbsp;
+							<a href="javascript:void(0);" class="remake-list-time-rpl" onclick="reply_sign({$vo.log_id});">回复</a>
 						</div>						
 					</div>	
-
+					</volist>
 					</div>
 
 

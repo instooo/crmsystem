@@ -91,7 +91,8 @@ class RoleController extends CommonController {
 		$cid=$_GET['cid'];
 		$act=$_GET['act'];
 		$map['c_id'] = $cid;
-		$caseresult = M('work_case')->where($map)->find();
+		$caseresult = M('work_case')->where($map)->find();		
+		$uidarrtmp[]=-1;
 		if($caseresult['c_state']!=2 && $act!='nopass'  ){
 			unset($map);
 			$map['w_id'] = $caseresult['w_id'];	
@@ -105,7 +106,7 @@ class RoleController extends CommonController {
 					}					
 				}
 			}	
-			$uidarrtmp[]=$caseresult['create_uid'];
+			$uidarrtmp[]=$caseresult['c_create_uid'];
 			$uidstr = array_unique($uidarrtmp);			
 			$map['user_number'] = array('in',$uidstr);
 			$user = M('user')->where($map)->select();		 
@@ -122,10 +123,11 @@ class RoleController extends CommonController {
 					}					
 				}
 			}	
-			$uidarrtmp[]=$caseresult['create_uid'];
+			$uidarrtmp[]=$caseresult['c_create_uid'];
 			$uidstr = array_unique($uidarrtmp);			
 			$map['user_number'] = array('in',$uidstr);
-			$user = M('user')->where($map)->select();		 
+			$user = M('user')->where($map)->select();	
+			
 		}			
 		$this->assign('user',$user);
 		$this->display();

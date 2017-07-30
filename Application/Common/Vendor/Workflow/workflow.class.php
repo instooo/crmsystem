@@ -17,15 +17,40 @@ class workflow{
 			
 		//查找所有的用户
 		$userinfo = M('user')->select();
-		$userinfo = array_column($userinfo,'user_number');
+		$userinfoarr = array();
+		foreach($userinfo as $val){
+			$userinfoarr[$val['user_number']]=$val;
+		}	
 		//查看当前实例的具体情况
 		$log = M('work_case_log')			
 			->where($map)
-			->order('log_id desc')
+			->order('log_id asc')
 			->select();	
-
-		print_r($log);
-		$result['history'] = $log;
+		$tmp_arr = array();
+		foreach($log as $key=>$val){
+			if($val['pid']==0){
+				$tmp_arr[$val['log_id']]['log_id']=$val['log_id'];	
+				$tmp_arr[$val['log_id']]['pid']=$val['pid'];
+				$tmp_arr[$val['log_id']]['c_id']=$val['c_id'];
+				$tmp_arr[$val['log_id']]['w_id']=$val['w_id'];
+				$tmp_arr[$val['log_id']]['step']=$val['step'];
+				$tmp_arr[$val['log_id']]['uid']=$val['uid'];
+				$tmp_arr[$val['log_id']]['user']=$userinfoarr[$val['uid']]['nickname'];
+				$tmp_arr[$val['log_id']]['re_uid']=$val['re_uid'];
+				$tmp_arr[$val['log_id']]['re_user']=$userinfoarr[$val['re_uid']]['nickname'];
+				$tmp_arr[$val['log_id']]['act_id']=$val['act_id'];
+				$tmp_arr[$val['log_id']]['create_time']=$val['create_time'];
+				$tmp_arr[$val['log_id']]['des']=$val['des'];
+				$tmp_arr[$val['log_id']]['comment']=$val['comment'];
+				$tmp_arr[$val['log_id']]['status']=$val['status'];
+			}else{		
+				$pid = $val['pid'];
+				$tmp_arr[$pid]['sub'][$key]=$val;
+				$tmp_arr[$pid]['sub'][$key]['user']=$userinfoarr[$val['uid']]['nickname'];
+				$tmp_arr[$pid]['sub'][$key]['re_user']=$userinfoarr[$val['re_uid']]['nickname'];
+			}
+		}			
+		$result['history'] = $tmp_arr;
 		return $result;
 	}
 	//添加实例	
@@ -78,7 +103,7 @@ class workflow{
 	}
 			
 	//执行步骤
-	public function doStep($data){	
+	public function doStep($data){
 		$ret = array('code'=>-1,'msg'=>'');
         do{			
 			$data['uid'] = $data['uid'];//用户id
@@ -326,13 +351,28 @@ class workflow{
 					break;
 				}else{						
 					//查找当前的操作
-					if($uid == $casere['c_create_uid'] && $casere['step']>-1){
+					if($uid == $casere['c_create_uid']){						
 						$map['c_id'] = $data['work_case'];
-						$sresult = M('work_case_step')->where($map)->order('st_id desc')->find();if($sresult['st_status'] == -1){
+						$sresult = M('work_case_step')->where($map)->order('st_id desc')->find();
+						$uidflag = strpos ($sresult['uid'],$casere['c_create_uid']);
+						$uidflag = ($uidflag===false)?0:1;
+						if($sresult['st_status'] == -1){
 							$ret['code'] = '1';
 							$ret['msg'] = '提交审批';				
 							$ret['data'][]= array('action'=>'so_start','des'=>'提交审批',);
 							break;
+						}else if($sresult['st_status'] == 0 && $uidflag){
+							$ret['code'] = '-1';
+							$ret['msg'] = '已完成';	
+							$ret['data'][]= array(
+								'action'=>'pass',
+								'des'=>'通过'
+							);	
+							$ret['data'][]= array(
+								'action'=>'nopass',
+								'des'=>'不通过'
+							);					
+							break;	
 						}else{
 							$ret['code'] = '-1';
 							$ret['msg'] = '已完成';	
@@ -388,9 +428,9 @@ class workflow{
 				$ret['msg'] = '实例不存在';
 				break;	
 			}	
-			if($act=="nopass"){
+			if($act=="nopass"){				
 				unset($map);
-				$nowuid = $this->get_numuid();				
+				$nowuid = $this->get_num_uid();				
 				$map['user_number'] = $nowuid;
 				$nowuser = M('user')->where($map)->find();
 				
@@ -399,7 +439,7 @@ class workflow{
 				$redata['flag'] = 'nopass';
 				$ret['code'] = '1';
 				$ret['msg'] = 'success';
-				$ret['data'] =$redata;
+				$ret['data'] =$redata;				
 				break;				
 			}else{		
 				unset($map);
@@ -424,7 +464,7 @@ class workflow{
 					break;	
 				}else{
 					unset($map);
-					$nowuid = $this->get_numuid();				
+					$nowuid = $this->get_num_uid();				
 					$map['user_number'] = $nowuid;
 					$nowuser = M('user')->where($map)->find();
 					//查找最大步骤
@@ -432,14 +472,14 @@ class workflow{
 					$map['w_id']=$result['w_id'];
 					$max = M('workflow_extend')->where($map)->order('step_id desc')->find();
 					if(($result['step']+1) >=$max['step_id'] )
-					{
+					{						
 						$redata['nowuser'] = $nowuser['nickname'] ;
 						$redata['step'] = $result['step']+1 ;				
 						$redata['flag'] = 'last';
 						$ret['code'] = '1';
 						$ret['msg'] = 'success';
 						$ret['data'] =$redata;
-				break;		
+						break;		
 					}else{
 						//查找下一步处理人
 						unset($map);
@@ -466,6 +506,20 @@ class workflow{
 			}
 		}while(0);
 		return $ret;
+	}
+
+	//获取当前账号
+	public function get_num_uid(){
+		if($_SESSION['tem_num']){
+			//查找当前用户
+			$nowuid = $_SESSION['tem_num'];			
+		}else if($_SESSION['authId']){
+			//查找当前用户
+			$nowuid = $_SESSION['user_number'];
+		}else{
+			echo "未登录";die;
+		}
+		return $nowuid;	
 	}
 }
 ?>

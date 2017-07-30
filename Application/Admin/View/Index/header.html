@@ -37,8 +37,10 @@
         </ul>
         <div class="user">
             <span>admin</span>
-            <i>消息</i>
-            <b>5</b>
+            <i><a href='/message/message_list'>消息</a></i>
+			<if condition="$count gt 0">
+            <b>{$count}</b>
+			</if>
         </div>
     </div>
     <div class="clear"></div>

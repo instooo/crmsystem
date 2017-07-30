@@ -7,9 +7,10 @@
  */
 namespace Admin\Controller;
 
-use Common\Vendor\Workflow\workflow;
 use Think\Controller;
 use Org\Util\Rbac;
+use \Common\Vendor\Workflow\workflow;
+use \Common\Vendor\Workflow\messagelog;
 
 class CommonController extends Controller {
 
@@ -35,8 +36,12 @@ class CommonController extends Controller {
         else
             $datalist = D('Node')->getNodeListByUid($_SESSION[C('USER_AUTH_KEY')]);
         $tree = D('Node')->getChildNode(0,$datalist);
+		//查看当前有多少消息
+		$messagelog = new messagelog();	
+		$count = $messagelog->get_message_count();
+		
         $this->assign("tree",$tree);
-
+		$this->assign("count",$count);
         $this->assign('url_tag', strtoupper(CONTROLLER_NAME.'/'.ACTION_NAME));
 
     }
