@@ -8,6 +8,7 @@
     .tr_list .tr_list_td_r{text-align: right;}
     .tr_list img{vertical-align:middle;}
     .tr_detail{border-bottom: 1px solid #ccc;height: 40px;line-height: 40px;display: none;}
+    .tr_detail .deal_td{width: 30%}
     .payment-type-plan{width: 60px;height: 20px;line-height: 20px;color: #f3ab6f;background: #fee7d1;display: inline-block;padding: 1px 10px;}
     .payment-type-record{width: 60px;height: 20px;line-height: 20px;color: #5ea5db;background: #c3e4fd;display: inline-block;padding: 1px 10px;}
     .payment-type-invoice{width: 60px;height: 20px;line-height: 20px;color: #95c566;background: #d2efb5;display: inline-block;padding: 1px 10px;}
@@ -20,55 +21,28 @@
 <div class="dynamic-detail-body tablist">
     <div style="background: #eaedf2;padding: 20px;">
         <table class="filetable" id="moneylist">
-            <tr class="tr_summary"><td colspan="5"><span class="txt_all">共{$all_plan_sum|round=###,2}元/</span><span class="txt_no">未收款{$all_no_sum|round=###,2}元</span></td></tr>
+            <tr class="tr_summary"><td colspan="5"><span class="txt_all">共{$all_plan_sum}元/</span><span class="txt_no">未收款{$all_no_sum}元</span></td></tr>
             <volist name="moneylogtree" id="vo">
                 <tr class="tr_list" data-id="{$vo.period}" data-json="{$vo.json}">
                     <td class="tr_list_td_l" colspan="2">第{$vo.period}期&nbsp;&nbsp;<img class="arrow_ud_img up" src="{:C('STATIC_URL')}/images/arrow_up2.png"></td>
-                    <td class="tr_list_td_r" colspan="3">计划 {$vo.plan_sum}元&nbsp;&nbsp;实际 {$vo.record_sum}元&nbsp;&nbsp;开票 {$vo.invoice_sum}元&nbsp;&nbsp;<img class="add_img" src="{:C('STATIC_URL')}/images/contract_add.png"></td>
+                    <td class="tr_list_td_r" colspan="3">计划 <span class="period_plan_sum">{$vo.plan_sum}</span>元&nbsp;&nbsp;实际 <span class="period_record_sum">{$vo.record_sum}</span>元&nbsp;&nbsp;开票 <span class="period_invoice_sum">{$vo.invoice_sum}</span>元&nbsp;&nbsp;<img class="add_img" src="{:C('STATIC_URL')}/images/contract_add.png"></td>
                 </tr>
                 <if condition="$vo['child']">
                     <volist name="vo.child" id="vv">
-                        <tr class="tr_detail" data-pid="{$vo.period}" data-json="{$vv.json}">
-                            <td>
+                        <tr class="tr_detail" data-id="{$vv.id}" data-pid="{$vo.period}" data-json="{$vv.json}">
+                            <td class="payment-type_td">
                                 <eq name="vv.type" value="1"><span class="payment-type-plan">计划</span></eq>
                                 <eq name="vv.type" value="2"><span class="payment-type-record">实际</span></eq>
                                 <eq name="vv.type" value="3"><span class="payment-type-invoice">开票</span></eq>
                             </td>
-                            <td><eq name="vv.type" value="1">{$vv.plan_time|date="Y-m-d",###}<else />{$vv.finish_time|date="Y-m-d",###}</eq></td>
+                            <td class="datetime_td"><eq name="vv.type" value="1">{$vv.plan_time|date="Y-m-d",###}<else />{$vv.finish_time|date="Y-m-d",###}</eq></td>
                             <td>收款：<span class="money_count_wrapper">{$vv.money|round=###,2}</span>元</td>
-                            <td>{$moneylogType[$vv['type']][$vv['status']]}</td>
-                            <td><img class="edit_open" src="{:C('STATIC_URL')}/images/edit_pen.png">&nbsp;&nbsp;<img class="delete_open" src="{:C('STATIC_URL')}/images/delete.png"></td>
+                            <td class="status_td">{$moneylogType[$vv['type']][$vv['status']]}</td>
+                            <td class="deal_td"><img class="edit_open" src="{:C('STATIC_URL')}/images/edit_pen.png">&nbsp;&nbsp;<img class="delete_open" src="{:C('STATIC_URL')}/images/delete.png"></td>
                         </tr>
                     </volist>
                 </if>
             </volist>
-            <!--
-            <tr class="tr_list" data-id="1">
-                <td class="tr_list_td_l" colspan="2">第1期&nbsp;&nbsp;<img class="arrow_ud_img up" src="{:C('STATIC_URL')}/images/arrow_up2.png"></td>
-                <td class="tr_list_td_r" colspan="3">计划 0.00元&nbsp;&nbsp;实际 0.00元&nbsp;&nbsp;开票 0.00元&nbsp;&nbsp;<img class="add_img" src="{:C('STATIC_URL')}/images/contract_add.png"></td>
-            </tr>
-            <tr class="tr_detail" data-pid="1">
-                <td><span class="payment-type-plan">计划</span></td>
-                <td>2017-07-29</td>
-                <td>收款：<span class="money_count_wrapper">10.00</span>元</td>
-                <td>未回款</td>
-                <td><img class="edit_open" src="{:C('STATIC_URL')}/images/edit_pen.png">&nbsp;&nbsp;<img class="delete_open" src="{:C('STATIC_URL')}/images/delete.png"></td>
-            </tr>
-            <tr class="tr_detail" data-pid="1">
-                <td><span class="payment-type-record">实际</span></td>
-                <td>2017-07-29</td>
-                <td>收款：<span class="money_count_wrapper">10.00</span>元</td>
-                <td>未开票</td>
-                <td><img class="edit_open" src="{:C('STATIC_URL')}/images/edit_pen.png">&nbsp;&nbsp;<img class="delete_open" src="{:C('STATIC_URL')}/images/delete.png"></td>
-            </tr>
-            <tr class="tr_detail" data-pid="1">
-                <td><span class="payment-type-invoice">开票</span></td>
-                <td>2017-07-29</td>
-                <td>收款：<span class="money_count_wrapper">10.00</span>元</td>
-                <td>未回款</td>
-                <td><img class="edit_open" src="{:C('STATIC_URL')}/images/edit_pen.png">&nbsp;&nbsp;<img class="delete_open" src="{:C('STATIC_URL')}/images/delete.png"></td>
-            </tr>
-            -->
         </table>
         <a class="cpayment-stage-add" href="javascript:;"><img src="{:C('STATIC_URL')}/images/contract_add.png">&nbsp;增加回款期次</a>
     </div>
@@ -116,7 +90,7 @@
                         var period = response.data.period;
                         var periodHtml = '<tr class="tr_list" data-id="'+period+'">' +
                                 '<td class="tr_list_td_l" colspan="2">第'+period+'期&nbsp;&nbsp;<img class="arrow_ud_img up" src="'+arrow_up2+'"></td> ' +
-                                '<td class="tr_list_td_r" colspan="3">计划 0.00元&nbsp;&nbsp;实际 0.00元&nbsp;&nbsp;开票 0.00元&nbsp;&nbsp;<img class="add_img" src="'+contract_add+'"></td> ' +
+                                '<td class="tr_list_td_r" colspan="3">计划 <span class="period_plan_sum">0.00</span>元&nbsp;&nbsp;实际 <span class="period_record_sum">0.00</span>元&nbsp;&nbsp;开票 <span class="period_invoice_sum">0.00</span>元&nbsp;&nbsp;<img class="add_img" src="'+contract_add+'"></td> ' +
                                 '</tr>';
                         $('#moneylist').append(periodHtml);
                     }else {
@@ -155,6 +129,7 @@
                 success:function (response) {
                     layer.close(load);
                     if (response.code == 1) {
+                        createDetailHtml(response.return_data);
                         layer.msg('保存成功', {icon: 1,time: 1000}, function(){
                             layer.close(layer_index);
                         });
@@ -221,6 +196,7 @@
                 success:function (response) {
                     layer.close(load);
                     if (response.code == 1) {
+                        createDetailHtml(response.return_data, true);
                         layer.msg('保存成功', {icon: 1,time: 1000}, function(){
                             layer.close(layer_index);
                         });
@@ -231,25 +207,47 @@
             });
         }
 
-        /*
-         <tr class="tr_detail" data-pid="{$vo.period}" data-json="{$vv.json}">
-         <td>
-         <eq name="vv.type" value="1"><span class="payment-type-plan">计划</span></eq>
-         <eq name="vv.type" value="2"><span class="payment-type-record">实际</span></eq>
-         <eq name="vv.type" value="3"><span class="payment-type-invoice">开票</span></eq>
-         </td>
-         <td><eq name="vv.type" value="1">{$vv.plan_time|date="Y-m-d",###}<else />{$vv.finish_time|date="Y-m-d",###}</eq></td>
-         <td>收款：<span class="money_count_wrapper">{$vv.money|round=###,2}</span>元</td>
-         <td>{$moneylogType[$vv['type']][$vv['status']]}</td>
-         <td><img class="edit_open" src="{:C('STATIC_URL')}/images/edit_pen.png">&nbsp;&nbsp;<img class="delete_open" src="{:C('STATIC_URL')}/images/delete.png"></td>
-         </tr>
+        /**
+        * 创建或修改回款详情
         * */
-        function createDetailHtml(data) {
+        function createDetailHtml(return_data, isedit) {
+            var data = return_data.info_data;
+            var data_sum = return_data.sum_data;
             var payment_type = {
                 1:'<span class="payment-type-plan">计划</span>',
                 2:'<span class="payment-type-record">实际</span>',
                 3:'<span class="payment-type-invoice">开票</span>',
             };
+            var statusArr = {
+                1:{0:'未回款',1:'已回款'},
+                2:{0:'未开票',1:'已开票'},
+                3:{0:'未回款',1:'已回款'}
+            };
+            var delete_img = "{:C('STATIC_URL')}/images/delete.png";
+            var edit_pen_img = "{:C('STATIC_URL')}/images/edit_pen.png";
+            var tr_list = $('.tr_list[data-id="'+data.period+'"]');
+            if (isedit) {
+                var tr_detail = $('.tr_detail[data-id="'+data.id+'"]');
+                tr_detail.attr('data-json', data.json);
+                tr_detail.find('.datetime_td').html(date_formate(data.plan_time?data.plan_time:data.finish_time, false));
+                tr_detail.find('.money_count_wrapper').html(data.money);
+                tr_detail.find('.status_td').html(statusArr[data.type][data.status]);
+            }else {
+                var detailHtml = '<tr class="tr_detail" data-id="'+data.id+'" data-pid="'+data.period+'" data-json="'+data.json+'">' +
+                        '<td class="payment-type_td">'+payment_type[data.type]+'</td>' +
+                        '<td class="datetime_td">'+date_formate(data.plan_time?data.plan_time:data.finish_time, false)+'</td>' +
+                        '<td>收款：<span class="money_count_wrapper">'+data.money+'</span>元</td>' +
+                        '<td class="status_td">'+statusArr[data.type][data.status]+'</td>' +
+                        '<td class="deal_td"><img class="edit_open" src="'+edit_pen_img+'">&nbsp;&nbsp;<img class="delete_open" src="'+delete_img+'"></td> ' +
+                        '</tr>';
+                $('.tr_detail[data-pid="'+data.period+'"]').last().after(detailHtml);
+            }
+            $('.tr_summary .txt_all').html('共'+data_sum.all_plan_sum+'元/');
+            $('.tr_summary .txt_no').html('未收款'+data_sum.all_no_sum+'元');
+            tr_list.find('.period_plan_sum').html(data_sum.moneylogtree[data.period].plan_sum);
+            tr_list.find('.period_record_sum').html(data_sum.moneylogtree[data.period].record_sum);
+            tr_list.find('.period_invoice_sum').html(data_sum.moneylogtree[data.period].invoice_sum);
+            $('.tr_detail[data-pid="'+data.period+'"]').show();
         }
         
         //选择类型
