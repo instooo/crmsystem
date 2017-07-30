@@ -23,13 +23,13 @@
         <table class="filetable" id="moneylist">
             <tr class="tr_summary"><td colspan="5"><span class="txt_all">共{$all_plan_sum}元/</span><span class="txt_no">未收款{$all_no_sum}元</span></td></tr>
             <volist name="moneylogtree" id="vo">
-                <tr class="tr_list" data-id="{$vo.period}" data-json="{$vo.json}">
+                <tr class="tr_list" data-id="{$vo.id}" data-period="{$vo.period}" data-json="{$vo.json}">
                     <td class="tr_list_td_l" colspan="2">第{$vo.period}期&nbsp;&nbsp;<img class="arrow_ud_img up" src="{:C('STATIC_URL')}/images/arrow_up2.png"></td>
-                    <td class="tr_list_td_r" colspan="3">计划 <span class="period_plan_sum">{$vo.plan_sum}</span>元&nbsp;&nbsp;实际 <span class="period_record_sum">{$vo.record_sum}</span>元&nbsp;&nbsp;开票 <span class="period_invoice_sum">{$vo.invoice_sum}</span>元&nbsp;&nbsp;<img class="add_img" src="{:C('STATIC_URL')}/images/contract_add.png"></td>
+                    <td class="tr_list_td_r" colspan="3">计划 <span class="period_plan_sum">{$vo.plan_sum}</span>元&nbsp;&nbsp;实际 <span class="period_record_sum">{$vo.record_sum}</span>元&nbsp;&nbsp;开票 <span class="period_invoice_sum">{$vo.invoice_sum}</span>元&nbsp;&nbsp;<img class="add_img" src="{:C('STATIC_URL')}/images/contract_add.png"><img class="delete_open" src="{:C('STATIC_URL')}/images/delete.png"></td>
                 </tr>
                 <if condition="$vo['child']">
                     <volist name="vo.child" id="vv">
-                        <tr class="tr_detail" data-id="{$vv.id}" data-pid="{$vo.period}" data-json="{$vv.json}">
+                        <tr class="tr_detail" data-id="{$vv.id}" data-period="{$vo.period}" data-json="{$vv.json}">
                             <td class="payment-type_td">
                                 <eq name="vv.type" value="1"><span class="payment-type-plan">计划</span></eq>
                                 <eq name="vv.type" value="2"><span class="payment-type-record">实际</span></eq>
@@ -87,10 +87,11 @@
                     if (response.code == 1) {
                         var arrow_up2 = "{:C('STATIC_URL')}/images/arrow_up2.png";
                         var contract_add = "{:C('STATIC_URL')}/images/contract_add.png";
-                        var period = response.data.period;
-                        var periodHtml = '<tr class="tr_list" data-id="'+period+'">' +
-                                '<td class="tr_list_td_l" colspan="2">第'+period+'期&nbsp;&nbsp;<img class="arrow_ud_img up" src="'+arrow_up2+'"></td> ' +
-                                '<td class="tr_list_td_r" colspan="3">计划 <span class="period_plan_sum">0.00</span>元&nbsp;&nbsp;实际 <span class="period_record_sum">0.00</span>元&nbsp;&nbsp;开票 <span class="period_invoice_sum">0.00</span>元&nbsp;&nbsp;<img class="add_img" src="'+contract_add+'"></td> ' +
+                        var delete_img = "{:C('STATIC_URL')}/images/delete.png";
+                        var info_data = response.return_data.info_data;
+                        var periodHtml = '<tr class="tr_list" data-id="'+info_data.id+'" data-period="'+info_data.period+'">' +
+                                '<td class="tr_list_td_l" colspan="2">第'+info_data.period+'期&nbsp;&nbsp;<img class="arrow_ud_img up" src="'+arrow_up2+'"></td> ' +
+                                '<td class="tr_list_td_r" colspan="3">计划 <span class="period_plan_sum">0.00</span>元&nbsp;&nbsp;实际 <span class="period_record_sum">0.00</span>元&nbsp;&nbsp;开票 <span class="period_invoice_sum">0.00</span>元&nbsp;&nbsp;<img class="add_img" src="'+contract_add+'"><img class="delete_open" src="'+delete_img+'"></td> ' +
                                 '</tr>';
                         $('#moneylist').append(periodHtml);
                     }else {
@@ -110,7 +111,7 @@
             });
             var lay_con = $('#layui-layer'+layer_index);
             var tr = $(this).parents('tr');
-            lay_con.find('.input_period').val(tr.attr('data-id'));
+            lay_con.find('.input_period').val(tr.attr('data-period'));
             lay_con.find('.do_savelog_btn').click(doAddMoneylog);
         });
         //选择日期
@@ -225,30 +226,80 @@
             };
             var delete_img = "{:C('STATIC_URL')}/images/delete.png";
             var edit_pen_img = "{:C('STATIC_URL')}/images/edit_pen.png";
-            var tr_list = $('.tr_list[data-id="'+data.period+'"]');
+            var tr_list = $('.tr_list[data-period="'+data.period+'"]');
             if (isedit) {
                 var tr_detail = $('.tr_detail[data-id="'+data.id+'"]');
-                tr_detail.attr('data-json', data.json);
-                tr_detail.find('.datetime_td').html(date_formate(data.plan_time?data.plan_time:data.finish_time, false));
-                tr_detail.find('.money_count_wrapper').html(data.money);
-                tr_detail.find('.status_td').html(statusArr[data.type][data.status]);
+                if (tr_detail.length && tr_detail.length > 0) {
+                    tr_detail.attr('data-json', data.json);
+                    tr_detail.find('.datetime_td').html(date_formate(data.plan_time?data.plan_time:data.finish_time, false));
+                    tr_detail.find('.money_count_wrapper').html(data.money);
+                    tr_detail.find('.status_td').html(statusArr[data.type][data.status]);
+                }
             }else {
-                var detailHtml = '<tr class="tr_detail" data-id="'+data.id+'" data-pid="'+data.period+'" data-json="'+data.json+'">' +
+                var detailHtml = '<tr class="tr_detail" data-id="'+data.id+'" data-period="'+data.period+'" data-json="'+data.json+'">' +
                         '<td class="payment-type_td">'+payment_type[data.type]+'</td>' +
                         '<td class="datetime_td">'+date_formate(data.plan_time?data.plan_time:data.finish_time, false)+'</td>' +
                         '<td>收款：<span class="money_count_wrapper">'+data.money+'</span>元</td>' +
                         '<td class="status_td">'+statusArr[data.type][data.status]+'</td>' +
                         '<td class="deal_td"><img class="edit_open" src="'+edit_pen_img+'">&nbsp;&nbsp;<img class="delete_open" src="'+delete_img+'"></td> ' +
                         '</tr>';
-                $('.tr_detail[data-pid="'+data.period+'"]').last().after(detailHtml);
+                var this_tr_detail = $('.tr_detail[data-period="'+data.period+'"]');
+                if (this_tr_detail && this_tr_detail.length > 0) {
+                    $('.tr_detail[data-period="'+data.period+'"]').last().after(detailHtml);
+                }else {
+                    tr_list.after(detailHtml);
+                }
             }
             $('.tr_summary .txt_all').html('共'+data_sum.all_plan_sum+'元/');
             $('.tr_summary .txt_no').html('未收款'+data_sum.all_no_sum+'元');
-            tr_list.find('.period_plan_sum').html(data_sum.moneylogtree[data.period].plan_sum);
-            tr_list.find('.period_record_sum').html(data_sum.moneylogtree[data.period].record_sum);
-            tr_list.find('.period_invoice_sum').html(data_sum.moneylogtree[data.period].invoice_sum);
-            $('.tr_detail[data-pid="'+data.period+'"]').show();
+            if (tr_list.length && tr_list.length > 0 && data_sum.moneylogtree && data_sum.moneylogtree[data.period]) {
+                tr_list.find('.period_plan_sum').html(data_sum.moneylogtree[data.period].plan_sum);
+                tr_list.find('.period_record_sum').html(data_sum.moneylogtree[data.period].record_sum);
+                tr_list.find('.period_invoice_sum').html(data_sum.moneylogtree[data.period].invoice_sum);
+            }
+            var arrow_ud_img = tr_list.find('.arrow_ud_img');
+            arrow_ud_img.removeClass('up').attr('src', "{:C('STATIC_URL')}/images/arrow_down2.png");
+            $('.tr_detail[data-period="'+data.period+'"]').show();
         }
+        //删除回款
+        $(document).on('click', '.delete_open', function () {
+            var tr = $(this).parents('tr');
+            var logid = tr.attr('data-id');
+            var msg = '删除后将不可恢复，确定要删除吗？';
+            if (tr.hasClass('tr_list')) {
+                msg = '该期次下的所有回款详情将全部删除，确定要删除吗？';
+            }
+            var layer_index = layer.confirm(msg, {
+                btn: ['确定','取消']
+            }, function () {
+                layer.close(layer_index);
+                var load = layer.load(1);
+                $.ajax({
+                    type:'post',
+                    dataType:'json',
+                    data:{logid:logid},
+                    url:"{:U('Agreetment/deleMoneylog')}",
+                    success:function (response) {
+                        layer.close(load);
+                        if (response.code == 1) {
+                            createDetailHtml(response.return_data, true);
+                            var info_data = response.return_data.info_data;
+                            if (info_data.type == 0) {
+                                $('.tr_list[data-id="'+info_data.id+'"]').remove();
+                                $('.tr_detail[data-period="'+info_data.period+'"]').remove();
+                            }else {
+                                $('.tr_detail[data-id="'+info_data.id+'"]').remove();
+                            }
+                            layer.msg('删除成功', {icon: 1,time: 1000}, function(){
+                                layer.close(layer_index);
+                            });
+                        }else {
+                            layer.msg(response.msg, {icon: 2,time: 1000});
+                        }
+                    }
+                });
+            });
+        });
         
         //选择类型
         $(document).on('change', '.input_select_type', function () {
@@ -271,26 +322,28 @@
             });
             layer.style(layer_index, {height:height[value]});
         });
-        
-       $('.tr_list .add_img').hover(function () {
-           $(this).attr('src', "{:C('STATIC_URL')}/images/contract_add_hover.png");
-       }, function () {
-           $(this).attr('src', "{:C('STATIC_URL')}/images/contract_add.png");
-       });
-        $('.tr_detail .edit_open').hover(function () {
+        $(document).on('mouseover', 'tr .add_img', function () {
+            $(this).attr('src', "{:C('STATIC_URL')}/images/contract_add_hover.png");
+        });
+        $(document).on('mouseout', 'tr .add_img', function () {
+            $(this).attr('src', "{:C('STATIC_URL')}/images/contract_add.png");
+        });
+        $(document).on('mouseover', 'tr .edit_open', function () {
             $(this).attr('src', "{:C('STATIC_URL')}/images/edit_pen_blue.png");
-        }, function () {
+        });
+        $(document).on('mouseout', 'tr .edit_open', function () {
             $(this).attr('src', "{:C('STATIC_URL')}/images/edit_pen.png");
         });
-        $('.tr_detail .delete_open').hover(function () {
+        $(document).on('mouseover', 'tr .delete_open', function () {
             $(this).attr('src', "{:C('STATIC_URL')}/images/delete_blue.png");
-        }, function () {
+        });
+        $(document).on('mouseout', 'tr .delete_open', function () {
             $(this).attr('src', "{:C('STATIC_URL')}/images/delete.png");
         });
-        $('.tr_list .tr_list_td_l').click(function () {
+        $(document).on('click', '.tr_list .tr_list_td_l', function () {
             var arrow_ud_img = $(this).find('.arrow_ud_img');
             var tr = $(this).parents('tr');
-            var tr_detail = tr.siblings('tr[data-pid="'+$(this).parents('tr').attr('data-id')+'"]');
+            var tr_detail = tr.siblings('tr[data-period="'+$(this).parents('tr').attr('data-period')+'"]');
             if (arrow_ud_img.hasClass('up')) {
                 arrow_ud_img.removeClass('up').attr('src', "{:C('STATIC_URL')}/images/arrow_down2.png");
                 tr_detail.show();

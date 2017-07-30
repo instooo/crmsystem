@@ -200,11 +200,6 @@ class AgreetmentController extends CommonController {
             if (!$periodinfo) {
                 $this->ajaxReturn(array('code'=>-3,'msg'=>'该回款期次不存在'), 'JSON');
             }
-            $planlog = $money_log->where(array('agree_id'  =>  $agreeinfo['id'],'type'=>1))->find();
-            if ($planlog) {
-                $this->ajaxReturn(array('code'=>-4,'msg'=>'已经添加过回款计划'), 'JSON');
-            }
-
             $data['money'] = $_POST['money'];
             $data['period'] = $_POST['period'];
             $data['type'] = 1;
@@ -213,6 +208,11 @@ class AgreetmentController extends CommonController {
             $data['remarks'] = trim($_POST['remarks']);
             if (!is_numeric($data['money']) || !is_numeric($data['period']) || !$data['plan_time'] || !is_numeric($data['status'])) {
                 $this->ajaxReturn(array('code'=>-5,'msg'=>'请填写完整的数据'), 'JSON');
+            }
+
+            $planlog = $money_log->where(array('agree_id'=>$agreeinfo['id'],'type'=>1,'period'=>$data['period']))->find();
+            if ($planlog) {
+                $this->ajaxReturn(array('code'=>-4,'msg'=>'已经添加过回款计划'), 'JSON');
             }
 
             //更新回款总额
@@ -335,5 +335,36 @@ class AgreetmentController extends CommonController {
         $info_data = $loginfo;
         $return_data = array('sum_data'=>$sum_data,'info_data'=>$info_data);
         $this->ajaxReturn(array('code'=>1,'msg'=>'保存成功','return_data'=>$return_data), 'JSON');
+    }
+
+    /**
+     * 删除回款记录
+     */
+    public function deleMoneylog() {
+        $logid = intval($_POST['logid']);
+        if (!$logid) {
+            $this->ajaxReturn(array('code'=>-1,'msg'=>'参数错误'), 'JSON');
+        }
+        $money_log = M('money_log');
+        $loginfo = $money_log->where(array('id'=>$logid))->find();
+        if (!$loginfo) {
+            $this->ajaxReturn(array('code'=>-2,'msg'=>'要删除的记录不存在'), 'JSON');
+        }
+        $map = array();
+        if ($loginfo['type'] == 0) {
+            //删除总期次
+            $map['period'] = $loginfo['period'];
+        }else {
+            $map['id'] = $logid;
+        }
+        $rs = $money_log->where($map)->delete();
+        if (false === $rs) {
+            $this->ajaxReturn(array('code'=>-500,'msg'=>'数据删除失败'), 'JSON');
+        }
+        //返回最新回款数据
+        $sum_data = $this->getMoneyLog($loginfo['agree_id']);
+        $info_data = $loginfo;
+        $return_data = array('sum_data'=>$sum_data,'info_data'=>$info_data);
+        $this->ajaxReturn(array('code'=>1,'msg'=>'数据删除成功','return_data'=>$return_data), 'JSON');
     }
 }

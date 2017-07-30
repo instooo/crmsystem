@@ -155,7 +155,7 @@
         var path = subdir + '/' + tr.attr('data-name');
         var type = tr.attr('data-type');
         var msg = (type=='dir')?'该目录下所有文件将全部删除，确定要删除该文件夹吗？':'确定要删除该文件吗？';
-        layer_index = layer.confirm(msg, {
+        var layer_index = layer.confirm(msg, {
             btn: ['确定','取消']
         }, function () {
             layer.close(layer_index);
