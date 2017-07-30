@@ -77,7 +77,8 @@ class workflow{
 			$data['c_id'] = $data['c_id'];//添加合同时候，选择哪种流程
 			$data['act'] = $data['act'];//用户id
 			$data['comment'] = $data['comment'];//用户id
-			$data['nextuid'] = rtrim($data['nextuid'],',');				
+			$data['nextuid'] = trim($data['nextuid'],',');	
+			$data['nextuid'] = str_replace(',','|',$data['nextuid']);			
 			if( $data['uid']=='' || $data['c_id']==''|| $data['act']==''){
 				$ret['code'] = '-40';
 				$ret['msg'] = '参数不全';
@@ -119,7 +120,6 @@ class workflow{
 					$extendmap['w_id'] = $caseresult['w_id'];
 					$extendmap['step_id'] = 1;
 					$extendresult = M ('workflow_extend')->where($extendmap)->find();
-					
 					if(strpos($extendresult['uid'],$data['nextuid'])===false){
 						$ret['code'] = '-1';
 						$ret['msg'] = '账号不在流程中';
@@ -273,9 +273,13 @@ class workflow{
 						$ret['msg'] = '系统错误';
 						break;
 					}			
-							
+					$ret['code'] = '1';
+					$ret['msg'] = '提交审核成功';
+					break;		
 				}else{
-					
+					$ret['code'] = '-1';
+					$ret['msg'] = '错误';
+					break;		
 				}				
 			}	
 			

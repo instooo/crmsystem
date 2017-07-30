@@ -9,6 +9,7 @@ use Think\Controller;
 use Think\Model;
 use Think\Think;
 use \Common\Vendor\Workflow\workflow;
+use \Common\Vendor\Workflow\messagelog;
 
 class AgreetmentController extends CommonController {
     public $partnerConfig;
@@ -78,6 +79,11 @@ class AgreetmentController extends CommonController {
 		$data['reuid'] = $_POST['reuid'];	
 		$workcase = new workflow();	
 		$result = $workcase->doStep($data);
+		if($result['code'] == 1){
+			//发送消息
+			$messagelog = new messagelog();	
+			$result = $messagelog->addMessagelog($data);
+		}
 		exit(json_encode($result));
 	}
 	
