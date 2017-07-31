@@ -24,7 +24,7 @@
 <script>
     var layer_index;
     $(function () {
-        readDir('agreement/1');
+        readDir($('#subdir').val());
     });
     $(document).on('click', '.add_doc_btn', function () {
         $('.doc_file').trigger('click');
