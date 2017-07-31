@@ -32,7 +32,7 @@ class MessageController extends CommonController {
 			$map['log_id'] =$_POST['newlogid'];			
 			$uid = $this->get_numuid();			
 			$result_new = M('work_case_log')->where($map)->find();
-			
+
 			if($result){
 				$logdata['c_id']=$result['c_id'];
 				$logdata['w_id']=$result['w_id'];			
@@ -45,8 +45,7 @@ class MessageController extends CommonController {
 				$logdata['des']='';
 				$logdata['status']=1;
 				$logdata['comment']=$_POST['comment'];
-				//
-				//print_r($logdata);die;
+				
 				$workcase = new caselog();	
 				$workcase->addCaselog($logdata);	
 
@@ -54,7 +53,7 @@ class MessageController extends CommonController {
 				$data['uid'] = $this->get_numuid();	
 				$data['c_id'] = $result['c_id'];					
 				$data['comment'] = $_POST['comment'];				
-				$data['reuid'] = $result['uid'];
+				$data['reuid'] = $result_new['uid'];
 				
 				$messagelog = new messagelog();	
 				$result = $messagelog->addMessagelog($data);
