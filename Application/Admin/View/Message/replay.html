@@ -9,6 +9,7 @@
 <body style="overflow-x: hidden;overflow-y: auto;">
 <div class="detail_left_inner">
 <input type='hidden' id='logid' value="{$logid}">
+<input type='hidden' id='newlogid' value="{$newlogid}">
 <div class="detail_left_head">
 	<span class="sp-icon"></span>
 	<input type='hidden' name='work_case' value="{$work_case.info.c_id}">
@@ -24,6 +25,7 @@
 <script>
 $(document).on("click",'#next',function(){
 	var logid = $("#logid").val();	
+	var newlogid = $("#newlogid").val();	
 	var comment = $("#comment").val();	
 	if(comment == '' || comment == 'undefined' || comment == null ){
 		 layer.msg('内容不能为空', {
@@ -34,7 +36,7 @@ $(document).on("click",'#next',function(){
 	$.ajax({
 		type:'post',
 		dataType:'json',
-		data:{logid:logid,comment:comment},
+		data:{logid:logid,comment:comment,newlogid:newlogid},
 		url:"{:U('Message/replay')}",
 		success:function (response) {  
 			var index = parent.layer.getFrameIndex(window.name); //获取窗口索引

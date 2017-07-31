@@ -28,13 +28,18 @@ class MessageController extends CommonController {
 			$map['log_id'] =$_POST['logid'];			
 			$uid = $this->get_numuid();			
 			$result = M('work_case_log')->where($map)->find();
+			
+			$map['log_id'] =$_POST['newlogid'];			
+			$uid = $this->get_numuid();			
+			$result_new = M('work_case_log')->where($map)->find();
+			
 			if($result){
 				$logdata['c_id']=$result['c_id'];
 				$logdata['w_id']=$result['w_id'];			
 				$logdata['step']=$result['step'];
 				$logdata['pid']	=$result['log_id'];
 				$logdata['uid']	=$uid;		
-				$logdata['re_uid']	=$result['uid'];
+				$logdata['re_uid']	=$result_new['uid'];
 				$logdata['act_id']=1;
 				$logdata['create_time']=time();
 				$logdata['des']='';
@@ -62,11 +67,13 @@ class MessageController extends CommonController {
 				
 			}
 		}else{
-			$logid = $_GET['logid'];			
-			if($logid==''){
+			$logid = $_GET['logid'];
+			$newlogid =$_GET['newlogid'];						
+			if($logid=='' || $newlogid ==''){
 				echo "参数不全";die;
 			}
-			$this->assign('logid',$logid);			
+			$this->assign('logid',$logid);	
+			$this->assign('newlogid',$newlogid);	
 			$this->display();
 		}
 		
@@ -74,7 +81,7 @@ class MessageController extends CommonController {
 
 	//读取消息
 	public function readmessage(){
-		$id = $_POST['id'];
+		$id = $_POST['id'];		
 		$messagelog = new messagelog();	
 		$list = $messagelog->readmessage($id);	
 	}
