@@ -145,3 +145,28 @@
 .add_wrapper_footer .btn_no .ui-button-text{
     color: #324b5c;
 }
+
+.multi_list{
+    display: none;
+    width: 280px;
+    height: 100px;
+    padding: 10px;
+    border: solid 1px #bac8d5;
+    border-radius: 3px;
+    overflow-y: scroll;
+    position: absolute;
+    background-color: white;
+    left: 23%;
+}
+.multi_list dd{
+    padding: 5px;
+    cursor: pointer;
+}
+.multi_list dd:hover{
+    background-color: #5294e0;
+    -moz-user-select:none;/*火狐*/
+    -webkit-user-select:none;/*webkit浏览器*/
+    -ms-user-select:none;/*IE10*/
+    -khtml-user-select:none;/*早期浏览器*/
+    user-select:none;
+}

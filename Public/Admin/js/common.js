@@ -1,3 +1,30 @@
+$(function () {
+    $(document).on('click', '.multi_input', function () {
+        $(this).siblings('.multi_list').show();
+    });
+    $(document).click(function (event) {
+        if (!$('.multi_input').is(event.target) && $('.multi_input').has(event.target).length === 0) {
+            if (!$('.multi_list').is(event.target) && $('.multi_list').has(event.target).length === 0) {
+                $('.multi_list').hide();
+            }
+        }
+    });
+    $(document).on('click', '.multi_list dd', function () {
+        var checkbox = $(this).find('input[type="checkbox"]');
+        checkbox.prop('checked', !checkbox.prop('checked'));
+        var multi_list = $(this).parents('.multi_list');
+        var value = '';
+        multi_list.find('dd').each(function () {
+            if ($(this).find('input[type="checkbox"]').prop('checked')) {
+                var s_val = $(this).find('input[type="checkbox"]').val();
+                value += (value == '')?s_val:','+s_val;
+            }
+        });
+        multi_list.siblings('.multi_input').val(value);
+    });
+});
+
+
 //监听关闭layer窗口
 function listenLayerClose(index, callback) {
     var layercloseflag;

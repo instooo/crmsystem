@@ -214,11 +214,13 @@ class CommonController extends Controller {
             }elseif (in_array($v['data_type'], array('multi_option'))) {
                 $optlist = json_decode($v['field_option'], true);
                 $optstr = '';
+                $sValue = explode(',', $data['field_'.$v['id']]);
                 foreach ($optlist as $val) {
-                    $selected = $data['field_'.$v['id']] == $val?'selected':'';
-                    $optstr .= '<option value="'.$val.'" '.$selected.'>'.$val.'</option>';
+                    $selected = in_array($val, $sValue)?'checked=true':'';
+                    $optstr .= '<dd><input type="checkbox" value="'.$val.'" '.$selected.'>'.$val.'</dd>';
                 }
-                $formStr .= '<li><label>'.$v['field_name'].'</label><select name="field_'.$v['id'].'" class="dfinput input_field'.$v['id'].'" multiple="multiple" style="width: 300px">'.$optstr.'</select></li>';
+                $inputStr = '<input type="text" class="dfinput multi_input input_field'.$v['id'].'" name="field_'.$v['id'].'" readonly value="'.$data['field_'.$v['id']].'" style="width: 300px">';
+                $formStr .= '<li><label>'.$v['field_name'].'</label>'.$inputStr.'<dl class="multi_list">'.$optstr.'</dl></li>';
             }elseif (in_array($v['data_type'], array('file'))) {
                 $formStr .= '<li><label>'.$v['field_name'].'</label><input name="field_'.$v['id'].'" type="file" class="dfinput input_field'.$v['id'].'" style="width: 300px" /></li>';
             }

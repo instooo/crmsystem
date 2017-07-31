@@ -11,7 +11,16 @@ namespace Admin\Controller;
 class AttachController extends CommonController {
 
     public function test() {
-        dump(iconv_get_encoding('all'));
+        $dirpath = ROOT_PATH.'Uploads/agreement/1';
+        $handle = opendir($dirpath);
+        if (!$handle) {
+            $this->ajaxReturn(array('code'=>-3,'msg'=>'目录读取失败'), 'JSON');
+        }
+        while ( false  !== ( $file  =  readdir ( $handle ))) {
+            if ($file == "." || $file == "..") continue;
+            dump(mb_detect_encoding($file));
+        }
+        //dump(iconv_get_encoding('all'));
     }
 
 
