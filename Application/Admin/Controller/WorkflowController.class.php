@@ -33,11 +33,13 @@ class WorkflowController extends CommonController {
 			//处理流程的几个步骤
 			$steps=I('post.step');
 			$acts=rtrim(I('post.act'),',');	
-			$des=rtrim(I('post.des'),',');					
+			$des=rtrim(I('post.des'),',');
+			$field=rtrim(I('post.field'),',');	
+			
 			$steps_arr = explode(',',$steps);
 			$acts_arr = explode(',',$acts);			
 			$dess_arr = explode(',',$des);
-			
+			$field_arr = explode(',',$field);
             if (!$data['w_name']) {
                 $ret['code'] = -2;
                 $ret['msg'] = '参数不全';
@@ -77,7 +79,12 @@ class WorkflowController extends CommonController {
 				$tmp_ar=explode(':',$val);					
 				$extend_data[$key]['step_id']=str_replace('steps','',$tmp_ar[0]);
 				$extend_data[$key]['des']=str_replace('user','',rtrim($tmp_ar[1],'|'));				
-			}					
+			}
+			foreach($field_arr as $key=>$val ){
+				$tmp_ar=explode(':',$val);					
+				$extend_data[$key]['step_id']=str_replace('steps','',$tmp_ar[0]);
+				$extend_data[$key]['field']=str_replace('user','',rtrim($tmp_ar[1],'|'));	
+			}				
 			$map['w_id']=$rs;			
 			$extend = M('workflow_extend')->where($map)->find(); 
 			if ($extend) {
@@ -148,6 +155,26 @@ class WorkflowController extends CommonController {
 		}
 		$this->assign('result',$result);
 		$this->assign('extend',$extend);
+		$this->display();
+	}
+
+	//编辑节点
+	public function edit(){
+		$data['wid'] = I('get.wid'); 			
+		if (!$data['wid']) {
+			$ret['code'] = -2;
+			$ret['msg'] = '参数不全';
+			break;
+		}
+		$map['w_id']=$data['wid'];			
+		$result = M('workflow')->where($map)->find(); 
+		if($result){			
+			$extend = M('workflow_extend')->where($map)->order('e_id desc')->select();			
+			$result['child'] = $extend;			
+		}else{
+			echo "流程不存在";die;
+		}
+		$this->assign('result',$result);		
 		$this->display();
 	}
 }

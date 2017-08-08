@@ -1,0 +1,59 @@
+<link href="/Public/Admin/css/style.css" rel="stylesheet" type="text/css" />
+<link href="/Public/Admin/css/partner.css" rel="stylesheet" type="text/css"/>
+
+<script src="{:C('STATIC_URL')}/js/shenpi.js" type="text/javascript"></script>
+
+<div id="main" style="width:100%;" >
+
+
+    
+    <div class="rightinfo"> 
+      
+    <div class="tipa" id="addlc" style="position:relative;width:100%;display:block">
+      <div class="tipinfo">
+        <ul class="forminfo">
+		<li><label>流程名称<span>*</span></label><input name="w_name" type="text" class="dfinput w_name" value="{$result.w_name}"><i>工作流程的名称</i></li>		
+		</ul>
+		<div class="approval-process" action="">
+        <div class="form-header font16 marginT20 ">
+            设置审批流程
+        </div>
+		<div class="form-body marginT10">
+            <div class="tx-c form-section paddingB20">
+                <div class="steps" style="width:100%">
+                    <ol style="width:3000px; height:92px;">
+						<volist name="result.child" id='vo'>
+                        <li>							
+                            <div class="add">
+                                <div class="mini-icon icon-add"></div>
+                            </div>
+                            <div class="arr">
+                            </div>
+                            <div class="standard"></div>
+                            <div class="node">
+                                <div>1</div>
+                            </div>
+                            <div class="set-person" data-uid="" data-act="" data-extend_tit="" data-field="">点击设置审批人</div>
+                            <div class="approvers"></div>
+                        </li> 
+						</volist>
+						<li>
+                            <div class="arr"></div>
+                            <div class="add">
+                                <div class="mini-icon icon-add"></div>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+	 </div>	
+	 <div style="position:fixed; bottom:20px;padding: 20px 20px 5px 20px;"><input name="" type="button" class="btn" id="addbtn" value="确认保存"></div>
+
+	 </div> 
+	 
+    </div>    
+    
+	
+</div>
+

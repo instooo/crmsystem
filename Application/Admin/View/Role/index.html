@@ -39,16 +39,39 @@
 		<div id="treeDemo" class="ztree" style="display:none;"></div>	
 		</div>		
 	</div>	
-
+	<div style="width:600px;position:relative; font-size:18px;padding: 0 20px;">
+		<div>
+		<label><input name="can" id='nocan' type="radio" value="0" checked />默认下一步</label> 	
+		<label><input name="can" id='can' type="radio" value="1" />可修改字段</label> 	
+		
+		</div>
+		<div class='fields' style='display:none'>
+		<label>可修改字段<span>*</span></label>
+		<volist name="fields" id='vo'>
+			<label><input name="fieldone" type="checkbox" value="{$vo.id}" />{$vo.field_name} </label> 	
+		</volist>
+		</div>
+	</div>
 	<div style="position:fixed; bottom:20px;padding: 20px 20px 5px 20px;"><input name="" type="button" class="btn" id="bumenbtn" value="确认保存"></div>	
 	<script>
 		$(function(){
+			$("#nocan").click(function(){
+				$(".fields").hide();
+			})
+			$("#can").click(function(){
+				$(".fields").show();
+			})
 			$.fn.zTree.init($("#treeDemo"), setting, zNodes);						
 			$(document).on("click",'.pulldown-input',showMenu);
 			$("#bumenbtn").click(function(){
 				var aa = $(".pulldown-default-show").html();
 				var bb = $(".pulldown-default-show").attr('data-uid');	
-				var extend_tit=$("input[name='extend_tit']").val();				
+				var extend_tit=$("input[name='extend_tit']").val();		
+				//多选字段的值
+				var filed='';
+				$("input[name='fieldone']:checked").each(function(){  
+					filed+=$(this).val()+"|";  					
+				})  						  
 				if(!aa || aa=='请选择'){
 					parent.layer.open({
 					  content: '请选择用户',
@@ -62,12 +85,13 @@
 				$(parent.document).find('.steps ol li').eq(wid).find('.set-person').attr("data-uid",bb);
 				$(parent.document).find('.steps ol li').eq(wid).find('.set-person').attr("data-act",acts);
 				$(parent.document).find('.steps ol li').eq(wid).find('.set-person').attr("data-extend_tit",extend_tit);
+				$(parent.document).find('.steps ol li').eq(wid).find('.set-person').attr("data-field",filed);
+				
 				
 				//$(parent.document).find('.steps ol li').eq(wid).find('.set-person').attr("isenable",'no');
 				var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
 				parent.layer.close(index);
-			})
-			
+			})			
 			//选择执行操作
 			
 		})

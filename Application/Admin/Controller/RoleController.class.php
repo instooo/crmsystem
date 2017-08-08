@@ -45,6 +45,9 @@ class RoleController extends CommonController {
 		//查找对应的action
 		$actresult = M('workflow_action')->select();
 		$this->assign('actresult',$actresult);
+		//查询出所有可选字段
+		$fields = M('fields')->where('`field_type`="agreement"')->select();		
+		$this->assign('fields',$fields);
 		$this->assign('extend_tit',$extend_tit);
 		$this->assign('title_html',$title_html);
 		$this->assign('wid',$wid);
