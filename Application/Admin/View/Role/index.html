@@ -41,24 +41,24 @@
 	</div>	
 	<div style="width:600px;position:relative; font-size:18px;padding: 0 20px;">
 		<div>
-		<label><input name="can" id='nocan' type="radio" value="0" checked />默认下一步</label> 	
-		<label><input name="can" id='can' type="radio" value="1" />可修改字段</label> 	
+		<label><input name="can" id='nocan' type="radio" value="0" <if condition="$data_field eq 0">checked</if> />默认下一步</label> 	
+		<label><input name="can" id='can' type="radio" value="1" <if condition="$data_field neq 0">checked</if>/>可修改字段</label> 	
 		
 		</div>
-		<div class='fields' style='display:none'>
+		<div class='fields' <if condition="$data_field eq 0">style='display:none'</if>>
 		<label>可修改字段<span>*</span></label>
 		<volist name="fields" id='vo'>
-			<label><input name="fieldone" type="checkbox" value="{$vo.id}" />{$vo.field_name} </label> 	
+			<label><input name="fieldone" type="checkbox" value="{$vo.id}" <if condition="$vo['is_select'] eq 1">checked</if>/>{$vo.field_name} </label> 	
 		</volist>
 		</div>
 	</div>
 	<div style="position:fixed; bottom:20px;padding: 20px 20px 5px 20px;"><input name="" type="button" class="btn" id="bumenbtn" value="确认保存"></div>	
 	<script>
-		$(function(){
+		$(function(){			
 			$("#nocan").click(function(){
 				$(".fields").hide();
 			})
-			$("#can").click(function(){
+			$("#can").click(function(){				
 				$(".fields").show();
 			})
 			$.fn.zTree.init($("#treeDemo"), setting, zNodes);						

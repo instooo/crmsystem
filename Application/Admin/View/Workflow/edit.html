@@ -1,16 +1,97 @@
+<html>
+<head>
+<title>
+编辑
+</title>
 <link href="/Public/Admin/css/style.css" rel="stylesheet" type="text/css" />
 <link href="/Public/Admin/css/partner.css" rel="stylesheet" type="text/css"/>
+  <script language="JavaScript" src="{:C('STATIC_URL')}/js/jquery.js"></script>
+      <script src="{:C('STATIC_URL')}/layer/layer.js" type="text/javascript"></script>
+    <script src="{:C('STATIC_URL')}/laydate/laydate.js" type="text/javascript"></script>
+<script>
+$(document).on('click', '.set-person',function(){
+	var wid = $(this).parent('li').find('.node div').html()-2;	
+	var datauid = $(this).attr('data-uid');
+	var dataact = $(this).attr('data-act');
+	var dataextend_tit = $(this).attr('data-extend_tit');
+	var data_field = $(this).attr('data-field');
+	var title_html=$(this).html();
+	layer_index = layer.open({
+		type: 2,
+		title: '设置审批人',
+		skin: 'layui-layer-rim', //加上边框
+		area: ['600px', '400px'], //宽高
+		shade: 0.5,
+		content: '/role/index/wid/'+wid+'?uid='+datauid+'&act='+dataact+'&extend_tit='+dataextend_tit+'&title_html='+title_html+'&data_field='+data_field,
+	});			
+});
 
-<script src="{:C('STATIC_URL')}/js/shenpi.js" type="text/javascript"></script>
-
+$(document).on('click', '#editbtn',function(){
+	var w_name=$(".w_name").val();	
+	var w_id=$("#w_id").val();	
+	if (w_name == '') {
+		layer.msg('流程名称不能为空', {icon:5,time:1000});
+		return false;
+	}
+	var len = $(".steps ol li").length;
+	var formjson="";
+	var actjson="";
+	var desjson="";	
+	var fieldjson="";
+	for(var i=1;i<len;i++){
+		var bb= $(".steps ol li").eq(i-1).find(".set-person").attr('data-uid');
+		var act= $(".steps ol li").eq(i-1).find(".set-person").attr('data-act');
+		var des= $(".steps ol li").eq(i-1).find(".set-person").attr('data-extend_tit');
+		var field= $(".steps ol li").eq(i-1).find(".set-person").attr('data-field');	
+		if(bb=='undefined'||!bb){
+			layer.msg('审批流程不能为空', {icon:5,time:1000});
+			return false;
+		}
+		if(act=='undefined'||!act){
+			layer.msg('操作不能为空', {icon:5,time:1000});
+			return false;
+		}
+		if(des=='undefined'||!des){
+			layer.msg('节点描述不能为空', {icon:5,time:1000});
+			return false;
+		}
+		field=(field=='undefined'||!field)?0:field; 				
+		formjson += "steps"+i+":"+bb + ",";	
+		actjson += "steps"+i+":"+act + ",";	
+		desjson += "steps"+i+":"+des + ",";
+		fieldjson += "steps"+i+":"+field + ",";	
+	}
+	if (formjson.length > 0 ) formjson = formjson.substring(0, formjson.length-1);	
+	$.ajax({
+		type:'post',
+		dataType:'json',
+		data:{w_id:w_id,w_name:w_name,step:formjson,act:actjson,des:desjson,field:fieldjson},
+		url:'/workflow/edit',
+		error:function () {
+			layer.msg('未知错误', {icon:5,time:1000});
+		},
+		success:function (data) {
+			if (data.code == 1) {
+				layer.msg('添加成功', {icon:6,time:1000}, function () {
+					var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+					parent.layer.close(index);;		
+				});
+			}else {
+				layer.msg(data.msg, {icon:5,time:1000});
+			}
+		}
+	});
+});
+</script>
+</head>
+<body>
 <div id="main" style="width:100%;" >
-
-
     
     <div class="rightinfo"> 
       
     <div class="tipa" id="addlc" style="position:relative;width:100%;display:block">
       <div class="tipinfo">
+	  <input type='hidden' id="w_id" value='{$result.w_id}'>
         <ul class="forminfo">
 		<li><label>流程名称<span>*</span></label><input name="w_name" type="text" class="dfinput w_name" value="{$result.w_name}"><i>工作流程的名称</i></li>		
 		</ul>
@@ -21,8 +102,8 @@
 		<div class="form-body marginT10">
             <div class="tx-c form-section paddingB20">
                 <div class="steps" style="width:100%">
-                    <ol style="width:3000px; height:92px;">
-						<volist name="result.child" id='vo'>
+                    <ol style="width:{$length}px; height:132px;">
+						<volist name="result.child" id='vo' >
                         <li>							
                             <div class="add">
                                 <div class="mini-icon icon-add"></div>
@@ -31,9 +112,9 @@
                             </div>
                             <div class="standard"></div>
                             <div class="node">
-                                <div>1</div>
+                                <div>{$i}</div>
                             </div>
-                            <div class="set-person" data-uid="" data-act="" data-extend_tit="" data-field="">点击设置审批人</div>
+                            <div class="set-person" data-uid="{$vo.uid}" data-act="{$vo.action}" data-extend_tit="{$vo.des}" data-field="{$vo.field}">{$vo.username}</div>
                             <div class="approvers"></div>
                         </li> 
 						</volist>
@@ -48,7 +129,7 @@
             </div>
         </div>
 	 </div>	
-	 <div style="position:fixed; bottom:20px;padding: 20px 20px 5px 20px;"><input name="" type="button" class="btn" id="addbtn" value="确认保存"></div>
+	 <div style="position:fixed; bottom:20px;padding: 20px 20px 5px 20px;"><input name="" type="button" class="btn" id="editbtn" value="确认保存"></div>
 
 	 </div> 
 	 
@@ -56,4 +137,5 @@
     
 	
 </div>
-
+</body>
+</html>
