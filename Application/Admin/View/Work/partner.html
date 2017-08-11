@@ -44,7 +44,7 @@
                                     <td class="td_{$key}" data-key="{$key}">{$vv}</td>
                                 </if>
                             </volist>
-                            <td><a href="javascript:;" class="tablelink edit">编辑</a> <a href="javascript:;" class="tablelink dele">删除</a></td>
+                            <td><a href="javascript:;" class="tablelink edit">编辑</a> <a href="javascript:;" class="tablelink detail">查看</a></td>
                         </tr>
                     </volist>
                 </tbody>
@@ -170,30 +170,21 @@
         });
     }
     
-    $(document).on('click', '.dele', function () {
+    $(document).on('click', '.detail', function () {
         var tr = $(this).parents('tr');
-        var id = tr.attr('data-id');
-        layer_index = layer.confirm('删除后数据将无法恢复，确定要删除吗？', {btn: ['确定','取消']},function () {
-            layer.close(layer_index);
-            var load = layer.load(1);
-            $.ajax({
-                type:'post',
-                dataType:'json',
-                data:{id:id,fieldtype:'partner'},
-                url:"{:U('Work/delePartner')}",
-                success:function (response) {
-                    layer.close(load);
-                    if (response.code == 1) {
-                        layer.msg('删除成功', {icon: 1,time: 1000}, function(){
-                            layer.close(layer_index);
-                            location.reload();
-                        });
-                    }else {
-                        layer.msg(response.msg, {icon: 2,time: 1000});
-                    }
-                }
-            });
-        });
+        var id = tr.attr('data-id'); 
+		layer_index = layer.open({
+			type: 2,
+			title: '合同详情',
+			skin: 'layui-layer-rim',
+			area: ['60%', '98%'],
+			shade: 0.1,
+			scrollbar: false,
+			content: '/Partner/detail/id/'+id,
+			end: function () {
+				location.reload() 
+			}
+		});
     });
     
 </script>

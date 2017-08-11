@@ -31,12 +31,12 @@
     </div>   
     <div class="topright">
         <ul>
-            <li><span><img src="{:C('STATIC_URL')}/images/help.png" title="帮助"  class="helpimg"/></span><a href="#">帮助</a></li>
+            <li><span><img src="{:C('STATIC_URL')}/images/help.png" title="帮助" class="helpimg"/></span><a href="#">帮助</a></li>
             <li><a href="#">关于</a></li>
             <li><a class="loginout_btn" href="javascript:;">退出</a></li>
         </ul>
         <div class="user">
-            <span>admin</span>
+            <span>{$user}</span>
             <i><a href='/message/message_list'>消息</a></i>
 			<if condition="$count gt 0">
             <b>{$count}</b>

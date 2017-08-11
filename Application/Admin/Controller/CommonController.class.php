@@ -14,7 +14,7 @@ use \Common\Vendor\Workflow\messagelog;
 
 class CommonController extends Controller {
 
-    public function _initialize() {
+    public function _initialize() {		
         //rbac 自带的游客验证
         Rbac::checkLogin();
         //如果是Index模块另外判断
@@ -40,6 +40,7 @@ class CommonController extends Controller {
 		$messagelog = new messagelog();	
 		$count = $messagelog->get_message_count();
 		
+		$this->assign('user',$_SESSION['username']);
         $this->assign("tree",$tree);
 		$this->assign("count",$count);
         $this->assign('url_tag', strtoupper(CONTROLLER_NAME.'/'.ACTION_NAME));

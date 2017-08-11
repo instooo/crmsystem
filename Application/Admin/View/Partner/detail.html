@@ -1,0 +1,178 @@
+<html>
+<head>
+<script language="JavaScript" src="{:C('STATIC_URL')}/js/jquery.js"></script>
+<link href="{:C('STATIC_URL')}/css/style.css" rel="stylesheet" type="text/css" />
+<script src="{:C('STATIC_URL')}/layer/layer.js" type="text/javascript"></script>
+<script src="{:C('STATIC_URL')}/laydate/laydate.js" type="text/javascript"></script>
+<script src="{:C('STATIC_URL')}/js/common.js" type="text/javascript"></script>
+<script language="JavaScript" src="{:C('STATIC_URL')}/js/jquery.form.min.js"></script>
+</head>
+<style>
+	.act_td{display: none;text-align: right;padding-right: 10px}
+</style>
+<body style="overflow-x: hidden;overflow-y: auto;">
+
+<div class="detail_left_inner">
+	<div class="cus_simple_info">
+		<div>
+			客户名称：<span class="contract-customer-name">
+			{$partnerinfo.partner_name}</span>
+		</div>		
+		<div class="marginB5">
+			<!--<span class="contract-detail-state" style="background-color:#ff6e7f">已作废</span>-->
+		</div>
+	</div>
+
+	<div class='mainbody'>
+	<div class="customer_tabs fn-clear">
+		<ul class="detail_main_nav">
+			<li class='slide_nav_hover'><a class="slide-panel-tab" data-index="0" href="#">动态</a></li>
+			<li><a class="slide-panel-tab" data-index="1" href="#">客户合同</a></li>
+			<li><a class="slide-panel-tab" data-index="2" href="#">基本信息</a></li>			
+		</ul>
+	</div>
+	<div>
+
+	<div class="dynamic-detail-body tablist" style='display:block;'>	
+	<div style="background: #eaedf2;">
+	<ul class="forminfo" style='margin-top:20px; padding:0 0 10px 0; background:#fff'>
+	<li><textarea name="" cols="" rows="" id='comment' class="textinput" style="width:100%" placeholder="建议和说明"></textarea></li>
+    <li><input name="" type="button" id='message' class="btn btn-primary" value="发布"></li>
+	</ul>
+	</div>	
+	<volist name="work_case['history']" id='vo'>
+		<div class="dynamic-replay-dialog">
+			<div class="dynamic-replay-body">
+				<div class="dynamic-replay-self-info">
+					<span class="crm-image-show-client" style="width: 40px; height: 40px; line-height: 40px; background-color: rgb(92, 179, 137);"></span>
+					<div class="dynamic-self-info">
+						<span class="dynamic-self-name"><a target="_blank" style='color: #017dbe;'>{$vo.user}</a>  :{$vo.des}</span>
+					</div>
+					<div class="dynamic-self-mess">
+						<span class="dynamic-normal-content">{$vo.comment}</span>
+					</div>
+					<div class="dynamic-self-time">
+
+					<font color='#999'>{$vo.create_time|date='Y年m月d日 H:i:s',###}</font><a href="javascript:void(0);" class="remake-list-time-rpl" onclick="reply_sign({$vo.log_id},{$vo.log_id});">回复</a>
+					<volist name="vo['sub']" id='v'>
+					<div class="remark-sub-list" style="padding-left:25px">
+						<span class="remark-sub-list-name">
+							<a target="_blank" style='color: #017dbe;'>{$v.user}</a>回复：					
+							<if condition="$v['uid'] neq $v['re_uid']" >							
+								回复：<a target="_blank" style='color: #017dbe;'>{$v.re_user}</a>  
+							</if>
+						</span>
+						<br>
+						<div class="content">
+							{$v.comment}
+						</div>
+						<div class="remake-list-time"><font color='#999'>{$v.create_time|date='Y年m月d日 H:i:s',###}</font>&nbsp;
+							<a href="javascript:void(0);" class="remake-list-time-rpl" onclick="reply_sign({$vo.log_id},{$v.log_id});">回复</a>
+						</div>						
+					</div>	
+					</volist>
+					</div>
+				</div>
+			</div>
+		</div>
+	</volist>
+	</div>
+
+	<!-- 汇款记录start -->
+	<include file="partner/agreement" />
+	<!-- 汇款记录end -->
+
+	<div class="dynamic-detail-body tablist">
+		<div class="modify-detail-container">
+			<div class="modify-body">
+				<volist name="detaidata" id="vo">
+				<div class="modify-base-info">
+					<div class="newclient-item-info" mappingname="name">
+					<span class="lable-container">
+					<span class="input-label">{$vo.name}</span>
+					<span class="normal"></span>
+					</span>
+					<span class="input-container" id="1002">
+					<span class="clientmodify-pen">
+					<span class="clientmodify-default-text">{$vo.val}</span>
+					</span></span><span class="error-warn"></span>
+					</div>
+				</div>
+				</volist>
+			</div>
+		</div>
+    </div>
+
+<script>
+$(document).on("click",'#message',function(){	
+	var comment = $("#comment").val();	
+	if(comment==''||comment=='undefined'||!comment){
+		layer_index = layer.open({
+			type: 1,
+			title: '消息不能为空',			
+		});
+		return false;
+	}
+	var pid = $("input[name='pid']").val();
+	layer_index = layer.open({
+		type: 2,
+		title: '合同详情',
+		skin: 'layui-layer-rim',
+		area: ['80%', '90%'],
+		shade: 0.1,
+		scrollbar: false,
+		content: '/message/replay_uid/comment/'+comment+'/pid/'+pid+'/type/2',
+		end: function () {
+			location.reload()
+		}
+	});
+});
+
+function reply_sign(log_id,newlogid){
+	var log_id = log_id;
+	var newlogid = newlogid;
+	layer_index = layer.open({
+		type: 2,
+		title: '合同详情',
+		skin: 'layui-layer-rim',
+		area: ['60%', '50%'],
+		shade: 0.1,
+		scrollbar: false,
+		content: '/Message/replay/logid/'+log_id+'/newlogid/'+newlogid,
+		end: function () {
+			location.reload()
+		}
+	});
+}
+;(function (window, $, undefined) {
+    /*
+     * tab切换插件
+     * 用例：$('*').createTab();
+     */
+    $.fn.createTab = function (opt) {
+        var def = {
+            activeEvt: 'click',
+            activeCls: 'cur'
+        }
+        $.extend(def, opt);
+        this.each(function () {
+            var $this = $(this);
+            var timer;
+            $this.find('ul.detail_main_nav li').click(def.activeEvt,function(){
+                var index = $(this).index(),
+                    that = $(this);
+				that.addClass('slide_nav_hover').siblings().removeClass('slide_nav_hover');
+				$('.tablist').eq(index).show().siblings().hide();
+
+            });
+        });
+    }
+
+})(window, jQuery);
+$(function(){
+    $(".mainbody").createTab()
+})
+
+</script>
+</body>
+</html>

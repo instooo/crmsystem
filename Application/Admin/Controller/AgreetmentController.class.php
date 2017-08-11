@@ -370,4 +370,5 @@ class AgreetmentController extends CommonController {
         $return_data = array('sum_data'=>$sum_data,'info_data'=>$info_data);
         $this->ajaxReturn(array('code'=>1,'msg'=>'数据删除成功','return_data'=>$return_data), 'JSON');
     }
+	
 }
