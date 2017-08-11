@@ -11,7 +11,9 @@ class workflow{
 	//获取单个实例的具体信息
 	public function onecase($data){
 		$map['c_id']=$data['c_id'];
-		$result['info'] = M('work_case a')			
+		$result['info'] = M('work_case a')	
+			->join('crm_agreement b on b.e_id = a.c_id')
+			->join('crm_partner c on c.id = b.partner_id')
 			->where($map)			
 			->find();
 			

@@ -84,4 +84,42 @@ class MessageController extends CommonController {
 		$messagelog = new messagelog();	
 		$list = $messagelog->readmessage($id);	
 	}
+	
+	//给指定人发消息
+	public function replay_uid(){
+		if($_POST){		
+			$data['uid'] = $this->get_numuid();	
+			$data['c_id'] = $_POST['cid'];		
+			$data['comment'] = $_POST['comment'];			
+			$data['reuid'] = $_POST['reuid'];			
+			
+			//查找当前到了哪一步			
+			$stepmap['c_id']=$data['c_id'];			
+			//一个步骤当中，可能有不通过情况
+			$stepresult  = M('work_case_step')->where($stepmap)->order('st_id desc')->find();	
+
+			//添加日志			
+			$logdata['c_id']=$data['c_id'];
+			$logdata['w_id']=$stepresult['w_id'];	
+			$logdata['step']	=$stepresult['step'];
+			$logdata['uid']	=$data['uid'];//用户id		
+			$logdata['act_id']=1;				
+			$logdata['des']=$_POST['comment'];
+			$logdata['status']=1;
+			$logdata['comment']=$data['comment'];					
+			$workcase = new caselog();	
+			$workcase->addCaselog($logdata);
+			
+			//发送消息
+			$messagelog = new messagelog();	
+			$result = $messagelog->addMessagelog($data);			
+			exit(json_encode($result));	
+		}else{
+			//查找下一步处理人
+			$this->assign('comment',$_GET['comment']);
+			$this->assign('cid',$_GET['cid']);		
+			$this->display();		
+		}
+		
+	}
 }

@@ -89,6 +89,8 @@ class PublicController extends Controller {
             unset($_SESSION[C('USER_AUTH_KEY')]);
             unset($_SESSION['username']);
 			unset($_SESSION['user_number']);
+			unset($_SESSION['tem_uid']);
+			unset($_SESSION['tem_num']);
             unset($_SESSION['_ACCESS_LIST']);
             $return_data['code'] = 1;
             $return_data['msg'] = '退出成功';

@@ -243,7 +243,39 @@ class CommonController extends Controller {
         ), 'JSON');
     }
 
-
+	//获取信息
+	public function get_form_info($id,$fieltype){	
+        $data = array();
+        if ($id) {
+            $data = M($fieltype)->where(array('id'=>$id))->find();
+        }
+		$fieldlist = $this->getFieldList($fieltype);
+		foreach($data as $key=>$val){
+			if($key=='agree_name'){
+				$redata[]=array(
+					'name'=>'合同名称',
+					'val'=>$data['agree_name']
+				);
+			}else if($key=='total_money'){
+				$redata[]=array(
+					'name'=>'合同金额',
+					'val'=>$data['total_money']
+				);
+			}else if($key=='addtime'){
+				$redata[]=array(
+					'name'=>'时间',
+					'val'=>date('Y-m-d H:i:s',$data['addtime'])
+				);
+			}else if(strpos($key,'field')!==false){
+				$redata[]=array(
+					'name'=>$fieldlist[$key]['field_name'],
+					'val'=>$val
+				);
+			}
+			
+		}
+		return 	$redata;
+	}
     /**
      * 文件上传
      * @return array
