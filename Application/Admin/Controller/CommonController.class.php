@@ -43,6 +43,7 @@ class CommonController extends Controller {
 		$this->assign('user',$_SESSION['username']);
         $this->assign("tree",$tree);
 		$this->assign("count",$count);
+		$this->assign("nodelist",$datalist);
         $this->assign('url_tag', strtoupper(CONTROLLER_NAME.'/'.ACTION_NAME));
 
     }
