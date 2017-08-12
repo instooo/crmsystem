@@ -503,12 +503,19 @@ class CommonController extends Controller {
      */
     public function getUserPartner($user_id) {
         $user_partner = M('user_partner')->where(array('userid'=>$user_id))->find();
-        $result = array($user_id);
+        $result = array();
         if ($user_partner['partners']) {
             $array = explode(',' ,$user_partner['partners']);
             foreach ($array as $val) {
                 if ($user_id == $val) continue;
                 $result[] = $val;
+            }
+        }
+        $userinfo = M('user')->where(array('id'=>$user_id))->find();
+        $partners = M('partner')->where(array('owner'=>$userinfo['user_number']))->select();
+        foreach ($partners as $val) {
+            if (!in_array($val['id'], $result)) {
+                $result[] = $val['id'];
             }
         }
         return $result;

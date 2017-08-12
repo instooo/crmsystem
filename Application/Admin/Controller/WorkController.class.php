@@ -24,7 +24,8 @@ class WorkController extends CommonController {
     public function partner() {
 		//查找自己拥有客户
 		$nowuid = $this->get_numuid();
-		$map['owner'] = array('in', $this->getUserPartner($nowuid));
+        $partners = $this->getUserPartner($_SESSION['authId']);
+		$map['p.id'] = array('in', $partners);
 		
         $fieldlist = $this->getFieldList('partner');
         $klist = array_keys($fieldlist);
@@ -95,10 +96,31 @@ class WorkController extends CommonController {
         $fieldlist = $this->getFieldList('contact');
         $klist = array_keys($fieldlist);
 
+        //查询客户
+        $partners = $this->getUserPartner($_SESSION['authId']);
+        $pmap['id'] = array('in', $partners);
+        $partnerlist = M('partner')->where($pmap)->select();
+        $this->assign('partnerlist', $partnerlist);
+
+        if ($_REQUEST['s_partner_id']) {
+            $map['p.partner_id'] = $_REQUEST['s_partner_id'];
+            $this->assign('s_partner_id', $_REQUEST['s_partner_id']);
+        }else {
+            $map['p.partner_id'] = array('in', $partners);
+        }
+
+        if ($_REQUEST['s_partner_id']) {
+            $map['p.partner_id'] = $_REQUEST['s_partner_id'];
+            $this->assign('s_partner_id', $_REQUEST['s_partner_id']);
+        }else {
+            $map['p.partner_id'] = array('in', $partners);
+        }
+
         $count = M('contact p')
             ->field('p.*,u.id as user_id,u.nickname,t.partner_name')
-            ->join('left join crm_user u on u.id=p.owner')
+            ->join('left join crm_user u on u.user_number=p.owner')
             ->join('left join crm_partner t on t.id=p.partner_id')
+            ->where($map)
             ->count();
         $page = new \Think\Page($count, 20);
         $page->setConfig('prev', '&nbsp;');
@@ -106,8 +128,9 @@ class WorkController extends CommonController {
 
         $datalist = M('contact p')
             ->field('p.*,u.id as user_id,u.nickname,t.partner_name')
-            ->join('left join crm_user u on u.id=p.owner')
+            ->join('left join crm_user u on u.user_number=p.owner')
             ->join('left join crm_partner t on t.id=p.partner_id')
+            ->where($map)
             ->order('p.id desc')
             ->limit("{$page->firstRow},{$page->listRows}")
             ->select();
@@ -162,17 +185,37 @@ class WorkController extends CommonController {
         $fieldlist = $this->getFieldList('agreement');
         $klist = array_keys($fieldlist);
 
+        $partners = $this->getUserPartner($_SESSION['authId']);
+        $pmap['id'] = array('in', $partners);
+        $partnerlist = M('partner')->where($pmap)->select();
+        $this->assign('partnerlist', $partnerlist);
+
+        $nowuid = $this->get_numuid();
+        $map['a.c_create_uid'] = $nowuid;
+
+        if ($_REQUEST['s_name']) {
+            $map['p.agree_name'] = array('like', "%".trim($_REQUEST['s_name'])."%");
+            $this->assign('s_name', $_REQUEST['s_name']);
+        }
+        if ($_REQUEST['s_partner_id']) {
+            $map['p.partner_id'] = $_REQUEST['s_partner_id'];
+            $this->assign('s_partner_id', $_REQUEST['s_partner_id']);
+        }else {
+            $map['p.partner_id'] = array('in', $partners);
+        }
+
         $count = M('agreement p')
+            ->join('crm_work_case a on a.c_id = p.e_id')
+            ->join('crm_work_case_log b on b.c_id=a.c_id and a.step=b.step')
             ->join('left join crm_user u on u.user_number=p.owner')
             ->join('left join crm_partner t on t.id=p.partner_id')
+            ->where($map)
             ->count();
+
         $page = new \Think\Page($count, 20);
         $page->setConfig('prev', '&nbsp;');
         $page->setConfig('next', '&nbsp;');
-		
-		
-		$nowuid = $this->get_numuid();
-		$map['a.c_create_uid'] = $nowuid;
+
 		
         $datalist = M('agreement p')
             ->field('p.*,u.id as user_id,u.nickname,t.partner_name,a.*,b.*')
@@ -209,10 +252,12 @@ class WorkController extends CommonController {
         $this->assign('list', $list);
 
         //查询客户
+        /*
 		$nowuid = $this->get_numuid();
 		$pmap['owner'] = $nowuid;	
         $partnerlist = M('partner')->where($pmap)->select();	
         $this->assign('partnerlist', $partnerlist);
+        */
 		//查询流程
         $workflow = M('workflow')->select();			
 		$this->assign('workflow',$workflow);
