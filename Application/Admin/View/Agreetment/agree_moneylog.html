@@ -16,7 +16,7 @@
     .cpayment-stage-add{display: block;width: 150px;height: 36px;line-height: 36px;border: 1px solid #ddd;color: #343d47 !important;border-radius: 3px;  position: relative;  text-align: center;margin-bottom: 5px;cursor: pointer;box-sizing: border-box;margin-top: 20px;}
     .cpayment-stage-add img{vertical-align:middle;}
     /*列表end*/
-    .forminfo .plan,.forminfo .record,.forminfo .invoice{display: none;}
+    .forminfo .plan,/*.forminfo .record,*/.forminfo .invoice{display: none;}
 </style>
 <div class="dynamic-detail-body tablist">
     <div style="background: #eaedf2;padding: 20px;">
@@ -54,7 +54,7 @@
         <input type="hidden" name="logid" class="input_logid" value="">
         <input type="hidden" name="agree_id" class="input_agree_id" value="{$agreeinfo.id}">
         <li><label>期次&nbsp;</label><input name="period" type="text" class="dfinput input_period" style="width: 230px" readonly /></li>
-        <li class="for_add"><label>类型&nbsp;</label><select name="select_type" class="dfinput input_select_type" style="width: 230px"><option value="">选择类型</option><option value="plan">回款计划</option><option value="record">回款记录</option><option value="invoice">开票记录</option></select></li>
+        <li class="for_add" style="display: none"><label>类型&nbsp;</label><select name="select_type" class="dfinput input_select_type" style="width: 230px"><option value="">选择类型</option><option value="plan">回款计划</option><option value="record" selected>回款记录</option><option value="invoice">开票记录</option></select></li>
         <li class="special invoice"><label>票据内容&nbsp;</label><input name="invoice_title" type="text" class="dfinput input_invoice_title" style="width: 230px" /></li>
         <li><label>金额&nbsp;</label><input name="money" type="text" class="dfinput input_money" style="width: 230px" /></li>
         <li class="special plan"><label>计划回款日期&nbsp;</label><input name="plan_time" type="text" class="dfinput dfinput_datetime input_plan_time" style="width: 230px" readonly /></li>
@@ -63,7 +63,7 @@
         <li class="special invoice"><label>发票类型&nbsp;</label><select name="invoice_type" class="dfinput input_invoice_type" style="width: 230px"><option value="增值税">增值税</option><option value="普通国税">普通国税</option><option value="普通地税">普通地税</option></select></li>
         <li class="special invoice"><label>发票号码&nbsp;</label><input name="invoice_num" type="text" class="dfinput input_invoice_num" style="width: 230px" /></li>
         <li class="special record"><label>付款方式&nbsp;</label><select name="pay_type" class="dfinput input_pay_type" style="width: 230px"><option value="月结">月结</option><option value="季结">季结</option><option value="年结">年结</option></select></li>
-        <li><label>状态&nbsp;</label><select name="status" class="dfinput input_status" style="width: 230px"></select></li>
+        <li><label>状态&nbsp;</label><select name="status" class="dfinput input_status" style="width: 230px"><option value="0">未开票</option><option value="1">已开票</option></select></li>
         <li><label>责任人&nbsp;</label><input name="user" type="text" class="dfinput input_user" style="width: 230px" readonly value="{$agreeinfo.nickname}" /></li>
         <li><label>备注&nbsp;</label><textarea name="remarks" class="dfinput input_remarks" style="width: 230px;height: 50px;"></textarea></li>
         <li><label>&nbsp;</label><input name="submit" type="button" class="btn do_savelog_btn" value="保存"/></li>
@@ -111,6 +111,8 @@
             });
             var lay_con = $('#layui-layer'+layer_index);
             var tr = $(this).parents('tr');
+            //只要实际回款记录
+            lay_con.find('.input_select_type').val('record');
             lay_con.find('.input_period').val(tr.attr('data-period'));
             lay_con.find('.do_savelog_btn').click(doAddMoneylog);
         });
@@ -132,6 +134,7 @@
                     if (response.code == 1) {
                         createDetailHtml(response.return_data);
                         layer.msg('保存成功', {icon: 1,time: 1000}, function(){
+                            $('.return_money').html(parseInt($('.return_money').html())+parseInt(response.return_data.info_data.money));
                             layer.close(layer_index);
                         });
                     }else {

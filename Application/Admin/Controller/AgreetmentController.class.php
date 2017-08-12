@@ -237,6 +237,7 @@ class AgreetmentController extends CommonController {
             if (!is_numeric($data['money']) || !is_numeric($data['period']) || !$data['finish_time'] || !is_numeric($data['status']) || !$data['pay_type']) {
                 $this->ajaxReturn(array('code'=>-5,'msg'=>'请填写完整的数据'), 'JSON');
             }
+            $return_money = $data['money'];
         }elseif ($select_type == 'invoice') {
             //添加开票记录
             if (!$periodinfo) {
@@ -266,6 +267,10 @@ class AgreetmentController extends CommonController {
         $rs = $money_log->add($data);
         if (!$rs) {
             $this->ajaxReturn(array('code'=>-500,'msg'=>'数据保存失败'), 'JSON');
+        }
+        if ($return_money) {
+            //更新回款金额
+            M('agreement')->where(array('id'=>$agree_id))->setInc('return_money', $return_money);
         }
         $data['id'] = $rs;
         $data['json'] = htmlspecialchars(json_encode($data));
@@ -300,6 +305,7 @@ class AgreetmentController extends CommonController {
                 $this->ajaxReturn(array('code'=>-3,'msg'=>'请填写完整的数据'), 'JSON');
             }
         }elseif ($loginfo['type'] == 2) {
+            //实际回款记录
             $data['money'] = $_POST['money'];
             $data['finish_time'] = strtotime($_POST['pay_time']);
             $data['status'] = $_POST['status'];
@@ -309,6 +315,7 @@ class AgreetmentController extends CommonController {
                 $this->ajaxReturn(array('code'=>-3,'msg'=>'请填写完整的数据'), 'JSON');
             }
         }elseif ($loginfo['type'] == 3) {
+            //开票记录
             $data['money'] = $_POST['money'];
             $data['finish_time'] = strtotime($_POST['invoice_time']);
             $data['status'] = $_POST['status'];
