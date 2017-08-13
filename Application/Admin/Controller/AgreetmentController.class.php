@@ -314,6 +314,7 @@ class AgreetmentController extends CommonController {
             if (!is_numeric($data['money']) || !$data['finish_time'] || !is_numeric($data['status']) || !$data['pay_type']) {
                 $this->ajaxReturn(array('code'=>-3,'msg'=>'请填写完整的数据'), 'JSON');
             }
+            $return_money = $data['money'];
         }elseif ($loginfo['type'] == 3) {
             //开票记录
             $data['money'] = $_POST['money'];
@@ -337,6 +338,10 @@ class AgreetmentController extends CommonController {
         $rs = $money_log->where(array('id'=>$logid))->save($data);
         if (false === $rs) {
             $this->ajaxReturn(array('code'=>-500,'msg'=>'数据保存失败'), 'JSON');
+        }
+        if ($return_money) {
+            //更新回款金额
+            M('agreement')->where(array('id'=>$loginfo['agree_id']))->setDec('return_money', $loginfo['money'] - $return_money);
         }
         $loginfo = array_merge($loginfo, $data);
         $loginfo['json'] = htmlspecialchars(json_encode($loginfo));
@@ -371,6 +376,8 @@ class AgreetmentController extends CommonController {
         if (false === $rs) {
             $this->ajaxReturn(array('code'=>-500,'msg'=>'数据删除失败'), 'JSON');
         }
+        //更新回款金额
+        M('agreement')->where(array('id'=>$loginfo['agree_id']))->setDec('return_money', $loginfo['money']);
         //返回最新回款数据
         $sum_data = $this->getMoneyLog($loginfo['agree_id']);
         $info_data = $loginfo;
