@@ -11,7 +11,7 @@ namespace Admin\Controller;
 class AttachController extends CommonController {
 
     public function test() {
-        $dirpath = ROOT_PATH.'Uploads/agreement/1';
+        $dirpath = ROOT_PATH.'Uploads/agreement/5';
         $handle = opendir($dirpath);
         if (!$handle) {
             $this->ajaxReturn(array('code'=>-3,'msg'=>'目录读取失败'), 'JSON');
@@ -20,7 +20,7 @@ class AttachController extends CommonController {
             if ($file == "." || $file == "..") continue;
             dump(mb_detect_encoding($file));
         }
-        //dump(iconv_get_encoding('all'));
+        dump(iconv_get_encoding('all'));
     }
 
 
@@ -64,9 +64,15 @@ class AttachController extends CommonController {
                 }
             }
         }
+		$mkdirname =$dirpath.'/'.$dirname;
         if (DIRECTORY_SEPARATOR == "\\") { //windows os
             $mkdirname = iconv('utf-8', 'gbk', $dirpath.'/'.$dirname);
         }
+		
+		if (preg_match("/[\x7f-\xff]/", $mkdirname)) { 
+			$this->ajaxReturn(array('code'=>-3,'msg'=>'请不要创建中文文件夹'), 'JSON');
+		}
+		
         if (!mkdir($mkdirname)) {
             $this->ajaxReturn(array('code'=>-3,'msg'=>'创建目录失败'), 'JSON');
         }
