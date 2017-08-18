@@ -504,7 +504,7 @@ class CommonController extends Controller {
      */
     public function getUserPartner($user_id) {
         $user_partner = M('user_partner')->where(array('userid'=>$user_id))->find();
-        $result = array();
+        $result = array(0);
         if ($user_partner['partners']) {
             $array = explode(',' ,$user_partner['partners']);
             foreach ($array as $val) {
