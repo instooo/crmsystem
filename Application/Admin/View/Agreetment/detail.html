@@ -118,7 +118,11 @@
 					</span>
 					<span class="input-container" id="1002">
 					<span class="clientmodify-pen">
+					<if condition="$vo['edit'] eq 1">
+					<span class="clientmodify-default-text">{$vo.val}</span><span>修改</span>
+					<else/>
 					<span class="clientmodify-default-text">{$vo.val}</span>
+					</if>
 					</span></span><span class="error-warn"></span>
 					</div>
 				</div>

@@ -531,13 +531,25 @@ class workflow{
 			//查看相关实例是否存在
 			$uid = $data['user'];	
 			$caseremap['a.c_id'] = $data['work_case'];			
-			$casere = M('work_case a')
-					->join('crm_workflow_extend b on a.step = b.step_id+1')
+			$casere = M('work_case a')				
 					->where($caseremap)
 					->find();
-			print_R(M('work_case a'));die;				
+			
+			if($casere){
+				$map['step_id'] = $casere['step']+1;
+				$map['w_id'] = $casere['w_id'];
+				$result = M('workflow_extend')->where($map)->find();
+				
+				if($result['field']!=0){
+					//查找相应字段名称
+					$result['field'] = str_replace('|',',',$result['field']);
+					$resultmap['id']=array('in',$result['field']);
+					$a = M('fields')->where($resultmap)->select();					
+				}
+			}
+			
 		}while(0);
-		return $ret;	
+		return $a;	
 	}
 }
 ?>

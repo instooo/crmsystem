@@ -47,9 +47,19 @@ class AgreetmentController extends CommonController {
 			$work_case = $workcase->onecase($casedata);
 			
 			//查找当前用户可修改字段
-			$edit = $workcase->get_cedit($data);			
+			$edit = $workcase->get_cedit($data);
+			$editarr = array_column($edit,'field_name');	
+			foreach($detaidata as $key=>$val){
+				if(in_array($val['name'],$editarr)){
+					$detaidata[$key]['edit']=1;					
+				}else{
+					$detaidata[$key]['edit']=0;
+				}
+			}
+			//print_r($detaidata);die;
 			
 			
+			$this->assign('edit',$edit);
 			$this->assign('result',$result);	
 			$this->assign('work_case',$work_case);
 
