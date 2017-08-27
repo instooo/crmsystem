@@ -251,7 +251,7 @@ class CommonController extends Controller {
         if ($id) {
             $data = M($fieltype)->where(array('id'=>$id))->find();
         }
-		$fieldlist = $this->getFieldList($fieltype);
+		$fieldlist = $this->getFieldList($fieltype);		
 		foreach($data as $key=>$val){
 			if($key=='agree_name'){
 				$redata[]=array(
@@ -273,8 +273,12 @@ class CommonController extends Controller {
 					'name'=>$fieldlist[$key]['field_name'],
 					'val'=>$val
 				);
+			}else if($key=='partner_name'){
+				$redata[]=array(
+					'name'=>'客户名称',
+					'val'=>$data['partner_name']
+				);
 			}
-			
 		}
 		return 	$redata;
 	}

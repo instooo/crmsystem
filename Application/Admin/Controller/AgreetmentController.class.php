@@ -29,7 +29,7 @@ class AgreetmentController extends CommonController {
 	public function detail(){
 		$cid = $_GET['cid'];
 		$agree_id= $_GET['agree_id'];
-		$detaidata = $this->get_form_info($agree_id,'agreement');	
+		$detaidata = $this->get_form_info($agree_id,'agreement');		
 		if($cid=='' || $agree_id == ''){		
 			echo "参数不全";die;
 		}else{
@@ -45,7 +45,11 @@ class AgreetmentController extends CommonController {
 			//查找当前登录用户拥有的实例	
 			$casedata['c_id'] =$cid;			
 			$work_case = $workcase->onecase($casedata);
-			//print_r($work_case);die;
+			
+			//查找当前用户可修改字段
+			$edit = $workcase->get_cedit($data);			
+			
+			
 			$this->assign('result',$result);	
 			$this->assign('work_case',$work_case);
 
@@ -58,8 +62,9 @@ class AgreetmentController extends CommonController {
 			
             //回款记录
             $moneylog = $this->getMoneyLog($agree_id);			
+			$partdata = $this->get_form_info($agreeinfo['partner_id'],'partner');	
 			
-			
+			$this->assign('partdata',$partdata);
 			$this->assign('detaidata',$detaidata);
             $this->assign('moneylogtree',$moneylog['moneylogtree']);
             $this->assign('all_plan_sum',$moneylog['all_plan_sum']);

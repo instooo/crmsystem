@@ -523,5 +523,21 @@ class workflow{
 		}
 		return $nowuid;	
 	}
+
+	//获取可修改字段
+	public function get_cedit($data){
+		$ret = array('code'=>-1,'msg'=>'');
+        do{		
+			//查看相关实例是否存在
+			$uid = $data['user'];	
+			$caseremap['a.c_id'] = $data['work_case'];			
+			$casere = M('work_case a')
+					->join('crm_workflow_extend b on a.step = b.step_id+1')
+					->where($caseremap)
+					->find();
+			print_R(M('work_case a'));die;				
+		}while(0);
+		return $ret;	
+	}
 }
 ?>

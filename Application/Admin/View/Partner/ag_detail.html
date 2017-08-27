@@ -1,0 +1,22 @@
+<div class="dynamic-detail-body tablist">
+	 <input name="id" type="hidden" id="doc_id" value="{$agreeinfo.id}">
+	<div class="modify-detail-container">
+			<div class="modify-body">
+				<volist name="partdata" id="vo">
+				<div class="modify-base-info">
+					<div class="newclient-item-info" mappingname="name">
+					<span class="lable-container">
+					<span class="input-label">{$vo.name}</span>
+					<span class="normal"></span>
+					</span>
+					<span class="input-container" id="1002">
+					<span class="clientmodify-pen">
+					<span class="clientmodify-default-text">{$vo.val}</span>
+					</span></span><span class="error-warn"></span>
+					</div>
+				</div>
+				</volist>
+			</div>
+		</div>
+</div>
+

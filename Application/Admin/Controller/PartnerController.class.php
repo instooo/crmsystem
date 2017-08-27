@@ -33,6 +33,11 @@ class PartnerController extends CommonController {
 		$this->display();
 	}
 	
+	//客户合同详情
+	public function ag_detail(){		
+		$this->display();
+	}
+	
 	//客户合同
 	public function agreement(){
 		$this->display();
