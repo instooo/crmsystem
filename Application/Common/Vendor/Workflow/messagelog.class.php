@@ -19,7 +19,8 @@ class messagelog{
 			$logdata['createtime']=time();
 			$logdata['updatetime']=0;		
 			$logdata['status']=0;
-			$logdata['message']=$data['comment'];				
+			$logdata['message']=$data['comment'];
+			$logdata['type']=$data['type']?$data['type']:"agreement";					
 			M('message_log')->add($logdata);	
 		}	
 	}

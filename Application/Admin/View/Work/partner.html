@@ -25,11 +25,13 @@
                 <thead>
                 <tr>
                     <th>客户名称</th>
-                    <th>所有者</th>
-                    <th>创建时间</th>
-                    <volist name="fieldlist" id="vo">
-                        <th>{$vo.field_name}</th>
-                    </volist>
+                    <th>合作类型</th>
+                    <th>联系名称</th>
+					<th>联系电话</th>
+                    <th>微信</th>
+                    <th>qq</th>
+					<th>地址</th>
+					<th>状态</th>
                     <th>操作</th>
                 </tr>
                 </thead>
@@ -37,13 +39,13 @@
                     <volist name="list" id="vo">
                         <tr data-id="{$vo.id}">
                             <td class="td_partner_name">{$vo.partner_name}</td>
-                            <td>{$vo.nickname}</td>
-                            <td>{$vo.addtime|date="Y-m-d H:i:s",###}</td>
-                            <volist name="vo" id="vv">
-                                <if condition="$fieldlist[$key]">
-                                    <td class="td_{$key}" data-key="{$key}">{$vv}</td>
-                                </if>
-                            </volist>
+                            <td>{$vo.khtype}</td>
+                            <td>{$vo.partner_name}</td>
+                            <td >{$vo.tel}</td>
+                            <td>{$vo.weixin}</td>
+                            <td>{$vo.qq}</td>                            
+							<td>{$vo.address}</td>
+                            <td>{$vo.status}</td>                           
                             <td><a href="javascript:;" class="tablelink edit">编辑</a> <a href="javascript:;" class="tablelink detail">查看</a></td>
                         </tr>
                     </volist>
@@ -68,53 +70,24 @@
 
 <script>
     var layer_index;
-    $(document).on('click', '.add_btn', function () {
-        var load = layer.load(1);
+    $(document).on('click', '.add_btn', function () {       
         $.ajax({
             type:'post',
             dataType:'json',
             data:{fieldtype:'partner'},
             url:"{:U('Common/getFieldForm')}",
             success:function (response) {
-                layer.close(load);
-                var formHtml = $('#add_temp').html().replace('##FORM##', response.form.html+response.form.script);
                 layer_index = layer.open({
-                    type: 1,
-                    title: '添加客户',
+                    type: 2,
+                    title: '添加合同',
                     skin: 'layui-layer-rim',
-                    area: ['550px', '450px'],
+                    area: ['100%', '100%'],
                     scrollbar: false,
-                    content: formHtml
-                });
-                $(document).on('click', '#layui-layer'+layer_index+' .btn', function () {
-                    addData($(this).parents('.dataform'));
+                    content: "/Work/addPartner"
                 });
             }
         });
     });
-    
-    //添加
-    function addData(con) {
-        var load = layer.load(1);
-        con.ajaxSubmit({
-            type:'post',
-            dataType:'json',
-            url:"{:U('Work/addPartner')}",
-            error:function () {
-                layer.close(load);
-            },
-            success:function (response) {
-                layer.close(load);
-                if (response.code == 1) {
-                    layer.msg('保存成功', {icon: 1,time: 1000}, function(){
-                        location.reload();
-                    });
-                }else {
-                    layer.msg(response.msg, {icon: 2,time: 1000});
-                }
-            }
-        });
-    }
     
     $(document).on('click', '.edit', function () {
         var tr = $(this).parents('tr');

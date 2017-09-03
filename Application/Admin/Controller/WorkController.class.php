@@ -19,6 +19,205 @@ class WorkController extends CommonController {
     }
 	
     /**
+     * 客户管理
+     */
+    public function partner() {
+		//查找自己拥有客户
+		$nowuid = $this->get_numuid();		
+        $partners = $this->getUserPartner($_SESSION['authId']);
+		$map['p.id'] = array('in', $partners);
+		print_r($partners);
+        $fieldlist = $this->getFieldList('partner');
+        $klist = array_keys($fieldlist);
+
+        $count = M('partner p')
+            ->field('p.*,u.id,u.nickname')
+			->where($map)
+            ->join('left join crm_user u on u.user_number=p.owner')
+            ->count();
+        $page = new \Think\Page($count, 20);
+        $page->setConfig('prev', '&nbsp;');
+        $page->setConfig('next', '&nbsp;');
+
+        $list = M('partner p')
+            ->field('p.*,u.id as user_id,u.nickname')
+            ->join('left join crm_user u on u.user_number=p.owner')
+            ->order('p.id desc')
+			->where($map)
+            ->limit("{$page->firstRow},{$page->listRows}")
+            ->select();
+      
+        $this->assign('pagebar', $page->show());
+        $this->assign('list', $list);
+
+        $this->display();
+    }
+
+
+    /**
+     * 添加客户
+     */
+    public function addPartner() {
+        if(IS_POST){
+			$return_data = array('code'=>-1,'msg'=>'未知错误');
+			do{			
+				//添加实例				
+				$adddata =$_POST;
+				$adddata['owner'] = $this->get_numuid();
+				$adddata['addtime'] = time();
+				
+				//添加合同
+				if (!$_POST['partner_name']) {
+					$return_data['code'] = -2;
+					$return_data['msg'] = '请输入客户名称';
+					break;
+				}
+				//添加合同
+				if (!$_POST['contact_name']) {
+					$return_data['code'] = -2;
+					$return_data['msg'] = '联系人信息';
+					break;
+				}
+				
+				//添加合同
+				if (!$_POST['tel']) {
+					$return_data['code'] = -2;
+					$return_data['msg'] = '请输入电话号码';
+					break;
+				}
+				if(!preg_match("/^1[34578]{1}\d{9}$/",$_POST['tel'])){  
+					$return_data['code'] = -2;
+					$return_data['msg'] = '电话号码不正确';
+					break;
+				}
+				if(!preg_match("/^\d*$/",$_POST['qq'])){  
+					$return_data['code'] = -2;
+					$return_data['msg'] = 'qq号码不正确';
+					break;
+				}
+				$rs = M('partner')->add($adddata);
+				if (!$rs) {
+					$return_data['code'] = -4;
+					$return_data['msg'] = '保存失败';
+					break;
+				}
+				$return_data['code'] = 1;
+				$return_data['msg'] = '保存成功';
+				break;
+			}while(0);
+			$this->ajaxReturn($return_data,'JSON');
+		}else{
+			//查询流程		
+			$this->display();
+		}
+    }
+
+    /**
+     * 编辑客户
+     */
+    public function editPartner() {
+        $this->editData();
+    }
+
+    /**
+     * 删除客户
+     */
+    public function delePartner() {
+        $this->deleData();
+    }
+
+
+
+    /**
+     * 联系人管理
+     */
+    public function contact() {
+        $fieldlist = $this->getFieldList('contact');
+        $klist = array_keys($fieldlist);
+
+        //查询客户
+        $partners = $this->getUserPartner($_SESSION['authId']);
+        $pmap['id'] = array('in', $partners);
+        $partnerlist = M('partner')->where($pmap)->select();
+        $this->assign('partnerlist', $partnerlist);
+
+        if ($_REQUEST['s_partner_id']) {
+            $map['p.partner_id'] = $_REQUEST['s_partner_id'];
+            $this->assign('s_partner_id', $_REQUEST['s_partner_id']);
+        }else {
+            $map['p.partner_id'] = array('in', $partners);
+        }
+
+        if ($_REQUEST['s_partner_id']) {
+            $map['p.partner_id'] = $_REQUEST['s_partner_id'];
+            $this->assign('s_partner_id', $_REQUEST['s_partner_id']);
+        }else {
+            $map['p.partner_id'] = array('in', $partners);
+        }
+
+        $count = M('contact p')
+            ->field('p.*,u.id as user_id,u.nickname,t.partner_name')
+            ->join('left join crm_user u on u.user_number=p.owner')
+            ->join('left join crm_partner t on t.id=p.partner_id')
+            ->where($map)
+            ->count();
+        $page = new \Think\Page($count, 20);
+        $page->setConfig('prev', '&nbsp;');
+        $page->setConfig('next', '&nbsp;');
+
+        $datalist = M('contact p')
+            ->field('p.*,u.id as user_id,u.nickname,t.partner_name')
+            ->join('left join crm_user u on u.user_number=p.owner')
+            ->join('left join crm_partner t on t.id=p.partner_id')
+            ->where($map)
+            ->order('p.id desc')
+            ->limit("{$page->firstRow},{$page->listRows}")
+            ->select();
+
+        $list = array();
+        foreach ($datalist as $val) {
+            $tmp = $this->dataPaser($val, $fieldlist);
+            $tmp['id'] = $val['id'];
+            $tmp['user_id'] = $val['user_id'];
+            $tmp['partner_id'] = $val['partner_id'];
+            $tmp['partner_name'] = $val['partner_name'];
+            $tmp['addtime'] = $val['addtime'];
+            $tmp['nickname'] = $val['nickname'];
+            $list[] = $tmp;
+        }
+
+        $this->assign('fieldlist', $fieldlist);
+        $this->assign('pagebar', $page->show());
+        $this->assign('list', $list);
+
+        $partner_list = M('partner')->select();
+        $this->assign('partner_list', $partner_list);
+
+        $this->display();
+    }
+
+    /**
+     * 添加联系人
+     */
+    public function addContact() {
+        $this->addData();
+    }
+
+    /**
+     * 编辑联系人
+     */
+    public function editContact() {
+        $this->editData();
+    }
+
+    /**
+     * 删除联系人
+     */
+    public function deleContact() {
+        $this->deleData();
+    }
+
+    /**
      * 我的合同管理
      */
     public function agreement() {
