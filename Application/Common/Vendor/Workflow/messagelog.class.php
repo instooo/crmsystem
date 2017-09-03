@@ -34,26 +34,48 @@ class messagelog{
 		return $count;
 	}
 
-	public function get_message_list(){
-		$userinfo = M('user')->select();
-		$userinfoarr = array();
-		foreach($userinfo as $val){
-			$userinfoarr[$val['user_number']]=$val;
-		}	
-		$nowuid = $this->get_num_uid();				
-		$map['reuid'] = $nowuid;
-	
-		$list = M('message_log a')
-				->field('a.*,b.*,b.id as aid,a.id')
-				->join('crm_agreement b on a.c_id=b.e_id')
-				->where($map)
-				->order('a.id desc')
-				->select();		
-		$tmp_arr = array();
-		foreach ($list as $key=>$val){
-			$tmp_arr[$key]=$val;
-			$tmp_arr[$key]['send'] = $userinfoarr[$val['uid']]['nickname'];
-		}
+	public function get_message_list($type){
+		if($type=='partner'){
+			$userinfo = M('user')->select();
+			$userinfoarr = array();
+			foreach($userinfo as $val){
+				$userinfoarr[$val['user_number']]=$val;
+			}	
+			$nowuid = $this->get_num_uid();				
+			$map['reuid'] = $nowuid;
+			$map['type'] = $type;
+			$list = M('message_log')
+					->field('*')				
+					->where($map)
+					->order('id desc')
+					->select();		
+			$tmp_arr = array();
+			foreach ($list as $key=>$val){
+				$tmp_arr[$key]=$val;
+				$tmp_arr[$key]['c_id']=str_replace('p_','',$val['c_id']);
+				$tmp_arr[$key]['send'] = $userinfoarr[$val['uid']]['nickname'];
+			}		
+		}else{
+			$userinfo = M('user')->select();
+			$userinfoarr = array();
+			foreach($userinfo as $val){
+				$userinfoarr[$val['user_number']]=$val;
+			}	
+			$nowuid = $this->get_num_uid();				
+			$map['reuid'] = $nowuid;
+		
+			$list = M('message_log a')
+					->field('a.*,b.*,b.id as aid,a.id')
+					->join('crm_agreement b on a.c_id=b.e_id')
+					->where($map)
+					->order('a.id desc')
+					->select();		
+			$tmp_arr = array();
+			foreach ($list as $key=>$val){
+				$tmp_arr[$key]=$val;
+				$tmp_arr[$key]['send'] = $userinfoarr[$val['uid']]['nickname'];
+			}	
+		}		
 		return $tmp_arr;
 	}
 	//获取当前账号

@@ -13,25 +13,21 @@
         <div class="tools">
 			 <div class="systemNotice-header-inner" style="width: 980px;">
 				<ul class="systemNotice-tabs">
-					<li class="systemNotice-tabs-item systemAllNoticeTab actived">
-						<a href="javascript:;">全部</a>
+					<li class="systemNotice-tabs-item systemAllNoticeTab <if condition="$type neq partner">actived</if>">
+						<a href="/message/message_list/type/agreement">合同</a>
 						<span class="sn-notice-tip" style="display: none;"></span>
 					</li>
-                    <li class="systemNotice-tabs-item systemCalendarNoticeTab">
-                        <a href="javascript:;">日程</a>
+                    <li class="systemNotice-tabs-item systemCalendarNoticeTab <if condition="$type eq partner">actived</if>">
+                        <a href="/message/message_list/type/partner">客户</a>
                         <span class="sn-notice-tip"></span>
-                    </li>
-					<li class="systemNotice-tabs-item systemEmailNoticeTab">
-						<a href="javascript:;">邮件</a>
-						<span class="sn-notice-tip" style="display: none;"></span>
-					</li>					
+                    </li>								
 				</ul>				
 			</div>		
         </div>
         <div class="tablelist_w ">
 			<ul class='message_list'>
 				<volist name='list' id='vo'>
-				<li class='td_agree_name'  data-cid="{$vo.c_id}" data-aid="{$vo.aid}" logid="{$vo.id}">
+				<li <if condition="$type neq partner"> class='td_agree_name'<else/>class='td_pt_name'</if>  data-cid="{$vo.c_id}" data-aid="{$vo.aid}" logid="{$vo.id}">
 				<if condition="$vo['status'] eq 0">
 				<font color='red'>(未读）</font>
 				<else/>
@@ -74,7 +70,31 @@
 			}
 		});
 	});
-	
+	//查看合同状态
+	$(document).on('click', '.td_pt_name', function (){
+		var id = $(this).attr('logid');
+		$.ajax({
+			type:'post',
+			dataType:'json',
+			data:{id:id},
+			url:"{:U('Message/readmessage')}",
+			success:function (response) {				
+			}
+		});
+	    var cid = $(this).attr('data-cid');      
+		layer_index = layer.open({
+			type: 2,
+			title: '合同详情',
+			skin: 'layui-layer-rim',
+			area: ['60%', '98%'],
+			shade: 0.1,
+			scrollbar: false,
+			content: '/Partner/detail/id/'+cid,
+			end: function () {
+				location.reload() 
+			}
+		});
+	});
 </script>
 
 <include file="Index/footer" />

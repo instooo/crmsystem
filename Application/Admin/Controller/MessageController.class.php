@@ -17,9 +17,11 @@ class MessageController extends CommonController {
 	
 	//我的消息列表
 	public function message_list(){
+		$type = $_GET['type'];
 		$messagelog = new messagelog();	
-		$list = $messagelog->get_message_list();		
+		$list = $messagelog->get_message_list($type);	
 		$this->assign('list',$list);
+		$this->assign('type',$type);
 		$this->display();
 	}
 	

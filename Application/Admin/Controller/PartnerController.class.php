@@ -39,7 +39,7 @@ class PartnerController extends CommonController {
 		$map['p_id']=$id;		
 		$log = M('work_partner_log')			
 			->where($map)
-			->order('log_id asc')
+			->order('log_id desc')
 			->select();			
 		$tmp_arr = array();
 		foreach($log as $key=>$val){
@@ -65,17 +65,9 @@ class PartnerController extends CommonController {
 				$tmp_arr[$pid]['sub'][$key]['re_user']=$userinfoarr[$val['re_uid']]['nickname'];
 			}
 		}			
-		$partnerinfo['history'] = $tmp_arr;
+			$partnerinfo['history'] = $tmp_arr;
             $this->assign('partnerinfo',$partnerinfo);
 		}
-		$this->display();
-	}
-	
-	public function add_plog(){
-		
-	}
-	//客户合同
-	public function agreement(){
 		$this->display();
 	}
 

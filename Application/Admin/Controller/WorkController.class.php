@@ -26,7 +26,7 @@ class WorkController extends CommonController {
 		$nowuid = $this->get_numuid();		
         $partners = $this->getUserPartner($_SESSION['authId']);
 		$map['p.id'] = array('in', $partners);
-		print_r($partners);
+	
         $fieldlist = $this->getFieldList('partner');
         $klist = array_keys($fieldlist);
 

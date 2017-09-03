@@ -27,8 +27,8 @@
 	<div class="customer_tabs fn-clear">
 		<ul class="detail_main_nav">
 			<li class='slide_nav_hover'><a class="slide-panel-tab" data-index="0" href="#">动态</a></li>
-			<li><a class="slide-panel-tab" data-index="1" href="#">客户合同</a></li>
-			<li><a class="slide-panel-tab" data-index="2" href="#">基本信息</a></li>			
+			<li><a class="slide-panel-tab" data-index="1" href="#">基本信息</a></li>
+			<li><a class="noclick" href="/Work/agreement?s_partner_id={$partnerinfo.id}" target="_blank">客户合同</a></li>			
 		</ul>
 	</div>
 	<div>
@@ -77,9 +77,6 @@
 		</div>
 	</volist>
 	</div>
-
-	<!-- 汇款记录start -->
-	<include file="partner/agreementaaaaa" />
 	<!-- 汇款记录end -->
 
 	<div class="dynamic-detail-body tablist">
@@ -174,14 +171,18 @@ function reply_sign(log_id,newlogid){
         $.extend(def, opt);
         this.each(function () {
             var $this = $(this);
-            var timer;
-            $this.find('ul.detail_main_nav li').click(def.activeEvt,function(){
+            var timer;			
+		
+			$this.find('ul.detail_main_nav li').click(def.activeEvt,function(){
                 var index = $(this).index(),
-                    that = $(this);
-				that.addClass('slide_nav_hover').siblings().removeClass('slide_nav_hover');
-				$('.tablist').eq(index).show().siblings().hide();
-
+                    that = $(this);					
+				if(that.find('a').attr('class') !=='noclick'){
+					that.addClass('slide_nav_hover').siblings().removeClass('slide_nav_hover');
+					$('.tablist').eq(index).show().siblings().hide();
+				}
             });
+			
+            
         });
     }
 
