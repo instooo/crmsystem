@@ -1,0 +1,60 @@
+<html>
+<head>
+<script language="JavaScript" src="{:C('STATIC_URL')}/js/jquery.js"></script>
+<script type="text/javascript" src="{:C('STATIC_URL')}/ztree/js/jquery.ztree.core.js"></script>
+<script type="text/javascript" src="{:C('STATIC_URL')}/ztree/js/jquery.ztree.excheck.js"></script>
+<link href="{:C('STATIC_URL')}/css/style.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="{:C('STATIC_URL')}/ztree/css/zTreeStyle/zTreeStyle.css" type="text/css">
+<style>
+.caozuo{float:right; margin}
+.caozuo input { width:80px; height:20px; margin-left:10px;}
+body,input,select{ font-size:14px; line-height:18px;}
+</style>
+</head>
+<body style="overflow-x: hidden;overflow-y: auto;">	
+<b style=" font-size:16px">当前用户用户：</b>
+<div id='nowuser'>{$userinfo.username}</div>
+<br/>
+<br/>
+<a href="/casedemo" class="btn" >首页</a>
+<br/>
+<br/><a  class="btn" style='display:block; float:left; margin-left:5px; text-align:center; line-height:28px;' href='/casedemo/case_list'>我的合同</a>
+<a  class="btn" style='display:block; float:left; margin-left:5px; text-align:center; line-height:28px;' href='/casedemo/addcase'>添加合同</a>
+<br/>
+<br/><br/>
+<br/><br/>
+<br/><br/>
+<br/><br/>
+<br/>
+<b style=" font-size:16px">流程（属于哪个流程）：</b>
+<select name="workflow">
+<volist name='workflow' id='vo'>
+<option value="{$vo.w_id}">{$vo.w_name}</option>
+</volist>
+</select>
+<b style=" font-size:16px">实例名称：</b>
+<input name="htname" type="txt"  id="htname" value="">
+<input name="" type="button" class="btn" id="casebtn" value="添加实例">
+
+
+<script>
+$(function(){
+	$("#casebtn").click(function(){		
+		var workflow = $("select[name='workflow']").val();
+		var htname =$("#htname").val(); 
+		$.ajax({
+            type:'post',
+            dataType:'json',
+            data:{workflow:workflow,htname:htname},
+            url:"{:U('Casedemo/addcase')}",
+            success:function (response) {  
+				if(response.code==1){					
+					$(".caozuo").html(response.html);
+				}
+            }
+        });
+	})	
+})	
+</script>
+</body>
+</html>

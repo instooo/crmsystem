@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>添加节点</title>
+    <link href="{:C('STATIC_URL')}/css/style.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="{:C('STATIC_URL')}/js/jquery.js"></script>
+    <script src="{:C('STATIC_URL')}/layer/layer.js" type="text/javascript"></script>
+    <style>
+        .forminfo i{display: none;}
+    </style>
+</head>
+
+<body>
+
+<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+        <li><a href="#">首页</a></li>
+        <li><a href="#">添加节点</a></li>
+    </ul>
+</div>
+
+<div class="formbody">
+
+    <div class="formtitle"><span>节点信息</span></div>
+
+    <ul class="forminfo">
+        <input type="hidden" class="dfinput input_level" value="" />
+        <li>
+            <label>上级节点</label>
+            <select class="dfinput input_pid">
+                <option value="" data-level="">选择上级节点</option>
+                <option value="0" data-level="0">一级节点</option>
+                <volist name="tree" id="vo">
+                    <option value="{$vo.id}" data-level="{$vo.level}">{$vo.tag_str} {$vo.title}</option>
+                    <volist name="vo.child" id="vv">
+                        <option value="{$vv.id}" data-level="{$vv.level}">{$vv.tag_str} {$vv.title}</option>
+                    </volist>
+                </volist>
+            </select>
+            <i>标题不能超过30个字符</i>
+        </li>
+        <li><label>描述</label><input name="title" type="text" class="dfinput input_title" /><i>标题不能为空</i></li>
+        <li><label>链接</label><input name="name" type="text" class="dfinput input_name" /><i>链接不能为空</i></li>
+        <li><label>是否显示</label><cite><input class="input_ismenu" name="ismenu" type="radio" value="1" checked="checked" />是&nbsp;&nbsp;&nbsp;&nbsp;<input class="input_ismenu" name="ismenu" type="radio" value="0" />否</cite></li>
+        <li><label>排序</label><input name="sort" type="text" class="dfinput input_sort" value="0" /><i>排序不能为空</i></li>
+        <li><label>&nbsp;</label><input name="submit" type="button" class="btn" value="确认保存"/></li>
+    </ul>
+</div>
+
+
+</body>
+<script>
+    $(function () {
+        $('.input_pid').change(function () {
+            var val = $(this).find('option:selected').attr('data-level');
+            if (!val) return false;
+            $('.input_level').attr('value', parseInt(val)+1);
+        });
+        $(document).on('click', '.btn', function () {
+            $('.forminfo i').hide();
+            var pid = $('.input_pid').val();
+            var title = $('.input_title').val();
+            var name = $('.input_name').val();
+            var ismenu = $('.input_ismenu').val();
+            var sort = $('.input_sort').val();
+            var level = $('.input_level').val();
+            var isValidate = true;
+            $('.forminfo .dfinput').each(function () {
+                if ($(this).val() == '') {
+                    isValidate = false;
+                    $(this).siblings('i').show();
+                    return false;
+                }
+            });
+            if (!isValidate) return false;
+            $.ajax({
+                type:'post',
+                dataType:'json',
+                data:{pid:pid,title:title,name:name,ismenu:ismenu,sort:sort,level:level},
+                url:"{:U('Permission/addNode')}",
+                success:function (response) {
+                    if (response.code == 1) {
+                        layer.msg('添加成功', {
+                            icon: 1,
+                            time: 1000
+                        }, function(){
+                            location.reload();
+                        });
+                    }else {
+                        layer.msg(response.msg, {icon: 2,time: 1000});
+                    }
+                }
+            });
+        });
+    });
+</script>
+</html>

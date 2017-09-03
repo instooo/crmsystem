@@ -1,0 +1,258 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<include file="Index/header" />
+<div id="main" >
+<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+        <li><a href="#">首页</a></li>
+        <li><a href="#">权限管理</a></li>
+        <li><a href="#">账户管理</a></li>
+    </ul>
+</div>
+
+<div class="rightinfo">
+
+    <div class="tools">
+
+        <ul class="toolbar">
+            <li class="add_btn"><span><img src="{:C('STATIC_URL')}/images/t01.png"/></span>添加</li>
+        </ul>
+
+    </div>
+
+    <div class="tablelist_w new_tablelist">
+        <table class="tablelist">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>用户名</th>
+                <th>昵称</th>
+                <th>角色</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="vo">
+                <tr>
+                    <td class="td_id">{$vo.id}</td>
+                    <td class="td_username">{$vo.username}</td>
+                    <td class="td_nickname">{$vo.nickname}</td>
+                    <td class="td_role" data-roleid="{$vo.role_id}">{$vo.rolename}</td>
+                    <td><a href="javascript:;" class="tablelink edit_btn">修改</a>&nbsp;<a href="javascript:;" class="tablelink partner_btn">客户设置</a><!--<a href="javascript:;" class="tablelink dele_btn"> 删除</a>--></td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <div id="add_temp" style="display: none">
+        <ul class="forminfo">
+            <input type="hidden" class="input_id" value="">
+            <li><label>用户名</label><input name="username" type="text" class="dfinput input_username" style="width: 300px" /></li>
+            <li><label>密码</label><input name="password" type="password" class="dfinput input_password" style="width: 300px" /></li>
+            <li><label>昵称</label><input name="nickname" type="text" class="dfinput input_nickname" style="width: 300px" /></li>
+            <li>
+                <label>角色</label>
+                <select class="dfinput input_role_id" style="width: 300px">
+                    <option value="">选择角色</option>
+                    <volist name="rolelist" id="vo">
+                        <option value="{$vo.id}">{$vo.name}</option>
+                    </volist>
+                </select>
+            </li>
+            <li><label>&nbsp;</label><input name="submit" type="button" class="btn do_save_btn" value="保存"/></li>
+        </ul>
+    </div>
+    <style>
+        .p_list{width: 300px;height: 100px;padding: 10px;border: solid 1px #bac8d5;border-radius: 3px;overflow-y: scroll}
+    </style>
+    <div id="partner_temp" style="display: none">
+        <form class="add_partner_form" method="post" action="{:U('Permission/editUserPartner')}">
+            <ul class="forminfo" style="padding: 20px;">
+                <input type="hidden" name="user_id" class="input_id" value="">
+                <li><label>用户名</label><input name="username" type="text" class="dfinput input_username" readonly style="width: 200px" /></li>
+                <li><label>可见客户</label><a href="javascript:;" class="tablelink selectall" style="line-height: 34px;">全选</a></li>
+                <li>
+                    <dl class="p_list">
+                        <volist name="partnerlist" id="vo">
+                            <dd><input type="checkbox" name="partner_id[]" value="{$vo.id}">{$vo.partner_name}</dd>
+                        </volist>
+                    </dl>
+                </li>
+                <li><label>&nbsp;</label><input name="submit" type="button" class="btn save_partner" value="保存"/></li>
+            </ul>
+        </form>
+    </div>
+
+
+</div>
+</div>
+<script>
+    $(function () {
+        var layer_index;
+        //设置可见客户
+        $(document).on('click', '.partner_btn', function () {
+            var tr = $(this).parents('tr');
+            $.ajax({
+                type:'get',
+                dataType:'json',
+                data:{user_id:tr.find('.td_id').html()},
+                url:"{:U('Permission/editUserPartner')}",
+                success:function (response) {
+                    if (response.code == 1) {
+                        layer_index = layer.open({
+                            type: 1,
+                            title: '编辑可见客户',
+                            skin: 'layui-layer-rim',
+                            area: ['365px', '380px'],
+                            content: $('#partner_temp').html()
+                        });
+                        var layer_con = $('#layui-layer'+layer_index);
+                        layer_con.find('.input_id').val(tr.find('.td_id').html());
+                        layer_con.find('.input_username').val(tr.find('.td_nickname').html());
+                        if (response.data.json) {
+                            for (var i in response.data.json) {
+                                layer_con.find('input[type="checkbox"][name="partner_id[]"][value="'+response.data.json[i]+'"]').prop('checked', true);
+                            }
+                        }
+                        layer_con.find('.save_partner').click(function () {
+                            doEditUserPartner(layer_con);
+                        });
+                    }
+                }
+            });
+        });
+        function doEditUserPartner(layer_con) {
+            var load = layer.load(1);
+            layer_con.find('.add_partner_form').ajaxSubmit({
+                type:'post',
+                dataType:'json',
+                url:"{:U('Permission/editUserPartner')}",
+                error:function () {
+                    layer.close(load);
+                },
+                success:function (response) {
+                    layer.close(load);
+                    if (response.code == 1) {
+                        layer.msg('保存成功', {icon: 1,time: 1000}, function(){
+                            layer.close(layer_index);
+                        });
+                    }else {
+                        layer.msg(response.msg, {icon: 2,time: 1000});
+                    }
+                }
+            });
+        }
+        $(document).on('click', '.forminfo .selectall', function () {
+            if ($(this).hasClass('all')) {
+                $(this).removeClass('all');
+                $(this).parents('.forminfo').find('input[type="checkbox"][name="partner_id[]"]').prop('checked', false);
+            }else {
+                $(this).addClass('all');
+                $(this).parents('.forminfo').find('input[type="checkbox"][name="partner_id[]"]').prop('checked', true);
+            }
+        });
+        
+        $(document).on('click', '.edit_btn', function () {
+            layer_index = layer.open({
+                type: 1,
+                title: '编辑账户',
+                skin: 'layui-layer-rim', //加上边框
+                area: ['365px', '420px'], //宽高
+                content: $('#add_temp').html()
+            });
+            var _tr = $(this).parents('tr');
+            var layer_obj = $('#layui-layer'+layer_index);
+            layer_obj.find('.input_id').val(_tr.find('.td_id').html());
+            layer_obj.find('.input_username').val(_tr.find('.td_username').html()).attr('readonly', true);
+            layer_obj.find('.input_nickname').val(_tr.find('.td_nickname').html());
+            layer_obj.find('.input_role_id').val(_tr.find('.td_role').attr('data-roleid'));
+        });
+        
+        $(document).on('click', '.do_save_btn', function () {
+            var layer_obj = $('#layui-layer'+layer_index);
+            var id = layer_obj.find('.input_id').val();
+            var password = layer_obj.find('.input_password').val();
+            var nickname = layer_obj.find('.input_nickname').val();
+            var role_id = layer_obj.find('.input_role_id').val();
+            if (id == '') {
+                layer.msg('参数错误', {icon: 2,time: 1000});
+                return false;
+            }
+            $.ajax({
+                type:'post',
+                dataType:'json',
+                data:{id:id,password:password,nickname:nickname,role_id:role_id},
+                url:"{:U('Permission/editUser')}",
+                success:function (response) {
+                    if (response.code == 1) {
+                        layer.msg('保存成功', {
+                            icon: 1,
+                            time: 1000
+                        }, function(){
+                            location.reload();
+                        });
+                    }else {
+                        layer.msg(response.msg, {
+                            icon: 2,
+                            time: 1000
+                        });
+                    }
+                }
+            });
+        });
+        
+        
+        $(document).on('click', '.add_btn', function () {
+            layer_index = layer.open({
+                type: 1,
+                title: '添加账户',
+                skin: 'layui-layer-rim', //加上边框
+                area: ['365px', '420px'], //宽高
+                content: $('#add_temp').html()
+            });
+            $('#layui-layer'+layer_index).find('.btn').removeClass('do_save_btn').addClass('do_add_btn');
+        });
+
+        $(document).on('click', '.do_add_btn', function () {
+            var layer_obj = $('#layui-layer'+layer_index);
+            var username = layer_obj.find('.input_username').val();
+            var password = layer_obj.find('.input_password').val();
+            var nickname = layer_obj.find('.input_nickname').val();
+            var role_id = layer_obj.find('.input_role_id').val();
+            if (username == '' || nickname == '' || role_id == '') {
+                layer.msg('您输入的信息不完整', {icon: 2,time: 1000});
+                return false;
+            }
+            $.ajax({
+                type:'post',
+                dataType:'json',
+                data:{username:username,password:password,nickname:nickname,role_id:role_id},
+                url:"{:U('Permission/addUser')}",
+                success:function (response) {
+                    if (response.code == 1) {
+                        layer.msg('保存成功', {
+                            icon: 1,
+                            time: 1000
+                        }, function(){
+                            location.reload();
+                        });
+                    }else {
+                        layer.msg(response.msg, {
+                            icon: 2,
+                            time: 1000
+                        });
+                    }
+                }
+            });
+        });
+        
+        //编辑用户可见客户
+        $(document).on('click', '.partner_btn', function () {
+            
+        });
+        
+    });
+</script>
+<include file="Index/footer" />

@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link href="{:C('STATIC_URL')}/css/style.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="{:C('STATIC_URL')}/js/jquery.js"></script>
+    <script src="{:C('STATIC_URL')}/layer/layer.js" type="text/javascript"></script>
+	<script src="{:C('STATIC_URL')}/js/common.js" type="text/javascript"></script>
+	<script src="{:C('STATIC_URL')}/laydate/laydate.js" type="text/javascript"></script>
+	  <script language="JavaScript" src="{:C('STATIC_URL')}/js/jquery.form.min.js"></script>
+    <style>
+        .forminfo i{display: none;}
+		.multi_list {
+			display: none;
+			width: 40%;
+			height: 40%;
+			left:30%;
+			top:20%;
+			padding: 10px 10px 50px;
+			border: solid 1px #bac8d5;
+			border-radius: 3px;
+			overflow-y: scroll;
+			position: absolute;
+			background-color: white;			
+		}
+    </style>
+</head>
+
+<body>
+<div class="formbody"> 
+
+    <ul class="forminfo">   
+		<form class="dataform" method="post" enctype="multipart/form-data" action="{:U('Work/addAgreement')}">
+        <li><label>合同号</label><input name="orderid" type="text" class="dfinput input_title" readonly value="{$orderid}"/><i>不可修改</i></li>
+		 <li><label>合同名称</label><input name="agree_name" type="text" class="dfinput input_title"  value=""/><i></i></li>
+		<li><label>审批流程</label> 
+		
+		<select class="dfinput input_partner_id" name="w_id" style="width: 300px">
+                    <option value="">请选择</option>
+                    <volist name="workflow" id="vo"><option value="{$vo.w_id}">{$vo.w_name}</option></volist>
+        </select><i></i></li>
+		<li><label>合同类型</label><input name="bltype" type="text" class="dfinput multi_input input_name" placeholder="办理事项" readonly="" />
+		<dl class="multi_list" style="display: none;">
+			<volist name='banshitype' id="vo">
+			<dd><input type="checkbox" value="{$vo.name}">{$vo.name}</dd>
+			</volist>
+		 </dl></li>
+		<li><label>说明</label><input name="bltext" type="text" class="dfinput input_name" placeholder="办理事项说明" /><i></i></li>
+        <li><label>客户名称</label>
+		<select class="dfinput input_partner_id" name="partner_id" style="width: 300px">
+                    <option value="">请选择</option>
+                    <volist name="partnerlist" id="vo"><option value="{$vo.id}">{$vo.partner_name}</option></volist>
+        </select>
+		
+		<i></i></li>
+		<li><label>业务资料清单</label><input type="text" class="dfinput multi_input input_field33" name="ywziliao" readonly="" value="">
+		 <dl class="multi_list" style="display: none;">
+			<volist name='zltype' id="vo">
+			<dd><input type="checkbox" value="{$vo.name}">{$vo.name}</dd>
+			</volist>
+		 </dl>		
+		 <li><label>后勤资料清单</label><input type="text" class="dfinput multi_input input_field33" name="hqziliao" readonly="" value="">
+		 <dl class="multi_list" style="display: none;">
+			<volist name='hqtype' id="vo">
+			<dd><input type="checkbox" value="{$vo.name}">{$vo.name}</dd>
+			</volist>
+		 </dl>
+		 </li>
+		 
+		<li><label>签约时间</label><input id="qydate" name="qydate" type="text" class="dfinput input_name" placeholder="签约时间" readonly/><i></i></li>
+        <li><label>总金额</label><input name="total_money" type="text" class="dfinput input_name" /><i></i></li>
+		 <li><label>具体金额说明</label><input name="moneydes" type="text" class="dfinput input_name" placeholder="金额明细"/><i></i></li>
+		 <li><label>客户情况说明</label><input name="khdes" type="text" class="dfinput input_name" placeholder="客户情况说明"/><i></i></li>
+        <li><label>&nbsp;</label><input name="submit" type="button" class="btn" value="确认保存"/></li>
+		</form>
+    </ul>
+</div>
+
+
+</body>
+<script>
+    laydate({elem: '#qydate',format: 'YYYY-MM-DD',istime:false});
+		$(function(){
+				
+		$(document).on('click', '.btn', function () {
+			var load = parent.layer.getFrameIndex(window.name); //获取窗口索引			
+			$(".dataform").ajaxSubmit({
+				type:'post',
+				dataType:'json',
+				url:"{:U('Work/addAgreement')}",
+				error:function () {
+					parent.layer.close(load);
+				},
+				success:function (response) {					
+					if (response.code == 1) {
+						layer.msg('保存成功', {icon: 1,time: 1000}, function(){
+							parent.location.reload();
+							parent.layer.close(load);
+						});
+					}else {
+						layer.msg(response.msg, {icon: 2,time: 1000});
+					}
+				}
+			});
+		});
+		})
+		
+		
+		
+	
+	
+	
+</script>
+</html>

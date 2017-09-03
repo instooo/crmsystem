@@ -1,0 +1,220 @@
+<div class="dynamic-detail-body tablist">
+    <div style="background: #eaedf2;">
+        <form id="add_doc_form">
+            <ul class="forminfo" style='margin-top:20px; padding:0 0 10px 0; background:#fff'>
+                <li>
+                    <input name="id" type="hidden" id="doc_id" value="{$agreeinfo.id}">
+                    <input name="subdir" type="hidden" id="subdir" value="agreement/{$agreeinfo.id}">
+                    <input name="doc_file" type="file" class="doc_file" style="display: none">
+                    <input name="upload_doc" type="button" class="btn btn-primary add_doc_btn" value="上传文档">
+                    <input name="add_fold" type="button" class="btn btn-primary add_fold_btn" value="新建文件夹">
+                </li>
+            </ul>
+        </form>
+        <table class="filetable" id="dirlist"></table>
+    </div>
+</div>
+
+<div id="add_dir_temp" style="display: none">
+    <ul class="forminfo" style="padding: 20px">
+        <li><label>文件夹名称&nbsp;</label><input name="dirname" type="text" class="dfinput input_dirname" style="width: 230px" /></li>
+        <li><label>&nbsp;</label><input name="submit" type="button" class="btn do_savedir_btn" value="保存"/></li>
+    </ul>
+</div>
+<script>
+    var layer_index;
+    $(function () {
+        readDir($('#subdir').val());
+    });
+    $(document).on('click', '.add_doc_btn', function () {
+        $('.doc_file').trigger('click');
+    });
+    //新建目录
+    $(document).on('click', '.add_fold_btn', function () {
+        layer_index = layer.open({
+            type: 1,
+            title: '新建文件夹',
+            skin: 'layui-layer-rim', //加上边框
+            area: ['470px', '220px'], //宽高
+            content: $('#add_dir_temp').html()
+        });
+        var lay_con = $('#layui-layer'+layer_index);
+        lay_con.find('.do_savedir_btn').click(function () {
+            var param = {};
+            param.subdir = $('#subdir').val();
+            param.dirname = $(this).parents('.forminfo').find('.input_dirname').val();
+            var load = layer.load(1);
+            $.ajax({
+                type:'post',
+                dataType:'json',
+                data:param,
+                url:"{:U('Attach/createDir')}",
+                success:function (response) {
+                    layer.close(load);
+                    if (response.code == 1) {
+                        layer.msg('保存成功', {icon: 1,time: 1000}, function(){
+                            layer.close(layer_index);
+                            var subdir = $('#subdir').val();
+                            readDir(subdir);
+                        });
+                    }else {
+                        layer.msg(response.msg, {icon: 2,time: 1000});
+                    }
+                }
+            });
+        });
+    });
+    //重命名目录
+    $(document).on('click', '.rename_btn', function () {
+        layer_index = layer.open({
+            type: 1,
+            title: '新建文件夹',
+            skin: 'layui-layer-rim', //加上边框
+            area: ['470px', '220px'], //宽高
+            content: $('#add_dir_temp').html()
+        });
+        var tr = $(this).parents('tr');
+        var old_dir = tr.attr('data-subdir')+'/'+tr.attr('data-name');
+        var lay_con = $('#layui-layer'+layer_index);
+        lay_con.find('.input_dirname').val(tr.attr('data-name'));
+        lay_con.find('.do_savedir_btn').click(function () {
+            var new_name = lay_con.find('.input_dirname').val();
+            if (new_name == '') {
+                layer.msg('文件夹名称不能为空', {icon: 2,time: 1000});
+                return false;
+            }
+            var load = layer.load(1);
+            var param = {};
+            param.old_dir = old_dir;
+            param.new_dir = tr.attr('data-subdir')+'/'+new_name;
+            $.ajax({
+                type:'post',
+                dataType:'json',
+                data:param,
+                url:"{:U('Attach/renameDir')}",
+                success:function (response) {
+                    layer.close(load);
+                    if (response.code == 1) {
+                        layer.close(layer_index);
+                        var subdir = $('#subdir').val();
+                        readDir(subdir);
+                    }else {
+                        layer.msg(response.msg, {icon: 2,time: 1000});
+                    }
+                }
+            });
+        });
+    });
+    //上传文件
+    $(document).on('change', '.doc_file', function () {
+        var load = layer.load(1);
+        $('#add_doc_form').ajaxSubmit({
+            type:'post',
+            dataType:'json',
+            url:"{:U('Attach/uploadAgreeDoc')}",
+            success:function (response) {
+                layer.close(load);
+                if (response.code == 1) {
+                    layer.msg('保存成功', {icon: 1,time: 1000}, function(){
+                        var subdir = $('#subdir').val();
+                        readDir(subdir);
+                    });
+                }else {
+                    layer.msg(response.msg, {icon: 2,time: 1000});
+                }
+            }
+        });
+    });
+    //访问目录
+    $(document).on('click', '.dirname_td', function () {
+        var subdir = $('#subdir').val();
+        subdir = subdir + '/' + $(this).parents('tr').attr('data-name');
+        readDir(subdir);
+    });
+    //上一目录
+    $(document).on('click', '.up_btn', function () {
+        var subdir = $('#subdir').val();
+        if (subdir == 'agreement/'+$('#doc_id').val()) return false;
+        var subarr = subdir.split('/');
+        var new_subdir = '';
+        for (var i in subarr) {
+            if (i == subarr.length-1) break;
+            new_subdir += subarr[i]+'/';
+        }
+        readDir(new_subdir);
+    });
+    //下载文件
+    $(document).on('click', '.dl_btn', function () {
+        window.open($(this).parents('tr').attr('data-url'));
+    });
+
+    //删除文件或目录
+    $(document).on('click', '.del_btn', function () {
+        var tr = $(this).parents('tr');
+        var subdir = $('#subdir').val();
+        var path = subdir + '/' + tr.attr('data-name');
+        var type = tr.attr('data-type');
+        var msg = (type=='dir')?'该目录下所有文件将全部删除，确定要删除该文件夹吗？':'确定要删除该文件吗？';
+        var layer_index = layer.confirm(msg, {
+            btn: ['确定','取消']
+        }, function () {
+            layer.close(layer_index);
+            var load = layer.load(1);
+            $.ajax({
+                type:'post',
+                dataType:'json',
+                data:{type:type,path:path},
+                url:"{:U('Attach/delFile')}",
+                success:function (response) {
+                    layer.close(load);
+                    if (response.code == 1) {
+                        var subdir = $('#subdir').val();
+                        readDir(subdir);
+                    }else {
+                        layer.msg(response.msg, {icon: 2,time: 1000});
+                    }
+                }
+            });
+        });
+    });
+    //读取目录
+    function readDir(subdir) {
+        subdir = subdir.replace(/(^\/*)|(\/*$)/g,"");
+        $.ajax({
+            type:'post',
+            dataType:'json',
+            data:{subdir:subdir},
+            url:"{:U('Attach/readDir')}",
+            success:function (response) {
+                if (response.code == 1) {
+                    var dir_img = "{:C('STATIC_URL')}/images/f01.png";
+                    var file_img = "{:C('STATIC_URL')}/images/f03.png";
+                    var tree = subdir.replace("agreement/1", "目录");
+                    var dirlist = '<tr><td>'+tree+'&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:;" class="tablelink up_btn">上一级</a></td><td></td></tr>';
+                    for (var i in response.list) {
+                        if (response.list[i].isfile == 1) {
+                            dirlist += '<tr data-type="file" data-url="'+response.list[i].url+'" data-subdir="'+response.list[i].subdir+'" data-name="'+response.list[i].name+'">' +
+                                    '<td><img src="'+file_img+'" />'+response.list[i].name+'</td>' +
+                                    '<td class="act_td"><a href="javascript:;" class="tablelink del_btn">删除</a>&nbsp;<a href="javascript:;" class="tablelink dl_btn">下载</a></td>' +
+                                    '</tr>';
+                        }else {
+                            dirlist += '<tr data-type="dir" data-subdir="'+response.list[i].subdir+'" data-name="'+response.list[i].name+'">' +
+                                    '<td class="dirname_td"><img src="'+dir_img+'" />'+response.list[i].name+'</td>' +
+                                    '<td class="act_td"><a href="javascript:;" class="tablelink del_btn">删除</a>&nbsp;<a href="javascript:;" class="tablelink rename_btn">重命名</a></td>' +
+                                    '</tr>';
+                        }
+                    }
+                    $('#dirlist').html(dirlist);
+                    $('#dirlist tr').hover(function () {
+                        $(this).find('.act_td').show();
+                    },function () {
+                        $(this).find('.act_td').hide();
+                    });
+                    //更改当前目录状态
+                    $('#subdir').val(subdir);
+                }
+            }
+        });
+    }
+
+</script>

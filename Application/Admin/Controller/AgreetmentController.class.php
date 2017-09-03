@@ -29,7 +29,8 @@ class AgreetmentController extends CommonController {
 	public function detail(){
 		$cid = $_GET['cid'];
 		$agree_id= $_GET['agree_id'];
-		$detaidata = $this->get_form_info($agree_id,'agreement');		
+		$detaidata = $this->get_form_info($agree_id,'agreement');
+		
 		if($cid=='' || $agree_id == ''){		
 			echo "参数不全";die;
 		}else{

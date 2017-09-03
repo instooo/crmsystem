@@ -27,7 +27,7 @@
 			{$work_case.info.partner_name}</span>
 		</div>
 		<div>
-			<span class="inline-block marginR30">合同日期：2017-07-19&nbsp;&nbsp;至&nbsp;&nbsp;2017-07-19</span>
+			<span class="inline-block marginR30">签约时间：{$agreeinfo.qydate}</span>
 			<span class="inline-block marginR30">合同总金额：{$agreeinfo.total_money}元</span>
 			<span class="inline-block">回款金额：<span class="return_money">{$all_record_sum}</span>元</span>
 		</div>
@@ -109,24 +109,46 @@
 	<div class="dynamic-detail-body tablist">
 		<div class="modify-detail-container">
 			<div class="modify-body">
-				<volist name="detaidata" id="vo">
-				<div class="modify-base-info">
-					<div class="newclient-item-info" mappingname="name">
-					<span class="lable-container">
-					<span class="input-label">{$vo.name}</span>
-					<span class="normal"></span>
-					</span>
-					<span class="input-container" id="1002">
-					<span class="clientmodify-pen">
-					<if condition="$vo['edit'] eq 1">
-					<span class="clientmodify-default-text">{$vo.val}</span><span>修改</span>
-					<else/>
-					<span class="clientmodify-default-text">{$vo.val}</span>
-					</if>
-					</span></span><span class="error-warn"></span>
-					</div>
+				<div class="modify-base-info list" >
+					<span class="input-label">合同号:&nbsp;</span>
+					<span class="clientmodify-default-text">{$agreeinfo.orderid}</span>
 				</div>
-				</volist>
+				<div class="modify-base-info list" >
+					<span class="input-label">合同名称:</span>
+					<span class="clientmodify-default-text">{$agreeinfo.agree_name}</span>
+				</div>                                     
+				<div class="modify-base-info list" >        
+					<span class="input-label">办理事项:</span>
+					<span class="clientmodify-default-text">{$agreeinfo.bltype}</span>
+				</div>                                    
+				<div class="modify-base-info list" >       
+					<span class="input-label">办理事项说明:</span>
+					<span class="clientmodify-default-text">{$agreeinfo.bltext}</span>
+				</div>                                     
+				<div class="modify-base-info list" >        
+					<span class="input-label">业务资料清单:</span>
+					<span class="clientmodify-default-text">{$agreeinfo.ywziliao}</span>
+				</div>
+				<div class="modify-base-info list" >
+					<span class="input-label">后勤资料清单:</span>
+					<span class="clientmodify-default-text">{$agreeinfo.hqziliao}</span>
+				</div>
+				<div class="modify-base-info list" >
+					<span class="input-label">签约时间:</span>
+					<span class="clientmodify-default-text">{$agreeinfo.qydate}</span>
+				</div>
+				<div class="modify-base-info list" >
+					<span class="input-label">总金额:</span>
+					<span class="clientmodify-default-text">{$agreeinfo.total_money}</span>
+				</div>
+				<div class="modify-base-info list" >
+					<span class="input-label">具体金额说明:</span>
+					<span class="clientmodify-default-text">{$agreeinfo.moneydes}</span>
+				</div>
+				<div class="modify-base-info list" >
+					<span class="input-label">客户情况说明:</span>
+					<span class="clientmodify-default-text">{$agreeinfo.khdes}</span>
+				</div>
 			</div>
 		</div>
     </div>

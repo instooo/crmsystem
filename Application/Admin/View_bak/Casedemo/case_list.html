@@ -1,0 +1,87 @@
+<html>
+<head>
+<script language="JavaScript" src="{:C('STATIC_URL')}/js/jquery.js"></script>
+<script type="text/javascript" src="{:C('STATIC_URL')}/ztree/js/jquery.ztree.core.js"></script>
+<script type="text/javascript" src="{:C('STATIC_URL')}/ztree/js/jquery.ztree.excheck.js"></script>
+<link href="{:C('STATIC_URL')}/css/style.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="{:C('STATIC_URL')}/ztree/css/zTreeStyle/zTreeStyle.css" type="text/css">
+<style>
+.caozuo{float:right; margin}
+.caozuo input { width:80px; height:20px; margin-left:10px;}
+body,input,select{ font-size:14px; line-height:18px;}
+table.gridtable {
+	font-family: verdana,arial,sans-serif;
+	font-size:11px;
+	color:#333333;
+	border-width: 1px;
+	border-color: #666666;
+	border-collapse: collapse;
+	width:99%;
+}
+table.gridtable th {
+	border-width: 1px;
+	padding: 6px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #dedede;
+}
+table.gridtable td {
+	border-width: 1px;
+	padding: 6px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #ffffff;
+	text-align:center;
+}
+</style>
+</head>
+<body style="overflow-x: hidden;overflow-y: auto;">	
+<b style=" font-size:16px">当前用户用户：</b>
+<div id='nowuser'>{$userinfo.username}</div>
+<br/>
+<br/>
+<a href="/casedemo" class="btn" >首页</a>
+<br/>
+<br/>
+<a  class="btn" style='display:block; float:left; margin-left:5px; text-align:center; line-height:28px;' href='/casedemo/case_list'>我的合同</a>
+<a  class="btn" style='display:block; float:left; margin-left:5px; text-align:center; line-height:28px;' href='/casedemo/addcase'>添加合同</a>
+<br/>
+<br/><br/>
+<br/><br/>
+<br/><br/>
+<br/><br/>
+<br/>
+
+<ul>
+<li><a class="btn" style='display:block; float:left; margin-left:5px; text-align:center; line-height:28px;'href="/casedemo/case_list?type=mine">我的合同</a></li>
+<li><a class="btn" style='display:block; float:left; margin-left:5px; text-align:center; line-height:28px;'href="/casedemo/case_list?type=done">已审合同</a></li>
+<li><a class="btn" style='display:block; float:left; margin-left:5px; text-align:center; line-height:28px;' href="/casedemo/case_list?type=doing">待审合同</a></li>
+</ul>
+
+<br/>
+
+
+<table class="gridtable">
+<tr>
+<th>合同ID</th>
+<th>合同名称</th>
+<th>合同状态</th>
+<th>操作</th>
+</tr>
+<volist name='list' id="vo">
+<tr>
+	<td>{$vo.c_id}</td>
+	<td>{$vo.c_title}</td>
+	<if condition='$vo.c_state eq 2'>
+	<td>已完成</td>
+	<elseif condition='$vo.c_state eq 0'/>
+	<td>草稿</td>
+	<else/>
+	<td>{$vo.des}了{$vo.uid}的审核(进行中)</td>
+	</if>	
+	<td><a href="/casedemo/onecase/cid/{$vo.c_id}">查看</td>
+</tr>
+</volist>
+</table>
+</body>
+</html>

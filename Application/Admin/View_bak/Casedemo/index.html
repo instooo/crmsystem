@@ -1,0 +1,50 @@
+<html>
+<head>
+<script language="JavaScript" src="{:C('STATIC_URL')}/js/jquery.js"></script>
+<script type="text/javascript" src="{:C('STATIC_URL')}/ztree/js/jquery.ztree.core.js"></script>
+<script type="text/javascript" src="{:C('STATIC_URL')}/ztree/js/jquery.ztree.excheck.js"></script>
+<link href="{:C('STATIC_URL')}/css/style.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="{:C('STATIC_URL')}/ztree/css/zTreeStyle/zTreeStyle.css" type="text/css">
+<style>
+.caozuo{float:right; margin}
+.caozuo input { width:80px; height:20px; margin-left:10px;}
+body,input,select{ font-size:14px; line-height:18px;}
+</style>
+</head>
+<body style="overflow-x: hidden;overflow-y: auto;">	
+<b style=" font-size:16px">当前用户用户：</b>
+<div id='nowuser'>{$userinfo.username}</div>
+<br/>
+<br/>
+<br/>
+<b style=" font-size:16px">用户：</b><select name="user">
+<volist name='user' id='vo'>
+<option value="{$vo.user_number}">{$vo.username}</option>
+</volist>
+</select>
+<input name="" type="button" class="btn" id="qiehuan" value="切换账号">
+
+<br/>
+<br/>
+<br/>
+<a  class="btn" style='display:block; float:left; margin-left:5px; text-align:center; line-height:28px;' href='/casedemo/case_list'>我的合同</a>
+<a  class="btn" style='display:block; float:left; margin-left:5px; text-align:center; line-height:28px;' href='/casedemo/addcase'>添加合同</a>
+<script>
+$(function(){
+	$("#qiehuan").click(function(){
+		var user = $("select[name='user']").val();		
+		$.ajax({
+            type:'post',
+            dataType:'json',
+            data:{user:user},
+            url:"{:U('Casedemo/index')}",
+            success:function (response) {  						
+				$("#nowuser").html(response.username);			
+            }
+        });
+	})		
+})
+	
+</script>
+</body>
+</html>

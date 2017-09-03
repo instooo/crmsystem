@@ -12,58 +12,51 @@
     <div class="rightinfo">
         <div class="tools">
 			<ul class="toolbar">            
-				<li class="current"><a href='/Work/agreement'>我的合同</a></li>
+				<li><a href='/Work/agreement'>我的合同</a></li>
 				<li><a href='/Work/dsagreement'>待审核合同</a></li>
-				<li><a href='/Work/ysagreement'>已审核合同</a></li>
+				<li class="current"><a href='/Work/ysagreement'>已审核合同</a></li>
 			</ul>
 		
             <ul class="toolbar1">
                 <li class="add_btn"><span><img src="{:C('STATIC_URL')}/images/t01.png"/></span>添加</li>
             </ul>
         </div>
-        <div class="tools" style="line-height: 46px">
-            <form method="get" action="">
-            合同名称：<input name="s_name" type="text" class="dfinput" value="{$s_name}" style="width: 200px;">&nbsp;
-            客户：<select name="s_partner_id" class="dfinput" style="width: 200px;">
-                    <option value="">全部客户</option>
-                    <volist name="partnerlist" id="vo">
-                        <option value="{$vo.id}" <if condition="$s_partner_id eq $vo['id']">selected</if>>{$vo.partner_name}</option>
-                    </volist>
-                </select>&nbsp;
-            <input name="search" type="submit" class="btn" value="查询">
-            </form>
-        </div>
         <div class="tablelist_w new_tablelist">
             <table class="tablelist">
                 <thead>
                 <tr>
-					<th>合同号</th>
                     <th>合同名称</th>
                     <th>客户名称</th>
                     <th>总金额</th>
-                    <th>所有者</th>                   
+                    <th>所有者</th>
+                    <volist name="fieldlist" id="vo">
+                        <th>{$vo.field_name}</th>
+                    </volist>
 					<th>进度</th>
-                    <th>签约时间</th>
+                    <th>操作</th>
                 </tr>
                 </thead>
                 <tbody>
                 <volist name="list" id="vo">
                     <tr data-id="{$vo.id}">
-						 <td class="td_agree_name" data-cid="{$vo.c_id}">{$vo.orderid}</td>
                         <td class="td_agree_name" data-cid="{$vo.c_id}">{$vo.agree_name}</td>
                         <td class="td_partner_id" data="{$vo.partner_id}">{$vo.partner_name}</td>
                         <td class="td_total_money">{$vo.total_money}</td>
                         <td>{$vo.nickname}</td>
-
+                        <volist name="vo" id="vv">
+                            <if condition="$fieldlist[$key]">
+                                <td class="td_{$key}" data-key="{$key}">{$vv}</td>
+                            </if>
+                        </volist>
 						<if condition='$vo.c_state eq 2'>
 						<td>已完成</td>
 						<elseif condition='$vo.c_state eq 0'/>
 						<td>草稿</td>
 						<else/>
 						<td>{$vo.uid}已{$vo.des}(进行中)</td>
-						</if>
-						<td>{$vo.addtime|date='Y-m-d H:i:s',###}</td>
+						</if>	
 
+						<td>{$vo.addtime|date='Y-m-d H:i:s',###}</td>
                     </tr>
                 </volist>
                 </tbody>
@@ -72,6 +65,33 @@
         </div>
     </div>
 </div>
+
+<div id="add_temp" style="display: none">
+    <ul class="forminfo">
+        <form class="dataform" method="post" enctype="multipart/form-data" action="{:U('Work/addAgreement')}">            
+            <input type="hidden" class="input_fieldtype" name="fieldtype" value="agreement">
+            <li><label>合同名称</label><input name="agree_name" type="text" class="dfinput input_agree_name" value="" style="width: 300px"/></li>
+			<li>
+                <label>审批流程</label>
+                <select class="dfinput input_partner_id" name="e_id" style="width: 300px">
+                    <option value="">请选择</option>
+                    <volist name="workflow" id="vo"><option value="{$vo.w_id}">{$vo.w_name}</option></volist>
+                </select>
+            </li>
+            <li>
+                <label>客户名称</label>
+                <select class="dfinput input_partner_id" name="partner_id" style="width: 300px">
+                    <option value="">请选择</option>
+                    <volist name="partnerlist" id="vo"><option value="{$vo.id}">{$vo.partner_name}</option></volist>
+                </select>
+            </li>
+            <li><label>总金额</label><input name="total_money" type="text" class="dfinput input_total_money" value="" style="width: 300px"/></li>
+            ##FORM##
+            <li><label>&nbsp;</label><input name="submit" type="button" class="btn do_save_btn" value="确认保存"/></li>
+        </form>
+    </ul>
+</div>
+
 <script>
     var layer_index;
     $(document).on('click', '.add_btn', function () {
@@ -82,16 +102,20 @@
             data:{fieldtype:'agreement'},
             url:"{:U('Common/getFieldForm')}",
             success:function (response) {
-                layer.close(load);               
+                layer.close(load);
+                var formHtml = $('#add_temp').html().replace('##FORM##', response.form.html+response.form.script);
                 layer_index = layer.open({
-                    type: 2,
+                    type: 1,
                     title: '添加合同',
                     skin: 'layui-layer-rim',
-                    area: ['100%', '100%'],
+                    area: ['550px', '450px'],
                     scrollbar: false,
-                    content: "/Work/addAgreement"
+                    content: formHtml
                 });
-			}
+                $(document).on('click', '#layui-layer'+layer_index+' .btn', function () {
+                    addData($(this).parents('.dataform'));
+                });
+            }
         });
     });
 
@@ -199,12 +223,10 @@
             });
         });
     });
-
-	
 	//查看合同状态
 	$(document).on('click', '.td_agree_name', function (){
 	     var cid = $(this).attr('data-cid');
-        var agree_id = $(this).parents('tr').attr('data-id');
+		 var agree_id = $(this).parents('tr').attr('data-id');
 		 layer_index = layer.open({
 			type: 2,
 			title: '合同详情',
@@ -213,12 +235,11 @@
 			shade: 0.1,
 			scrollbar: false,
 			content: '/Agreetment/detail/cid/'+cid+'/agree_id/'+agree_id,
-			end: function () {
+			end: function () {		
 				location.reload() 
 			}
 		});
 	});
-	
 </script>
 
 <include file="Index/footer" />

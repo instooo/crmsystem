@@ -1,0 +1,148 @@
+<html>
+<head>
+<script language="JavaScript" src="{:C('STATIC_URL')}/js/jquery.js"></script>
+<script type="text/javascript" src="{:C('STATIC_URL')}/ztree/js/jquery.ztree.core.js"></script>
+<script type="text/javascript" src="{:C('STATIC_URL')}/ztree/js/jquery.ztree.excheck.js"></script>
+<link href="{:C('STATIC_URL')}/css/style.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="{:C('STATIC_URL')}/ztree/css/zTreeStyle/zTreeStyle.css" type="text/css">
+<style>
+.ztree{
+	position:absolute;
+	width: 375px;  
+	max-height:200px;
+	overflow-y:scroll;
+    top: 55px;
+	left: 153px;      
+    background-color: #fff;
+    border-radius: 2px;
+    z-index: 80;
+    box-sizing: border-box;
+    border: 1px solid #e1e1e1;
+    display: none;
+	}
+</style>
+</head>
+<body style="overflow-x: hidden;overflow-y: auto;">
+	<ul class="forminfo" style='margin-top:10px'>
+		<li><label style='width:22.5%'>节点名称<span>*</span></label><input name="extend_tit" type="text" class="dfinput w_name"value="{$extend_tit}"></li>		
+	</ul>
+	<div id="bumen" style="width:600px;position:relative;">
+		<div class="approval-form">
+	    <div class="form-group marginB30">
+                <label>审批人<span>*</span></label>
+                <div>                  
+                    <div class="set-tree pulldown-container">
+                        <div class="pulldown-input"><span class="pulldown-text pulldown-default-show">{$title_html}</span><span class="pulldown-icon"></span></div>
+                    </div>                   
+                </div>
+         </div> 
+		<div id="treeDemo" class="ztree" style="display:none;"></div>	
+		</div>		
+	</div>	
+	<div style="width:600px;position:relative; font-size:18px;padding: 0 20px;">
+		<div>
+		<label><input name="can" id='nocan' type="radio" value="0" <if condition="$data_field eq 0">checked</if> />默认下一步</label> 	
+		<label><input name="can" id='can' type="radio" value="1" <if condition="$data_field neq 0">checked</if>/>可修改字段</label> 	
+		
+		</div>
+		<div class='fields' <if condition="$data_field eq 0">style='display:none'</if>>
+		<label>可修改字段<span>*</span></label>
+		<volist name="fields" id='vo'>
+			<label><input name="fieldone" type="checkbox" value="{$vo.id}" <if condition="$vo['is_select'] eq 1">checked</if>/>{$vo.field_name} </label> 	
+		</volist>
+		</div>
+	</div>
+	<div style="position:fixed; bottom:20px;padding: 20px 20px 5px 20px;"><input name="" type="button" class="btn" id="bumenbtn" value="确认保存"></div>	
+	<script>
+		$(function(){			
+			$("#nocan").click(function(){
+				$(".fields").hide();
+			})
+			$("#can").click(function(){				
+				$(".fields").show();
+			})
+			$.fn.zTree.init($("#treeDemo"), setting, zNodes);						
+			$(document).on("click",'.pulldown-input',showMenu);
+			$("#bumenbtn").click(function(){
+				var aa = $(".pulldown-default-show").html();
+				var bb = $(".pulldown-default-show").attr('data-uid');	
+				var extend_tit=$("input[name='extend_tit']").val();		
+				//多选字段的值
+				var filed='';
+				$("input[name='fieldone']:checked").each(function(){  
+					filed+=$(this).val()+"|";  					
+				})  						  
+				if(!aa || aa=='请选择'){
+					parent.layer.open({
+					  content: '请选择用户',
+					  scrollbar: false
+					});
+					return false;					
+				}
+				var acts='2|3|';				
+				var wid ={$wid}+1;				
+				$(parent.document).find('.steps ol li').eq(wid).find('.set-person').html(aa);
+				$(parent.document).find('.steps ol li').eq(wid).find('.set-person').attr("data-uid",bb);
+				$(parent.document).find('.steps ol li').eq(wid).find('.set-person').attr("data-act",acts);
+				$(parent.document).find('.steps ol li').eq(wid).find('.set-person').attr("data-extend_tit",extend_tit);
+				$(parent.document).find('.steps ol li').eq(wid).find('.set-person').attr("data-field",filed);
+				
+				
+				//$(parent.document).find('.steps ol li').eq(wid).find('.set-person').attr("isenable",'no');
+				var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+				parent.layer.close(index);
+			})			
+			//选择执行操作
+			
+		})
+		var setting = {
+			check: {
+				enable: true
+			},
+			view: {
+				showIcon: showIconForTree
+			},
+			chkboxType : { "Y" : "ps", "N" : "ps" },
+			data: {
+				simpleData: {
+					enable: true
+				}
+			},
+			callback: {
+				beforeClick: beforeClick,	
+				onCheck: onCheck	
+			}
+		};		
+		
+		var zNodes ={$json_data};
+		function beforeClick(treeId, treeNode) {			
+			var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+			zTree.checkNode(treeNode, !treeNode.checked, null, true);			
+			return false;
+		}	
+		function onCheck(e, treeId, treeNode) {			
+			var zTree = $.fn.zTree.getZTreeObj("treeDemo"),			
+			nodes = zTree.getCheckedNodes(true),			
+			v = "";
+			vuid = "";
+			for (var i=0, l=nodes.length; i<l; i++) {				
+				if(nodes[i].type=='user'){					
+					v += nodes[i].name + ",";
+					vuid += nodes[i].id + "|";
+				}
+			}
+			if (v.length > 0 ) v = v.substring(0, v.length-1);
+			if (vuid.length > 0 ) vuid = vuid.substring(0, vuid.length-1);
+			var cityObj = $(".pulldown-default-show");
+			cityObj.attr('data-uid',vuid);
+			cityObj.html(v);
+		}
+		function showIconForTree(treeId, treeNode) {
+			return !treeNode.isParent;
+		};
+		function showMenu() {		
+			$(".ztree").toggle();
+		}	
+	</script>
+</body>
+</html>

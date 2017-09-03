@@ -1,0 +1,32 @@
+<html>
+ <!--<![endif]-->
+ <head> 
+  <meta http-equiv="Content-Type" content="text/html; charset=gbk" /> 
+  <meta name="renderer" content="webkit" /> 
+  <meta http-equiv="X-UA-Compatible" content="IE=10,chrome=1" /> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0" /> 
+  <link href="{:C('STATIC_URL')}/css/canvas.css" rel="stylesheet" type="text/css"/>
+  <title>流程图</title>  
+ </head> 
+ <body> 
+  <div id="canvas" class="canvas"> 
+   <div class="explanation"> 
+    <span class="big3">{$result.w_name}</span> 
+   </div> 
+   <div id="prcsList">
+	<volist name='extend' id='vo'>	
+    <div id="window1_1" class="window window4 _jsPlumb_endpoint_anchor_" style="left:{$vo.left}px; top: 90px;">
+     <table class="window-content">
+      <tbody>
+       <tr>
+        <td>第{$vo.step_id}步：{$vo.des}</td>
+       </tr>
+      </tbody>
+     </table>
+    </div>
+	</volist>
+   </div> 
+  </div> 
+  
+ </body>
+</html>

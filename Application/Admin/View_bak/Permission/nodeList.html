@@ -1,0 +1,269 @@
+<include file="Index/header" />
+<div id="main" >
+<style>
+    .pl_1{padding-left: 20px;}
+    .pl_2{padding-left: 40px;}
+</style>
+<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+        <li><a href="#">首页</a></li>
+        <li><a href="#">权限管理</a></li>
+        <li><a href="#">节点管理</a></li>
+    </ul>
+</div>
+
+<div class="rightinfo">
+
+    <div class="tools">
+
+        <ul class="toolbar">
+            <li class="add"><span><img src="{:C('STATIC_URL')}/images/t01.png"/></span>添加</li>
+            <!--
+            <li class="click"><span><img src="{:C('STATIC_URL')}/images/t02.png"/></span>修改</li>
+            <li><span><img src="{:C('STATIC_URL')}/images/t03.png"/></span>删除</li>
+            <li><span><img src="{:C('STATIC_URL')}/images/t04.png"/></span>统计</li>
+            -->
+        </ul>
+
+
+        <ul class="toolbar1">
+            <li><span><img src="{:C('STATIC_URL')}/images/t05.png"/></span>设置</li>
+        </ul>
+
+    </div>
+
+    <div class="tablelist_w">
+        <table class="tablelist">
+            <thead>
+            <tr>
+                <th style="width: 20%">描述</th>
+                <th style="width: 30%">链接</th>
+                <th style="width: 10%">排序</th>
+                <th style="width: 10%">是否显示</th>
+                <th style="width: 30%">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="tree" id="vo">
+                <tr data-id="{$vo.id}" data-pid="{$vo.pid}" data-level="{$vo.level}">
+                    <td class="pl_1"><i class="unfold"></i><span class="td_title">{$vo.title}</span></td>
+                    <td class="td_name">{$vo.name}</td>
+                    <td class="td_sort">{$vo.sort}</td>
+                    <td class="td_ismenu" data-ismenu="{$vo.ismenu}">
+                        <equal name="vo.ismenu" value="1">显示</equal>
+                        <equal name="vo.ismenu" value="0">不显示</equal>
+                    </td>
+                    <td><a href="javascript:;" class="tablelink edit">修改</a> <a href="javascript:;" class="tablelink dele"> 删除</a></td>
+                </tr>
+                <volist name="vo.child" id="vv">
+                    <tr class="c_pid_{$vv.pid}" data-id="{$vv.id}" data-pid="{$vv.pid}" data-level="{$vv.level}">
+                        <td class="pl_2"><i class="nofold"></i><span class="td_title">{$vv.title}</span></td>
+                        <td class="td_name">{$vv.name}</td>
+                        <td  class="td_sort">{$vv.sort}</td>
+                        <td class="td_ismenu" data-ismenu="{$vv.ismenu}">
+                            <equal name="vv.ismenu" value="1">显示</equal>
+                            <equal name="vv.ismenu" value="0">不显示</equal>
+                        </td>
+                        <td><a href="javascript:;" class="tablelink edit">修改</a> <a href="javascript:;" class="tablelink dele"> 删除</a></td>
+                    </tr>
+                </volist>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<div id="edit_temp" style="display: none">
+    <ul class="forminfo">
+        <input type="hidden" class="input_id" value="">
+        <input type="hidden" class="dfinput input_level" value="" />
+        <li>
+            <label>上级节点</label>
+            <select class="dfinput input_pid" style="width: 300px">
+                <option value="" data-level="">选择上级节点</option>
+                <option value="0" data-level="0">一级节点</option>
+                <volist name="tree" id="vo">
+                    <option value="{$vo.id}" data-level="{$vo.level}">{$vo.tag_str} {$vo.title}</option>
+                    <volist name="vo.child" id="vv">
+                        <option value="{$vv.id}" data-level="{$vv.level}">{$vv.tag_str} {$vv.title}</option>
+                    </volist>
+                </volist>
+            </select>
+        </li>
+        <li><label>描述</label><input name="title" type="text" class="dfinput input_title" style="width: 300px" /></li>
+        <li><label>链接</label><input name="title" type="text" class="dfinput input_name" style="width: 300px" /></li>
+        <li><label>排序</label><input name="title" type="text" class="dfinput input_sort" style="width: 300px" /></li>
+        <li>
+            <label>是否显示</label>
+            <select class="dfinput input_ismenu" style="width: 300px">
+                <option value="0">不显示</option>
+                <option value="1">显示</option>
+            </select>
+        </li>
+        <li><label>&nbsp;</label><input name="submit" type="button" class="btn do_save_btn" value="确认保存"/></li>
+    </ul>
+</div>
+</div>
+<script>
+    $(function () {
+        var layer_index;
+        $(document).on('click', '.unfold', function () {
+            $('.c_pid_'+$(this).parents('tr').attr('data-id')).hide();
+            $(this).removeClass('unfold').addClass('fold');
+        });
+        $(document).on('click', '.fold', function () {
+            $('.c_pid_'+$(this).parents('tr').attr('data-id')).show();
+            $(this).removeClass('fold').addClass('unfold');
+        });
+        $(document).on('change', '.input_pid', function () {
+            var val = $(this).find('option:selected').attr('data-level');
+            if (!val) return false;
+            $('.input_level').attr('value', parseInt(val)+1);
+        });
+        /*
+        $('.input_pid').change(function () {
+            console.log(111);
+            var val = $(this).find('option:selected').attr('data-level');
+            if (!val) return false;
+            $('.input_level').attr('value', parseInt(val)+1);
+        });
+        */
+        $(document).on('click', '.edit', function () {
+            layer_index = layer.open({
+                type: 1,
+                title: '编辑节点',
+                skin: 'layui-layer-rim', //加上边框
+                //area: ['420px', '240px'], //宽高
+                content: $('#edit_temp').html()
+            });
+            var tr = $(this).parents('tr');
+            var layer_con = $('#layui-layer'+layer_index);
+            layer_con.find('.input_id').val(tr.attr('data-id'));
+            layer_con.find('.input_pid').val(tr.attr('data-pid'));
+            layer_con.find('.input_title').val(tr.find('.td_title').html());
+            layer_con.find('.input_name').val(tr.find('.td_name').html());
+            layer_con.find('.input_sort').val(tr.find('.td_sort').html());
+            layer_con.find('.input_ismenu').val(tr.find('.td_ismenu').attr('data-ismenu'));
+            layer_con.find('.input_level').val(tr.attr('data-level'));
+            $(document).on('click', '#layui-layer'+layer_index+' .do_save_btn', function () {
+                initEdit(layer_con);
+            });
+        });
+        $(document).on('click', '.add', function () {
+            layer_index = layer.open({
+                type: 1,
+                title: '添加节点',
+                skin: 'layui-layer-rim', //加上边框
+                //area: ['420px', '240px'], //宽高
+                content: $('#edit_temp').html()
+            });
+            var layer_con = $('#layui-layer'+layer_index);
+            $(document).on('click', '#layui-layer'+layer_index+' .do_save_btn', function () {
+                initAdd(layer_con);
+            });
+        });
+
+        function initAdd(layer_con) {
+            var param = {};
+            param.pid = layer_con.find('.input_pid').val();
+            param.title = layer_con.find('.input_title').val();
+            param.name = layer_con.find('.input_name').val();
+            param.sort = layer_con.find('.input_sort').val();
+            param.ismenu = layer_con.find('.input_ismenu').val();
+            param.level = layer_con.find('.input_level').val();
+            if (param.pid == '' || param.title == '' || param.name == '' || param.sort == '' || param.ismenu == '' || param.level == '') {
+                layer.msg('参数不全', {icon: 2,time: 1000});
+                return false;
+            }
+            $.ajax({
+                type:'post',
+                dataType:'json',
+                data:param,
+                url:"{:U('Permission/addNode')}",
+                success:function (response) {
+                    if (response.code == 1) {
+                        layer.msg('保存成功', {
+                            icon: 1,
+                            time: 1000
+                        }, function(){
+                            location.reload();
+                        });
+                    }else {
+                        layer.msg(response.msg, {icon: 2,time: 1000});
+                    }
+                }
+            });
+        }
+
+        function initEdit(layer_con) {
+            var param = {};
+            param.node_id = layer_con.find('.input_id').val();
+            param.pid = layer_con.find('.input_pid').val();
+            param.title = layer_con.find('.input_title').val();
+            param.name = layer_con.find('.input_name').val();
+            param.sort = layer_con.find('.input_sort').val();
+            param.ismenu = layer_con.find('.input_ismenu').val();
+            param.level = layer_con.find('.input_level').val();
+            if (param.node_id == '' || param.pid == '' || param.title == '' || param.name == '' || param.sort == '' || param.ismenu == '' || param.level == '') {
+                layer.msg('参数不全', {icon: 2,time: 1000});
+                return false;
+            }
+            $.ajax({
+                type:'post',
+                dataType:'json',
+                data:param,
+                url:"{:U('Permission/editNode')}",
+                success:function (response) {
+                    if (response.code == 1) {
+                        layer.msg('保存成功', {
+                            icon: 1,
+                            time: 1000
+                        }, function(){
+                            location.reload();
+                        });
+                    }else {
+                        layer.msg(response.msg, {icon: 2,time: 1000});
+                    }
+                }
+            });
+        }
+        
+        $(document).on('click', '.dele', function () {
+            var node_id = $(this).parents('tr').attr('data-id');
+            var msg = $('.c_pid_'+node_id).length>0?'当前节点下有子节点，将全部删除，确定要删除该节点吗？':'确定要删除该节点吗？';
+            layer.confirm(msg, {
+                btn: ['确定','取消']
+            }, function(){
+
+                if (!node_id || node_id == '') {
+                    layer.msg('参数错误', {icon: 2,time: 1000});
+                    return false;
+                }
+                $.ajax({
+                    type:'post',
+                    dataType:'json',
+                    data:{id:node_id},
+                    url:"{:U('Permission/deleNode')}",
+                    success:function (response) {
+                        if (response.code == 1) {
+                            layer.msg('保存成功', {
+                                icon: 1,
+                                time: 1000
+                            }, function(){
+                                location.reload();
+                            });
+                        }else {
+                            layer.msg(response.msg, {icon: 2,time: 1000});
+                        }
+                    }
+                });
+            });
+        });
+
+
+    })
+</script>
+
+<include file="Index/footer" />

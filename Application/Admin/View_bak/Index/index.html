@@ -1,0 +1,50 @@
+<include file="Index/header" />
+
+<div id="main" >
+    <div class="place">
+        <span>位置：</span>
+        <ul class="placeul">
+            <li><a href="#">首页</a></li>
+        </ul>
+    </div>
+
+    <div class="mainindex">
+
+        <div class="welinfo">
+            <span><img src="{:C('STATIC_URL')}/images/sun.png" alt="天气" /></span>
+            <b>{$_SESSION['username']}您好，欢迎使用CRM管理系统</b>
+        </div>
+
+        <div class="xline"></div>
+
+        <ul class="iconlist">
+            <li><img src="{:C('STATIC_URL')}/images/i02.png" /><p><a href="/Work/agreement">合同管理</a></p></li>
+            <li><img src="{:C('STATIC_URL')}/images/i07.png" /><p><a href="/Work/contact">联系人管理</a></p></li>
+            <li><img src="{:C('STATIC_URL')}/images/i09.png" /><p><a href="/Work/partner">客户管理</a></p></li>
+            <li><img src="{:C('STATIC_URL')}/images/i01.png" /><p><a href="/workflow/index">流程管理</a></p></li>
+        </ul>
+
+        <div class="xline"></div>
+        <div class="box"></div>
+
+        <if condition="$nodelist">
+            <div class="welinfo">
+                <span><img src="{:C('STATIC_URL')}/images/dp.png" alt="提醒" /></span>
+                <b>您还可以进行如下操作</b>
+            </div>
+
+            <ul class="infolist">
+                <volist name="nodelist" id="vo">
+                    <if condition="$vo['level'] eq 2 and $vo['ismenu'] eq 1">
+                        <a href="{$vo.name}" class="ibtn" style="margin-right: 5px;">{$vo.title}</a>
+                    </if>
+                </volist>
+            </ul>
+        </if>
+
+
+    </div>
+</div>
+
+<include file="Index/footer" />
+

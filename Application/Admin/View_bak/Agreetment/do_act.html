@@ -1,0 +1,175 @@
+<html>
+<head>
+<script language="JavaScript" src="{:C('STATIC_URL')}/js/jquery.js"></script>
+<link href="{:C('STATIC_URL')}/css/style.css" rel="stylesheet" type="text/css" />
+<script src="{:C('STATIC_URL')}/layer/layer.js" type="text/javascript"></script>
+</head>
+<body style="overflow-x: hidden;overflow-y: auto;">
+<div class="detail_left_inner">
+<input type='hidden' id='act' value="{$act}">
+<input type='hidden' id='cid' value="{$cid}">
+
+
+<div class="work-prcs-title" style="margin-bottom: 10px;font-weight: normal;border-radius: 4px;-webkit-border-radius: 4px;">
+	<if condition="$redata['data']['step'] eq -1">
+		当前步骤为<font color="red">{$redata.data.stepdes}</font>中,处理人<font color="red">				
+				<div self_type="self" style="display:inline;">
+					{$redata.data.nowuser}                   
+				</div>
+				<div style="display:inline;">					               
+				</div>
+			</font>
+	<else/>
+		当前步骤为<font color="red">第{$redata.data.step}步</font>中,处理人<font color="red">				
+				<div self_type="self" style="display:inline;">
+					{$redata.data.nowuser}                   
+				</div>
+				<div style="display:inline;">					               
+				</div>
+			</font>
+	</if>
+</div>
+
+<if condition="$redata['data']['flag'] eq nopass">
+<div class="work-prcs-block">
+    	<div class="work-prcs-title " style='margin-bottom:10px;'>
+    	 操作：<font color="red">	不通过</font>
+         </div>	
+ </div>
+<elseif condition="$redata['data']['flag'] neq last"/>
+<div class="work-prcs-block">
+    	<div class="work-prcs-title">
+    	   请选择下一步骤           
+         </div>
+    	<div class="work-prcs-content clearfix">
+    		<div class="workflow-procs-nodes-wrap">
+                <ul id="workPrcsData" class="workflow-procs-nodes">
+				<li class="workflow-node active">
+				<a href="#">{$redata.data.des}  </a>
+                <ol></ol>
+                </li>			
+				</ul>
+            </div>
+			
+            <div class="workflow-procs-line"></div>
+            <div class="workflow-procs-nodes-result-wrap">
+            <ul id="work-next-prcs-block" class="workflow-procs-nodes-result" style="top: 7px;">
+				<li class="workflow-node-result clearfix ">
+					<div class="workflow-node-title">                  
+						<div class="workflow-node-ops">                    
+							<input class="user-tags btn-info" id="chose_user2" type="button" value="选择人员">
+							<div class="managers">经办人：</div>
+							<input type='hidden' name='nextuid' id='nextuid' value="<volist name="redata.data.nextuser" id="vo">
+								{$vo.user_number},
+								</volist>"/>
+							<volist name="redata.data.nextuser" id="vo">
+							<div class="user-tags userss" data_uid="{$vo.user_number}">{$vo.nickname}<i class="close">×</i></div>
+							</volist>
+						</div>
+					</div>
+				 </li>
+			</ul>
+            </div>
+    	</div>
+       
+    </div>
+<else/>
+<div class="work-prcs-block">
+    	<div class="work-prcs-title " style='margin-bottom:10px;'>
+		 步骤：<font color="red">最后一步</font>
+    	 确认流程（完结）
+         </div>	
+    </div>		 
+</if>
+<div class="work-prcs-title" >
+		向以下人员发送事务提醒消息				
+</div>
+
+<div class="work-msg-content">    
+	<textarea name="remind_others_name" id="remind_others_name" data-uid="{$vo.user_number}" readonly="">{$vo.nickname}</textarea>
+	<a class="orgAdd" id="others-add" href="javascript:void(0);">选择</a>
+	<a class="orgClear" id="others-clear">清空</a>
+</div>
+
+<ul class="forminfo" style='margin-top:20px; padding:0'>
+	<li><textarea name="" cols="" rows="" id='comment' class="textinput" style="width:100%"></textarea></li>	
+    <li><input name="" type="button" id='next' class="btn btn-primary" value="提交">
+	<input type="button" class="baocun" name="cancle" id="cancle" value=" 取消 ">
+	</li>
+</ul>
+</div>
+<script>
+$(document).on("click",'#next',function(){
+	var act = $("#act").val();
+	var work_case = $("#cid").val();
+	var comment = $("#comment").val();
+	////流程接收人
+	var nextuid = $("#nextuid").val();
+	
+	//消息接收人
+	var reuid = $("#remind_others_name").attr('data-uid');
+	if(nextuid=='undefined' || nextuid==''||!nextuid){
+		
+	}else{
+		if(nextuid==''||!nextuid){
+			layer_index = layer.open({
+			type: 1,
+			title: '请选择下一步流程'
+		});	
+		}
+		if (nextuid.substr(0,1)==','){nextuid=nextuid.substr(1);} 
+	}
+	if(reuid=='undefined' || reuid==''||!reuid){
+		layer_index = layer.open({
+			type: 1,
+			title: '消息接收人不能为空'
+		});	
+	}else{
+		if (reuid.substr(0,1)==','){reuid=reuid.substr(1);} 
+	}
+	$.ajax({
+		type:'post',
+		dataType:'json',
+		data:{work_case:work_case,act:act,comment:comment,nextuid:nextuid,reuid:reuid},
+		url:"{:U('Agreetment/step_go')}",
+		success:function (response) {  
+			var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+			parent.layer.close(index);
+		}
+	});	
+});
+$(document).on("click",'#cancle',function(){	
+	var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+	parent.layer.close(index);
+});
+
+$(document).on("click",'#chose_user2',function(){	
+	var cid = $("#cid").val();
+	layer_index = layer.open({
+		type: 2,
+		title: '查看流程',
+		skin: 'layui-layer-rim', //加上边框
+		area: ['90%', '90%'], //宽高
+		shade: 0.1,
+		content: '/role/get_wkrole/cid/'+cid+'/act/'+act,
+	});			
+});
+$(document).on("click",'#others-add',function(){	
+	var cid = $("#cid").val();
+	var act = $("#act").val();
+	layer_index = layer.open({
+		type: 2,
+		title: '查看流程',
+		skin: 'layui-layer-rim', //加上边框
+		area: ['90%', '90%'], //宽高
+		shade: 0.1,
+		content: '/role/get_wkallrole/cid/'+cid+'/act/'+act,
+	});			
+});
+$(document).on("click",'#others-clear',function(){	
+	$("#remind_others_name").html('');
+	$("#remind_others_name").attr('data-uid','');
+});
+</script>
+</body>
+</html>
