@@ -116,7 +116,66 @@ class WorkController extends CommonController {
      * 编辑客户
      */
     public function editPartner() {
-        $this->editData();
+        if(IS_POST){
+            $return_data = array('code'=>-1,'msg'=>'未知错误');
+            do{
+                $id = $_REQUEST['id'];
+                if (!$id) {
+                    $return_data['code'] = -1;
+                    $return_data['msg'] = '参数缺失';
+                    break;
+                }
+                //添加实例
+                $adddata =$_POST;
+                $adddata['owner'] = $this->get_numuid();
+                $adddata['addtime'] = time();
+
+                //添加合同
+                if (!$_POST['partner_name']) {
+                    $return_data['code'] = -2;
+                    $return_data['msg'] = '请输入客户名称';
+                    break;
+                }
+                //添加合同
+                if (!$_POST['contact_name']) {
+                    $return_data['code'] = -2;
+                    $return_data['msg'] = '联系人信息';
+                    break;
+                }
+
+                //添加合同
+                if (!$_POST['tel']) {
+                    $return_data['code'] = -2;
+                    $return_data['msg'] = '请输入电话号码';
+                    break;
+                }
+                if(!preg_match("/^1[34578]{1}\d{9}$/",$_POST['tel'])){
+                    $return_data['code'] = -2;
+                    $return_data['msg'] = '电话号码不正确';
+                    break;
+                }
+                if(!preg_match("/^\d*$/",$_POST['qq'])){
+                    $return_data['code'] = -2;
+                    $return_data['msg'] = 'qq号码不正确';
+                    break;
+                }
+                $rs = M('partner')->where(array('id'=>$id))->save($adddata);
+                if (false === $rs) {
+                    $return_data['code'] = -4;
+                    $return_data['msg'] = '保存失败';
+                    break;
+                }
+                $return_data['code'] = 1;
+                $return_data['msg'] = '保存成功';
+                break;
+            }while(0);
+            $this->ajaxReturn($return_data,'JSON');
+        }else{
+            $id = $_REQUEST['id'];
+            $info = M('partner')->where(array('id'=>$id))->find();
+            $this->assign('info', $info);
+            $this->display();
+        }
     }
 
     /**

@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link href="{:C('STATIC_URL')}/css/style.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="{:C('STATIC_URL')}/js/jquery.js"></script>
+    <script src="{:C('STATIC_URL')}/layer/layer.js" type="text/javascript"></script>
+    <script src="{:C('STATIC_URL')}/js/common.js" type="text/javascript"></script>
+    <script src="{:C('STATIC_URL')}/laydate/laydate.js" type="text/javascript"></script>
+    <script language="JavaScript" src="{:C('STATIC_URL')}/js/jquery.form.min.js"></script>
+    <style>
+        .forminfo i{display: none;}
+        .multi_list {
+            display: none;
+            width: 40%;
+            height: 40%;
+            left:30%;
+            top:20%;
+            padding: 10px 10px 50px;
+            border: solid 1px #bac8d5;
+            border-radius: 3px;
+            overflow-y: scroll;
+            position: absolute;
+            background-color: white;
+        }
+    </style>
+</head>
+
+<body>
+<div class="formbody">
+
+    <ul class="forminfo">
+        <form class="dataform" method="post" enctype="multipart/form-data" action="{:U('Work/editPartner')}">
+            <input type="hidden" name="id" value="{$info.id}">
+            <li><label>客户名称</label><input name="partner_name" type="text" class="dfinput input_title" value="{$info.partner_name}"/><i>不可修改</i></li>
+            <li><label>联系人</label><input name="contact_name" type="text" class="dfinput input_title"  value="{$info.contact_name}"/><i></i></li>
+            <li><label>联系电话</label><input name="tel" type="text" class="dfinput input_title"  placeholder="联系电话" value="{$info.tel}"/><i></i><i></i></li>
+            <li><label>微信</label><input name="weixin" type="text" class="dfinput input_title"  placeholder="微信" value="{$info.weixin}"/><i></i></li>
+            <li><label>qq</label><input name="qq" type="text" class="dfinput input_name" placeholder="qq" value="{$info.qq}" /><i></i></li>
+            <li><label>描述</label><textarea name="des" type="text" class="dfinput input_name" style=" height:100px">{$info.des}</textarea><i></i></li>
+            <li><label>联系地址:</label>
+                <input name="address" type="text" class="dfinput input_title"  value="{$info.address}"/><i></i></li>
+            <li><label>客户类型: </label>
+                <select class="dfinput input_partner_id" name="khtype" style="width: 300px">
+                    <option value="短期" <if condition="$info['khtype'] eq '短期'">selected</if>>短期</option>
+                    <option value="长期" <if condition="$info['khtype'] eq '长期'">selected</if>>长期</option>
+                </select>
+            <li><label>状态:</label><select class="dfinput input_partner_id" name="status" style="width: 300px">
+                <option value="1" <if condition="$info['status'] eq 1">selected</if>>合作</option>
+                <option value="0" <if condition="$info['status'] eq 0">selected</if>>未合作</option>
+            </select>
+            </li>
+
+
+            <li><label>&nbsp;</label><input name="submit" type="button" class="btn" value="确认保存"/></li>
+        </form>
+    </ul>
+</div>
+
+
+</body>
+<script>
+    $(function(){
+        $(document).on('click', '.btn', function () {
+            var load = parent.layer.getFrameIndex(window.name); //获取窗口索引
+            $(".dataform").ajaxSubmit({
+                type:'post',
+                dataType:'json',
+                url:"{:U('Work/editPartner')}",
+                error:function () {
+                    parent.layer.close(load);
+                },
+                success:function (response) {
+                    if (response.code == 1) {
+                        layer.msg('保存成功', {icon: 1,time: 1000}, function(){
+                            parent.location.reload();
+                            parent.layer.close(load);
+                        });
+                    }else {
+                        layer.msg(response.msg, {icon: 2,time: 1000});
+                    }
+                }
+            });
+        });
+    })
+
+
+
+
+
+
+</script>
+</html>

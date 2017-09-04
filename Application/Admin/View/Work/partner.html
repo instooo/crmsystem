@@ -93,30 +93,13 @@
         var tr = $(this).parents('tr');
         var id = tr.attr('data-id');
         if (!id || id == '') return false;
-        var load = layer.load(1);
-        $.ajax({
-            type:'post',
-            dataType:'json',
-            data:{fieldtype:'partner',id:id},
-            url:"{:U('Common/getFieldForm')}",
-            success:function (response) {
-                layer.close(load);
-                var formHtml = $('#add_temp').html().replace('##FORM##', response.form.html+response.form.script);
-                layer_index = layer.open({
-                    type: 1,
-                    title: '编辑客户',
-                    skin: 'layui-layer-rim',
-                    area: ['550px', '450px'],
-                    scrollbar: false,
-                    content: formHtml
-                });
-                var layer_con = $('#layui-layer'+layer_index);
-                layer_con.find('.input_id').val(id);
-                layer_con.find('.input_partner_name').val(tr.find('.td_partner_name').html());
-                $(document).on('click', '#layui-layer'+layer_index+' .btn', function () {
-                    editData($(this).parents('.dataform'));
-                });
-            }
+        layer_index = layer.open({
+            type: 2,
+            title: '编辑合同',
+            skin: 'layui-layer-rim',
+            area: ['100%', '100%'],
+            scrollbar: false,
+            content: "/Work/editPartner?id="+id
         });
     });
 
