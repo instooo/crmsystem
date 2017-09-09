@@ -38,9 +38,10 @@
                 <thead>
                 <tr>
 					<th>合同号</th>
-                    <th>合同名称</th>
+                    <th>合同类型</th>
                     <th>客户名称</th>
                     <th>总金额</th>
+					<th>回款金额</th>
                     <th>所有者</th>                   
 					<th>进度</th>
                     <th>签约时间</th>
@@ -50,9 +51,10 @@
                 <volist name="list" id="vo">
                     <tr data-id="{$vo.id}">
 						 <td class="td_agree_name" data-cid="{$vo.c_id}">{$vo.orderid}</td>
-                        <td class="td_agree_name" data-cid="{$vo.c_id}">{$vo.agree_name}</td>
+                        <td><if condition="$vo['type'] eq 0">短期合同<else/>长期合同</if></td>
                         <td class="td_partner_id" data="{$vo.partner_id}">{$vo.partner_name}</td>
-                        <td class="td_total_money">{$vo.total_money}</td>
+                        <td class="td_total_money">￥{$vo.total_money}</td>
+						 <td class="td_total_money">￥{$vo.return_money}</td>
                         <td>{$vo.nickname}</td>
 
 						<if condition='$vo.c_state eq 2'>
@@ -75,24 +77,31 @@
 <script>
     var layer_index;
     $(document).on('click', '.add_btn', function () {
-        var load = layer.load(1);
-        $.ajax({
-            type:'post',
-            dataType:'json',
-            data:{fieldtype:'agreement'},
-            url:"{:U('Common/getFieldForm')}",
-            success:function (response) {
-                layer.close(load);               
-                layer_index = layer.open({
-                    type: 2,
-                    title: '添加合同',
-                    skin: 'layui-layer-rim',
-                    area: ['100%', '100%'],
-                    scrollbar: false,
-                    content: "/Work/addAgreement"
-                });
-			}
-        });
+		//询问框
+		layer.confirm('你要选择的合同类型？', {
+		  btn: ['短期客户合同','长期客户合同'] //按钮
+		}, function(){
+			layer_index = layer.open({
+				type: 2,
+				title: '添加短期客户合同',
+				skin: 'layui-layer-rim',
+				area: ['100%', '100%'],
+				scrollbar: false,
+				content: "/Work/addAgreement"
+			});
+		}, function(){
+		  layer_index = layer.open({
+			type: 2,
+			title: '添加长期客户合同',
+			skin: 'layui-layer-rim',
+			area: ['100%', '100%'],
+			scrollbar: false,
+			content: "/Work/addlongAgreement"
+		  });
+		});
+		return false;
+	
+		
     });
 
     //添加

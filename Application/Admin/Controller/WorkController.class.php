@@ -430,7 +430,7 @@ class WorkController extends CommonController {
 	}
 
 	/**
-     * 添加合同
+     * 添加短期合同
      */
     public function addAgreement() {
 		if(IS_POST){
@@ -460,6 +460,82 @@ class WorkController extends CommonController {
 				
 				$adddata['owner'] = $this->get_numuid();
 				$adddata['addtime'] = time();			
+				$rs = M('agreement')->add($adddata);
+				if (!$rs) {
+					$return_data['code'] = -4;
+					$return_data['msg'] = '保存失败';
+					break;
+				}
+				$return_data['code'] = 1;
+				$return_data['msg'] = '保存成功';
+				break;
+			}while(0);
+			$this->ajaxReturn($return_data,'JSON');
+		}else{
+			$banshitype = M('type')->where('typeid=1')->select();
+			$this->assign('banshitype',$banshitype);
+			
+			$zltype = M('type')->where('typeid=2')->select();
+			$this->assign('zltype',$zltype);
+			
+			$hqtype = M('type')->where('typeid=3')->select();
+			$this->assign('hqtype',$zltype);
+			
+			$partners = $this->getUserPartner($_SESSION['authId']);
+			$pmap['id'] = array('in', $partners);
+			$partnerlist = M('partner')->where($pmap)->select();
+			$this->assign('partnerlist', $partnerlist);
+			
+			//合同号
+			$orderid = date('YmdHi');
+			$chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';  
+			$str = '';  
+			for ( $i = 0; $i < 8; $i++ ){ 
+				$str .= $chars[ mt_rand(0, strlen($chars) - 1) ];  
+			} 
+			$orderid = $orderid.$str;
+			$this->assign('orderid',$orderid);			
+			//查询流程
+			$workflow = M('workflow')->select();			
+			$this->assign('workflow',$workflow);
+			$this->display();
+		}
+		
+    }
+
+	
+	/**
+     * 添加合同
+     */
+    public function addlongAgreement() {
+		if(IS_POST){
+			$return_data = array('code'=>-1,'msg'=>'未知错误');
+			do{			
+				//添加实例
+				$data['uid'] = $this->get_numuid();	
+				$data['wid'] = $_POST['w_id'];
+				$data['title'] = $_POST['agree_name'];				
+				$workcase = new workflow();	
+				$recase = $workcase->addCase($data);
+				$adddata =$_POST;
+				$adddata['e_id'] = $recase['data']['c_id'];		
+				//添加合同
+				if (!is_numeric($_POST['total_money'])) {
+					$return_data['code'] = -2;
+					$return_data['msg'] = '您输入的数据不合法';
+					break;
+				}
+				
+				//添加合同
+				if (!$_POST['w_id'] || !$_POST['agree_name']|| !$_POST['bltype']||!$_POST['partner_id'] || !$_POST['qydate']) {					
+					$return_data['code'] = -2;
+					$return_data['msg'] = '请输入完整数据';
+					break;
+				}
+				
+				$adddata['owner'] = $this->get_numuid();
+				$adddata['addtime'] = time();
+				$adddata['type'] = 1;	
 				$rs = M('agreement')->add($adddata);
 				if (!$rs) {
 					$return_data['code'] = -4;

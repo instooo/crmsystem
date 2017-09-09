@@ -28,9 +28,10 @@
                 <thead>
                 <tr>
 					<th>合同号</th>
-                    <th>合同名称</th>
+                    <th>合同类型</th>
                     <th>客户名称</th>
                     <th>总金额</th>
+					<th>回款金额</th>
                     <th>所有者</th>                   
 					<th>进度</th>
                     <th>签约时间</th>
@@ -40,9 +41,10 @@
                 <volist name="list" id="vo">
                     <tr data-id="{$vo.id}">
 						 <td class="td_agree_name" data-cid="{$vo.c_id}">{$vo.orderid}</td>
-                        <td class="td_agree_name" data-cid="{$vo.c_id}">{$vo.agree_name}</td>
+                       <td><if condition="$vo['type'] eq 0">短期合同<else/>长期合同</if></td>
                         <td class="td_partner_id" data="{$vo.partner_id}">{$vo.partner_name}</td>
                         <td class="td_total_money">{$vo.total_money}</td>
+						<td class="td_total_money">￥{$vo.return_money}</td>
                         <td>{$vo.nickname}</td>
 
 						<if condition='$vo.c_state eq 2'>
