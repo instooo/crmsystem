@@ -445,25 +445,66 @@ class workflow{
 				break;				
 			}else{		
 				unset($map);
-				if($result['step']==-1){//提交审核
-					$map['w_id']=$result['w_id'];
-					$next = M('workflow_extend')->where($map)->order('e_id asc')->find();
-					//查找下一步的处理人员
-					unset($map);
-					$uidarr = explode('|',$next['uid']);
-					$map['user_number'] = array('in',$uidarr);
-					$user = M('user')->where($map)->select();
-					
-					$redata['nowuser'] = $result['nickname'] ;			
-					$redata['step'] = $result['step'] ;
-					$redata['stepdes'] = "草稿" ;
-					$redata['des'] = $next['des'];
-					$redata['nextuser'] = $user;
-					$redata['flag'] = 'first';	
-					$ret['code'] = '1';
-					$ret['msg'] = 'success';
-					$ret['data'] =$redata;
-					break;	
+				if($act=="so_start"){
+					if($result['step']==-1){//提交审核
+						$map['w_id']=$result['w_id'];
+						$next = M('workflow_extend')->where($map)->order('e_id asc')->find();
+						//查找下一步的处理人员
+						unset($map);
+						$uidarr = explode('|',$next['uid']);
+						$map['user_number'] = array('in',$uidarr);
+						$user = M('user')->where($map)->select();
+						
+						$redata['nowuser'] = $result['nickname'] ;			
+						$redata['step'] = $result['step'] ;
+						$redata['stepdes'] = "草稿" ;
+						$redata['des'] = $next['des'];
+						$redata['nextuser'] = $user;
+						$redata['flag'] = 'first';	
+						$ret['code'] = '1';
+						$ret['msg'] = 'success';
+						$ret['data'] =$redata;
+						break;	
+					}else{
+						unset($map);
+						$nowuid = $this->get_num_uid();				
+						$map['user_number'] = $nowuid;
+						$nowuser = M('user')->where($map)->find();
+						//查找最大步骤
+						unset($map);
+						$map['w_id']=$result['w_id'];
+						$max = M('workflow_extend')->where($map)->order('step_id desc')->find();
+						if(($result['step']+1) >=$max['step_id'] )
+						{						
+							$redata['nowuser'] = $nowuser['nickname'] ;
+							$redata['step'] = $result['step']+1 ;				
+							$redata['flag'] = 'last';
+							$ret['code'] = '1';
+							$ret['msg'] = 'success';
+							$ret['data'] =$redata;
+							break;		
+						}else{
+							//查找下一步处理人
+							unset($map);
+							$map['step_id']=$result['step']+1;
+							$map['w_id']=$result['w_id'];
+							$next = M('workflow_extend')->where($map)->find();
+							unset($map);
+							$uidarr = explode('|',$next['uid']);
+							$map['user_number'] = array('in',$uidarr);
+							$user = M('user')->where($map)->select();
+							//查找当前人				
+							$redata['nextuser'] = $user;
+							$redata['des'] = $next['des'];
+							$redata['step'] = $result['step']+1 ;
+							$redata['nowuser'] = $nowuser['nickname'] ;	
+							$redata['flag'] = 'middle';
+							$ret['code'] = '1';
+							$ret['msg'] = 'success';
+							$ret['data'] =$redata;
+							break;		
+						}					
+					}					
 				}else{
 					unset($map);
 					$nowuid = $this->get_num_uid();				
@@ -503,8 +544,7 @@ class workflow{
 						$ret['data'] =$redata;
 						break;		
 					}
-				
-				}	
+				}				
 			}
 		}while(0);
 		return $ret;

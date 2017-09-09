@@ -359,29 +359,10 @@ class WorkController extends CommonController {
 			->where($map)			
             ->order('p.id desc')
             ->limit("{$page->firstRow},{$page->listRows}")
-            ->select();	
-		$datalist = second_array_unique_bykey($datalist,'c_id');		
-        $list = array();
-        foreach ($datalist as $val) {
-            $tmp = $this->dataPaser($val, $fieldlist);
-            $tmp['id'] = $val['id'];
-            $tmp['user_id'] = $val['user_id'];
-            $tmp['nickname'] = $val['nickname'];
-            $tmp['addtime'] = $val['addtime'];
-            $tmp['agree_name'] = $val['agree_name'];
-            $tmp['partner_id'] = $val['partner_id'];
-            $tmp['partner_name'] = $val['partner_name'];
-            $tmp['total_money'] = $val['total_money'];
-			$tmp['c_state'] = $val['c_state'];
-			$tmp['des'] = $val['des'];
-			$tmp['uid'] = $val['uid'];
-			$tmp['c_id'] = $val['c_id'];
-            $list[] = $tmp;
-        }
-		
-        $this->assign('fieldlist', $fieldlist);
+            ->select();
+		$datalist = second_array_unique_bykey($datalist,'c_id');	        
         $this->assign('pagebar', $page->show());
-        $this->assign('list', $list);
+        $this->assign('list', $datalist);
 
         //查询客户
 		$nowuid = $this->get_numuid();
@@ -431,30 +412,11 @@ class WorkController extends CommonController {
 				->where($mapnew)			
 				->order('p.id desc')
 				->limit("{$page->firstRow},{$page->listRows}")
-				->select();	
+				->select();				
 			$datalist = second_array_unique_bykey($datalist,'c_id');
-			$list = array();
-			foreach ($datalist as $val) {
-				$tmp = $this->dataPaser($val, $fieldlist);
-				$tmp['id'] = $val['id'];
-				$tmp['user_id'] = $val['user_id'];
-				$tmp['nickname'] = $val['nickname'];
-				$tmp['addtime'] = $val['addtime'];
-				$tmp['agree_name'] = $val['agree_name'];
-				$tmp['partner_id'] = $val['partner_id'];
-				$tmp['partner_name'] = $val['partner_name'];
-				$tmp['total_money'] = $val['total_money'];
-				$tmp['c_state'] = $val['c_state'];
-				$tmp['des'] = $val['des'];
-				$tmp['uid'] = $val['uid'];
-				$tmp['c_id'] = $val['c_id'];
-				$list[] = $tmp;
-			}			
-			
-        }
-		$this->assign('fieldlist', $fieldlist);
+        }		
 		$this->assign('pagebar', $page->show());
-		$this->assign('list', $list);
+		$this->assign('list', $datalist);
 		//查询客户
 		$nowuid = $this->get_numuid();
 		$pmap['owner'] = $nowuid;	
@@ -490,7 +452,7 @@ class WorkController extends CommonController {
 				}
 				
 				//添加合同
-				if (!$_POST['w_id'] || !$_POST['agree_name']|| !$_POST['bltype']||!$_POST['partner_id'] || !!$_POST['qydate']) {					
+				if (!$_POST['w_id'] || !$_POST['agree_name']|| !$_POST['bltype']||!$_POST['partner_id'] || !$_POST['qydate']) {					
 					$return_data['code'] = -2;
 					$return_data['msg'] = '请输入完整数据';
 					break;

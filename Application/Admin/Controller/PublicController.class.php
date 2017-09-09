@@ -9,29 +9,7 @@ namespace Admin\Controller;
 use Think\Controller;
 use Org\Util\Rbac;
 
-class PublicController extends Controller {
-    public function test() {
-        dump($_SESSION);die;
-        $max_id = M('user')->max('id');
-        $num = $max_id?$max_id+1:1;
-        dump(strlen($num));die;
-        dump(array_fill(0,5,0));
-    }
-
-    public function adduser() {
-        echo 111;die;
-        $data = array();
-        $data['username'] = 'admin';
-        $data['password'] = md5('123456');
-        $data['nickname'] = '超级管理员';
-        $data['realname'] = '超级管理员';
-        $data['last_login_time'] = time();
-        $data['last_login_ip'] = get_client_ip();
-        $data['create_time'] = time();
-        $data['update_time'] = time();
-        $rs = M('user')->add($data);
-        dump($rs);
-    }
+class PublicController extends Controller {   
 
     /**
      * 登录页
