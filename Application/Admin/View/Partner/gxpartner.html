@@ -1,0 +1,132 @@
+<html>
+<head>
+<script language="JavaScript" src="{:C('STATIC_URL')}/js/jquery.js"></script>
+<script type="text/javascript" src="{:C('STATIC_URL')}/ztree/js/jquery.ztree.core.js"></script>
+<script type="text/javascript" src="{:C('STATIC_URL')}/ztree/js/jquery.ztree.excheck.js"></script>
+<link href="{:C('STATIC_URL')}/css/style.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="{:C('STATIC_URL')}/ztree/css/zTreeStyle/zTreeStyle.css" type="text/css">
+<style>
+.ztree{
+	position:absolute;
+	width: 375px;  
+	max-height:200px;
+	overflow-y:scroll;
+    top: 55px;
+	left: 153px;      
+    background-color: #fff;
+    border-radius: 2px;
+    z-index: 80;
+    box-sizing: border-box;
+    border: 1px solid #e1e1e1;
+    display: none;
+	}
+</style>
+</head>
+<body style="overflow-x: hidden;overflow-y: auto;">	
+	<input type="hidden" id="par_id" value="{$par_id}"/>
+	<div id="bumen" style="width:600px;position:relative;">
+		<div class="approval-form">
+	    <div class="form-group marginB30">
+                <label>用户选择<span>*</span></label>
+                <div>                  
+                    <div class="set-tree pulldown-container">
+                        <div class="pulldown-input"><span class="pulldown-text pulldown-default-show">{$title_html}</span><span class="pulldown-icon"></span></div>
+                    </div>                   
+                </div>
+         </div> 
+		<div id="treeDemo" class="ztree" style="display:none;"></div>	
+		</div>		
+	</div>		
+	<div style="position:fixed; bottom:20px;padding: 20px 20px 5px 20px;"><input name="" type="button" class="btn" id="bumenbtn" value="共享"></div>	
+	<script>
+		$(function(){
+			var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+			$.fn.zTree.init($("#treeDemo"), setting, zNodes);						
+			$(document).on("click",'.pulldown-input',showMenu);
+			$("#bumenbtn").click(function(){
+				var aa = $(".pulldown-default-show").html();				
+				var bb = $(".pulldown-default-show").attr('data-uid');
+				var par_id = $("#par_id").val();		
+				if(!aa || aa=='请选择'){
+					parent.layer.open({
+					  content: '请选择用户',
+					  scrollbar: false
+					});
+					return false;					
+				}
+				var param = {};
+				param.uid = bb;
+				param.par_id =par_id;
+				
+				$.ajax({
+					type:'post',
+					dataType:'json',
+					data:param,
+					url:"{:U('partner/gxpartner')}",
+					success:function (response) {						
+						if (response.code == 1) {
+								parent.layer.msg('保存成功', {icon: 1,time: 1000}, function(){
+								parent.layer.close(index);							
+							});
+						}else {
+							parent.layer.msg(response.msg, {icon: 2,time: 1000});
+						}
+					}
+				});
+			})			
+			//选择执行操作
+			
+			 onCheck();
+			
+		})
+		var setting = {
+			check: {
+				enable: true
+			},
+			view: {
+				showIcon: showIconForTree
+			},
+			chkboxType : { "Y" : "ps", "N" : "ps" },
+			data: {
+				simpleData: {
+					enable: true
+				}
+			},
+			callback: {
+				beforeClick: beforeClick,	
+				onCheck: onCheck	
+			}
+		};		
+		
+		var zNodes ={$json_data};
+		function beforeClick(treeId, treeNode) {			
+			var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+			zTree.checkNode(treeNode, !treeNode.checked, null, true);			
+			return false;
+		}	
+		function onCheck(e, treeId, treeNode) {			
+			var zTree = $.fn.zTree.getZTreeObj("treeDemo"),			
+			nodes = zTree.getCheckedNodes(true),			
+			v = "";
+			vuid = "";
+			for (var i=0, l=nodes.length; i<l; i++) {				
+				if(nodes[i].type=='user'){					
+					v += nodes[i].name + ",";
+					vuid += nodes[i].id + "|";
+				}
+			}
+			if (v.length > 0 ) v = v.substring(0, v.length-1);
+			if (vuid.length > 0 ) vuid = vuid.substring(0, vuid.length-1);
+			var cityObj = $(".pulldown-default-show");
+			cityObj.attr('data-uid',vuid);
+			cityObj.html(v);
+		}
+		function showIconForTree(treeId, treeNode) {
+			return !treeNode.isParent;
+		};
+		function showMenu() {		
+			$(".ztree").toggle();
+		}	
+	</script>
+</body>
+</html>

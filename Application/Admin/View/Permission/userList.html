@@ -112,7 +112,7 @@
                         layer_con.find('.input_id').val(tr.find('.td_id').html());
                         layer_con.find('.input_username').val(tr.find('.td_nickname').html());
                         if (response.data.json) {
-                            for (var i in response.data.json) {
+                            for (var i in response.data.json) {							
                                 layer_con.find('input[type="checkbox"][name="partner_id[]"][value="'+response.data.json[i]+'"]').prop('checked', true);
                             }
                         }

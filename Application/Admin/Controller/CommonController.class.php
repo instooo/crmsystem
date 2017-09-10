@@ -507,15 +507,10 @@ class CommonController extends Controller {
      * @return array
      */
     public function getUserPartner($user_id) {
-        $user_partner = M('user_partner')->where(array('userid'=>$user_id))->find();
-        $result = array(0);
-        if ($user_partner['partners']) {
-            $array = explode(',' ,$user_partner['partners']);
-            foreach ($array as $val) {
-                if ($user_id == $val) continue;
-                $result[] = $val;
-            }
-        }
+        $user_partner = M('user_partner')->where(array('userid'=>$user_id))->select();
+        
+        $result = array_column($uidarr,'userid');
+		$result = $result?$result:array(0);
         $userinfo = M('user')->where(array('id'=>$user_id))->find();
         $partners = M('partner')->where(array('owner'=>$userinfo['user_number']))->select();
         foreach ($partners as $val) {

@@ -231,7 +231,7 @@ h2{font-weight:normal;}
     border-radius: 3px;	
 	}
 	.textinput{border-top:solid 1px #a7b5bc; border-left:solid 1px #a7b5bc; border-right:solid 1px #ced9df; border-bottom:solid 1px #ced9df; background:url(../images/inputbg.gif) repeat-x; padding:10px; width:504px; height:135px; line-height:20px; overflow:hidden;}
-.btn{width:137px;height:35px; background:url(../images/btnbg.png) no-repeat; font-size:14px;font-weight:bold;color:#fff; cursor:pointer;}
+.btn{width:137px;height:35px; background:#00adee; font-size:14px;font-weight:bold;color:#fff; cursor:pointer; border-radius:4px; border:1px #e1e1e1 solid;}
 
 
 /*tip*/

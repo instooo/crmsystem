@@ -71,4 +71,66 @@ class PartnerController extends CommonController {
 		$this->display();
 	}
 
+	//共享客户
+	public function gxpartner(){
+		if (IS_POST) {			
+            $uid = $_POST['uid'];
+            $par_id = $_POST['par_id'];
+			
+            if (!$par_id||!$uid) {
+                $this->ajaxReturn(array('code'=>-1,'msg'=>'参数不全'), 'JSON');
+            }
+			$data = explode('|', $uid);
+			foreach($data as $key=>$val){
+				$map['userid']=$val;
+				$map['partners']=$par_id;
+				$tmpresult = M('user_partner')->where($map)->find();
+				if(!$tmpresult){
+					$updata[$key]['userid']=$val;
+					$updata[$key]['partners']=$par_id;
+				}
+			}  
+			if($updata){
+				 if (false === M('user_partner')->addAll($updata)) {
+					$this->ajaxReturn(array('code'=>-2,'msg'=>'保存失败'), 'JSON');
+				}
+			} 
+			$this->ajaxReturn(array('code'=>1,'msg'=>'保存成功'), 'JSON');
+           
+           
+        }else {
+			//查询出对应的职位和对应的用户，数量比较少，忽略性能
+			$role = M('role')->field('id,name,pid')->select();
+			//查询出所有的用户，数量比较少，忽略性能
+			$member = D('UserView')->select();	
+			$array_data = array();
+			foreach($role as $key =>$val){
+				$val['type']='jiaose';
+				$val['pId']=$val['pid'];
+				unset($val['pid']);
+				$role[$key]=$val;			
+			}
+			//查询uid
+			$pmap['partners'] = $_GET['pid'];
+			$uidarr = M('user_partner')->where($pmap)->select();
+			$uidarr = array_column($uidarr,'userid');
+			
+			foreach($member as $key =>$val){			
+				//$array_data[$key]['id']="user".$val['id'];
+				$array_data[$key]['id']=$val['id'];				
+				$array_data[$key]['name']=$val['nickname'];	
+				//$array_data[$key]['nickname']=$val['nickname'];	
+				$array_data[$key]['pId']=$val['role_id'];	
+				$array_data[$key]['type']='user';
+				if(in_array($val['id'],$uidarr)){
+					$array_data[$key]['checked']=true;
+				}
+			}	
+			$array_data = array_merge($array_data,$role);
+			$json_data = json_encode($array_data);
+			$this->assign('par_id',$_GET['pid']);	
+			$this->assign('json_data',$json_data);
+			$this->display();
+		}
+	}
 }

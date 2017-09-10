@@ -523,15 +523,23 @@ class PermissionController extends CommonController {
             if (!$user_id) {
                 $this->ajaxReturn(array('code'=>-1,'msg'=>'参数不全'), 'JSON');
             }
-            $data = array();
+            $data = array();		
             if (is_array($partner_id) && count($partner_id) > 0) {
-                $data['partners'] = implode(',', $partner_id);
-            }else {
-                $data['partners'] = '';
-            }
-            if (false === M('user_partner')->where(array('userid'=>$user_id))->save($data)) {
-                $this->ajaxReturn(array('code'=>-2,'msg'=>'保存失败'), 'JSON');
-            }
+				foreach($partner_id as $key=>$val){
+					$map['userid']=$user_id;
+					$map['partners']=$val;
+					$tmpresult = M('user_partner')->where($map)->find();
+					if(!$tmpresult || $val!=0){
+						$updata[$key]['userid']=$user_id;
+						$updata[$key]['partners']=$val;
+					}
+				}  
+            }				
+           	if($updata){
+				 if (false === M('user_partner')->addAll($updata)) {					 
+					$this->ajaxReturn(array('code'=>-2,'msg'=>'保存失败'), 'JSON');
+				}
+			} 
             $this->ajaxReturn(array('code'=>1,'msg'=>'保存成功'), 'JSON');
         }else {
             $user_id = intval($_GET['user_id']);
@@ -539,15 +547,9 @@ class PermissionController extends CommonController {
                 $this->ajaxReturn(array('code'=>-1,'msg'=>'参数不全'), 'JSON');
             }
             $user_partner = M('user_partner');
-            $data = $user_partner->where(array('userid'=>$user_id))->find();
-            if (!$data) {
-                $data = array();
-                $data['userid'] = $user_id;
-                $data['partners'] = '';
-                $user_partner->add($data);
-            }
-            if ($data['partners']) {
-                $data['json'] = explode(',', $data['partners']);
+            $dataaa = $user_partner->where(array('userid'=>$user_id))->select();           
+            if ($dataaa) {
+                $data['json'] = array_column($dataaa,'partners');
             }
             $this->ajaxReturn(array('code'=>1,'msg'=>'获取成功','data'=>$data), 'JSON');
         }
