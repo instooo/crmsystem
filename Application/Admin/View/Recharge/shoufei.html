@@ -1,0 +1,136 @@
+<include file="Index/header" />
+<div id="main" >
+    <div class="place">
+        <span>位置：</span>
+        <ul class="placeul">
+            <li><a href="#">首页</a></li>
+            <li><a href="#">工作管理</a></li>
+            <li><a href="#">收费管理</a></li>
+        </ul>
+    </div>
+
+    <div class="rightinfo">        
+        <div class="tools" style="line-height: 46px">
+            <form method="get" action="">
+            合同名称：<input name="s_name" type="text" class="dfinput" value="{$s_name}" style="width: 200px;">&nbsp;
+            客户：<select name="s_partner_id" class="dfinput" style="width: 200px;">
+                    <option value="">全部客户</option>
+                    <volist name="partnerlist" id="vo">
+                        <option value="{$vo.id}" <if condition="$s_partner_id eq $vo['id']">selected</if>>{$vo.partner_name}</option>
+                    </volist>
+                </select>&nbsp;
+            <input name="search" type="submit" class="btn" value="查询">
+            </form>
+        </div>
+        <div class="tablelist_w new_tablelist">
+            <table class="tablelist">
+                <thead>
+                <tr>
+					<th>合同号</th>                  
+                    <th>客户名称</th>
+                    <th>总金额</th>
+					<th>回款金额</th>
+					<volist name="month_arr" id="vo">
+					<th data-year="{$vo.ym}">{$vo.m}月</th>
+					</volist>
+                </tr>
+                </thead>
+                <tbody>
+                <volist name="agreement" id="vo">
+                    <tr data-id="{$vo.id}">
+						 <td class="td_agree_name" data-cid="{$vo.c_id}">{$vo.orderid}</td>
+                         <td class="td_partner_id" data="{$vo.partner_id}">{$vo.partner_name}</td>
+                         <td class="td_total_money">￥{$vo.total_money}</td>
+						 <td class="td_total_money">￥{$vo.return_money}</td>
+						 <volist name="month_arr" id="v">
+						
+							<in name="v.ym" value="$vo['monthar']">
+								<td><div class="minuson" data-year="{$v.ym}"></div></td>	
+							<else/>
+								<td><div class="pluson" data-year="{$v.ym}"></div></td>
+							</in>  
+						</volist>
+                    </tr>
+                </volist>
+                </tbody>
+            </table>
+            <div class="page">{$pagebar}</div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div id="add_moneylog_temp" style="display: none">
+    <form class="add_log_form" method="post" action="{:U('Agreetment/addMoneylog')}">
+    <ul class="forminfo" style="padding: 30px">
+        <input type="hidden" name="logid" class="input_logid" value="">
+        <input type="hidden" name="agree_id" class="input_agree_id" value="{$agreeinfo.id}">		
+        <input type="hidden" name="select_type" class="input_agree_id" value="record">		   
+        <li><label>金额&nbsp;</label><input name="money" type="text" class="dfinput input_money" style="width: 230px" /></li>    
+		<if condition="$agreeinfo['type'] eq 0">
+        <li class="special record"><label>回款日期&nbsp;</label><input name="pay_time" type="text" class="dfinput dfinput_datetime input_pay_time" style="width: 230px" readonly /></li>
+		<else/>
+		 <li class="special record"><label>回款日期&nbsp;</label><input name="pay_time" type="text" class="dfinput dfinput_datetime_mon input_pay_time" style="width: 230px" readonly /></li>
+		</if>	
+        <li class="special record"><label>付款方式&nbsp;</label>
+		<input name="pay_type" type="text" class="dfinput input_money" style="width: 230px; background:#e1e1e1" value="月结" readonly/>	      
+        <li><label>备注&nbsp;</label><textarea name="remarks" class="dfinput input_remarks" style="width: 230px;height: 50px;"></textarea></li>
+        <li><label>&nbsp;</label><input name="submit" type="button" class="btn do_savelog_btn" value="保存"/></li>
+    </ul>
+    </form>
+</div>
+
+
+
+
+<script>
+	$(function(){
+		var layer_index;
+        //添加回款期次
+        $(document).on('click', '.pluson', function () {			
+            layer_index = layer.open({
+                type: 1,
+                title: '添加回款详情',
+                skin: 'layui-layer-rim', //加上边框
+                area: ['600px', '500'], //宽高
+                content: $('#add_moneylog_temp').html()
+            });
+			var lay_con = $('#layui-layer'+layer_index);
+			var ym = $(this).attr("data-year");
+			var agree_id=$(this).parents("tr").attr("data-id");			
+			lay_con.find("input[name='agree_id']").val(agree_id);
+			lay_con.find("input[name='pay_time']").val(ym);
+			lay_con.find("input[name='pay_time']").attr('readonly');
+			lay_con.find('.do_savelog_btn').click(doAddMoneylog);
+        });      
+        
+        function doAddMoneylog() {
+            var load = layer.load(1);
+            $('#layui-layer'+layer_index+' .add_log_form').ajaxSubmit({
+                type:'post',
+                dataType:'json',
+                url:"{:U('Agreetment/addMoneylog')}",
+                error:function () {
+                    layer.close(load);
+                },
+                success:function (response) {
+                    layer.close(load);
+                    if (response.code == 1) {                       
+                        layer.msg('保存成功', {icon: 1,time: 1000}, function(){                           
+                            layer.close(layer_index);
+							location.reload() 
+                        });
+                    }else {
+                        layer.msg(response.msg, {icon: 2,time: 1000});
+                    }
+					
+                }
+            });
+        }
+	
+	})
+</script>
+
+<include file="Index/footer" />

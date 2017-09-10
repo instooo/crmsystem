@@ -75,6 +75,15 @@ class AgreetmentController extends CommonController {
             $moneylog = $this->getMoneyLog($agree_id);			
 			$partdata = $this->get_form_info($agreeinfo['partner_id'],'partner');	
 			
+			$special_role = array(25);
+			$usermap['user_id'] = $_SESSION['authId'];
+			$userinfo = M('role_user')->where($usermap)->find();
+			if(in_array($userinfo['role_id'],$special_role)){
+				$is_caiwu = 1;
+			}else{
+				$is_caiwu = 0;
+			}
+			$this->assign('is_caiwu',$is_caiwu);
 			$this->assign('partdata',$partdata);
 			$this->assign('detaidata',$detaidata);
             $this->assign('moneylogtree',$moneylog['moneylogtree']);
@@ -178,10 +187,17 @@ class AgreetmentController extends CommonController {
             $data['money'] = $_POST['money'];
             $data['period'] = $periodinfo[0]['period']?$periodinfo[0]['period']+1:1;
             $data['type'] = 2;
-            $data['finish_time'] = strtotime($_POST['pay_time']); 
-			$data['month'] = date('Ym',$data['finish_time']);			
+			if($agreeinfo['type']==0){
+			    $data['finish_time'] = strtotime($_POST['pay_time']); 
+				$data['month'] = date('Ym',$data['finish_time']);			
+			}else{
+				 $data['finish_time'] = strtotime($_POST['pay_time']."01"); 
+				 $data['month'] = date('Ym',$data['finish_time']);		
+			}
+          	
             $data['pay_type'] = $_POST['pay_type'];
             $data['remarks'] = trim($_POST['remarks']);
+		
             if (!is_numeric($data['money']) || !is_numeric($data['period']) || !$data['finish_time'] || !$data['pay_type']) {
                 $this->ajaxReturn(array('code'=>-5,'msg'=>'请填写完整的数据'), 'JSON');
             }

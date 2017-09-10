@@ -22,6 +22,7 @@
     <div style="background: #eaedf2;padding: 20px;">
         <table class="filetable" id="moneylist">
             <tr class="tr_summary"><td colspan="5"><span class="txt_all">共{$agreeinfo.total_money}元/</span><span class="txt_no">已回款{$agreeinfo.return_money}元</span></td></tr>
+			<if condition="$is_caiwu eq 1">
             <volist name="moneylogtree" id="vo">
                 <tr class="tr_list" id="tr_detail{$vo.id}" data-id="{$vo.id}" data-period="{$vo.period}" data-json="{$vo.json}">
                     <td class="tr_list_td_l" colspan="2">第{$vo.period}期&nbsp;&nbsp;<img class="arrow_ud_img up" src="{:C('STATIC_URL')}/images/arrow_up2.png"></td>
@@ -34,8 +35,24 @@
 					</span>&nbsp;&nbsp;回款金额 <span class="period_record_sum">{$vo.money}</span>元&nbsp;&nbsp;&nbsp;&nbsp;<img class="edit_open" src="{:C('STATIC_URL')}/images/edit_pen.png"><img class="delete_open" src="{:C('STATIC_URL')}/images/delete.png"></td>
                 </tr>               
             </volist>
+			<else/>
+			<volist name="moneylogtree" id="vo">
+                <tr class="tr_list" id="tr_detail{$vo.id}" data-id="{$vo.id}" data-period="{$vo.period}" data-json="{$vo.json}">
+                    <td class="tr_list_td_l" colspan="2">第{$vo.period}期&nbsp;&nbsp;<img class="arrow_ud_img up" src="{:C('STATIC_URL')}/images/arrow_up2.png"></td>
+                    <td class="tr_list_td_r" colspan="3">时间： <span class="period_plan_sum">
+					<if condition="$agreeinfo['type'] eq 0">
+					{$vo.finish_time|date="Y-m-d",###}
+					<else/>
+					{$vo.finish_time|date="Y年m月",###}
+					</if>
+					</span>&nbsp;&nbsp;回款金额 <span class="period_record_sum">{$vo.money}</span>元&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                </tr>               
+            </volist>
+			</if>
         </table>
+		<if condition="$is_caiwu eq 1">
         <a class="cpayment-stage-add" href="javascript:;"><img src="{:C('STATIC_URL')}/images/contract_add.png">&nbsp;增加回款期次</a>
+		</if>
     </div>
 </div>
 

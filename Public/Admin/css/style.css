@@ -1183,3 +1183,25 @@ a:link {
     position: relative;
     cursor: pointer;
 }
+.minus{	
+	background: url(../images/tasks.png) center no-repeat;	
+}
+.minuson{	
+	background: url(../images/tasks.png) center no-repeat;	
+}
+.plus{	
+	background: url(../images/plus1.png) center no-repeat;	
+}
+.pluson{
+	background: url(../images/plus2.png) center no-repeat;
+}
+.pluson:hover{
+	background: url(../images/plus2.png) center no-repeat;
+	background-size:25px 25px;	
+}
+.minus,.minuson,.plus,.pluson{
+	vertical-align:middle;
+	width:40px;
+	height:40px;
+	background-size:20px 20px;	
+}
