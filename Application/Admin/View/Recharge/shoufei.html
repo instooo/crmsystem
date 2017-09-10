@@ -12,13 +12,8 @@
     <div class="rightinfo">        
         <div class="tools" style="line-height: 46px">
             <form method="get" action="">
-            合同名称：<input name="s_name" type="text" class="dfinput" value="{$s_name}" style="width: 200px;">&nbsp;
-            客户：<select name="s_partner_id" class="dfinput" style="width: 200px;">
-                    <option value="">全部客户</option>
-                    <volist name="partnerlist" id="vo">
-                        <option value="{$vo.id}" <if condition="$s_partner_id eq $vo['id']">selected</if>>{$vo.partner_name}</option>
-                    </volist>
-                </select>&nbsp;
+            合同号码：<input name="orderid" type="text" class="dfinput" value="{$orderid}" style="width: 200px;">&nbsp;
+            客户名称：<input name="partner_name" type="text" class="dfinput" value="{$partner_name}" style="width: 200px;">
             <input name="search" type="submit" class="btn" value="查询">
             </form>
         </div>
