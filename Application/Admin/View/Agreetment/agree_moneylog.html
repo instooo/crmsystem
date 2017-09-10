@@ -23,7 +23,7 @@
         <table class="filetable" id="moneylist">
             <tr class="tr_summary"><td colspan="5"><span class="txt_all">共{$agreeinfo.total_money}元/</span><span class="txt_no">已回款{$agreeinfo.return_money}元</span></td></tr>
             <volist name="moneylogtree" id="vo">
-                <tr class="tr_list" data-id="{$vo.id}" data-period="{$vo.period}" data-json="{$vo.json}">
+                <tr class="tr_list" id="tr_detail{$vo.id}" data-id="{$vo.id}" data-period="{$vo.period}" data-json="{$vo.json}">
                     <td class="tr_list_td_l" colspan="2">第{$vo.period}期&nbsp;&nbsp;<img class="arrow_ud_img up" src="{:C('STATIC_URL')}/images/arrow_up2.png"></td>
                     <td class="tr_list_td_r" colspan="3">时间： <span class="period_plan_sum">
 					<if condition="$agreeinfo['type'] eq 0">
@@ -114,14 +114,24 @@
         }
         //编辑回款详情
         $(document).on('click', '.edit_open', function () {
+			 var data = $(this).parents('tr').attr('data-json');
+			 data = eval('(' + data + ')');
              layer_index = layer.open({
                 type: 1,
                 title: '添加回款详情',
                 skin: 'layui-layer-rim', //加上边框
                 area: ['600px', '500'], //宽高
                 content: $('#add_moneylog_temp').html()
-            });
+            });			
 			var lay_con = $('#layui-layer'+layer_index);
+			lay_con.find("input[name='money']").val(data.money);
+			lay_con.find("input[name='pay_time']").val(data.pay_time);
+			lay_con.find("input[name='pay_type']").val(data.pay_type);
+			lay_con.find("input[name='user']").val(data.nickname);
+			lay_con.find("input[name='remarks']").val(data.remarks);
+			lay_con.find("input[name='logid']").val(data.id);
+			
+			lay_con.find('.do_savelog_btn').click(doEditMoneylog);
         });
         function doEditMoneylog() {
             var load = layer.load(1);
@@ -166,38 +176,20 @@
             var edit_pen_img = "{:C('STATIC_URL')}/images/edit_pen.png";
             var tr_list = $('.tr_list[data-period="'+data.period+'"]');
             if (isedit) {
-                var tr_detail = $('.tr_detail[data-id="'+data.id+'"]');
+                var tr_detail = $('#tr_detail'+data.id);
                 if (tr_detail.length && tr_detail.length > 0) {
                     tr_detail.attr('data-json', data.json);
-                    tr_detail.find('.datetime_td').html(date_formate(data.plan_time?data.plan_time:data.finish_time, false));
-                    tr_detail.find('.money_count_wrapper').html(data.money);
-                    tr_detail.find('.status_td').html(statusArr[data.type][data.status]);
+                    tr_detail.find('.period_plan_sum').html(date_formate(data.finish_time, false));
+                    tr_detail.find('.period_record_sum').html(data.money);                    
                 }
+				$(".txt_no").html(data_sum.all_plan_sum+"元");
             }else {
-                var detailHtml = '<tr class="tr_detail" data-id="'+data.id+'" data-period="'+data.period+'" data-json="'+data.json+'">' +
-                        '<td class="payment-type_td">'+payment_type[data.type]+'</td>' +
-                        '<td class="datetime_td">'+date_formate(data.plan_time?data.plan_time:data.finish_time, false)+'</td>' +
-                        '<td>收款：<span class="money_count_wrapper">'+data.money+'</span>元</td>' +
-                        '<td class="status_td">'+statusArr[data.type][data.status]+'</td>' +
-                        '<td class="deal_td"><img class="edit_open" src="'+edit_pen_img+'">&nbsp;&nbsp;<img class="delete_open" src="'+delete_img+'"></td> ' +
-                        '</tr>';
-                var this_tr_detail = $('.tr_detail[data-period="'+data.period+'"]');
-                if (this_tr_detail && this_tr_detail.length > 0) {
-                    $('.tr_detail[data-period="'+data.period+'"]').last().after(detailHtml);
-                }else {
-                    tr_list.after(detailHtml);
-                }
+                var detailHtml = '<tr class="tr_list" id="tr_detai"'+data.id+'data-id="'+data.id+'" data-period="'+data.period+'" data-json="'+data.json+'">' +
+                        ' <td class="tr_list_td_l" colspan="2">第'+data.period+'期&nbsp;&nbsp;<img class="arrow_ud_img up" src="/Public/Admin/images/arrow_up2.png"></td>'+
+						'<td class="tr_list_td_r" colspan="3">时间： <span class="period_plan_sum">'+date_formate(data.finish_time, false)+'</span>&nbsp;&nbsp;回款金额 <span class="period_record_sum">'+data.money+'</span>元&nbsp;&nbsp;&nbsp;&nbsp;<img class="edit_open" src="/Public/Admin/images/edit_pen.png"><img class="delete_open" src="/Public/Admin/images/delete.png"></td></tr>';
+				 $("#moneylist").append(detailHtml);
+				 $(".txt_no").html(data_sum.all_plan_sum+"元");
             }
-            $('.tr_summary .txt_all').html('共'+data_sum.all_plan_sum+'元/');
-            $('.tr_summary .txt_no').html('未收款'+data_sum.all_no_sum+'元');
-            if (tr_list.length && tr_list.length > 0 && data_sum.moneylogtree && data_sum.moneylogtree[data.period]) {
-                tr_list.find('.period_plan_sum').html(data_sum.moneylogtree[data.period].plan_sum);
-                tr_list.find('.period_record_sum').html(data_sum.moneylogtree[data.period].record_sum);
-                tr_list.find('.period_invoice_sum').html(data_sum.moneylogtree[data.period].invoice_sum);
-            }
-            var arrow_ud_img = tr_list.find('.arrow_ud_img');
-            arrow_ud_img.removeClass('up').attr('src', "{:C('STATIC_URL')}/images/arrow_down2.png");
-            $('.tr_detail[data-period="'+data.period+'"]').show();
         }
         //删除回款
         $(document).on('click', '.delete_open', function () {

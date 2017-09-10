@@ -125,47 +125,26 @@ class AgreetmentController extends CommonController {
      * @return array
      */
     public function getMoneyLog($agree_id) {
-        $moneylog = M('money_log')->where(array('agree_id'=>$agree_id))->order('period asc,addtime asc')->select();
-        $moneylogtree = array();
-        $all_plan_sum = 0;
-        $all_record_sum = 0;
-        $all_invoice_sum = 0;
-        foreach ($moneylog as $val) {
-            if ($val['type'] == 0) {
-                $temp = $val;
-                $temp['plan_sum'] = 0;
-                $temp['record_sum'] = 0;
-                $temp['invoice_sum'] = 0;
-                $temp['json'] = htmlspecialchars(json_encode($val));
-                $moneylogtree[$val['period']] = $temp;
-            }else {
-                $temp = $val;
-                if ($val['type'] == 1) {
-                    $moneylogtree[$val['period']]['plan_sum'] += $val['money'];
-                    $all_plan_sum += $val['money'];
-                }elseif ($val['type'] == 2) {
-                    $moneylogtree[$val['period']]['record_sum'] += $val['money'];
-                    $all_record_sum += $val['money'];
-                }elseif ($val['type'] == 3) {
-                    $moneylogtree[$val['period']]['invoice_sum'] += $val['money'];
-                    $all_invoice_sum += $val['money'];
-                }
-                $temp['json'] = htmlspecialchars(json_encode($temp));
-                $period = $moneylogtree[$val['period']];
-                unset($period['child']);
-                $moneylogtree[$val['period']]['json'] = htmlspecialchars(json_encode($period));
-                $moneylogtree[$val['period']]['child'][] = $temp;
-            }
+        $moneylog = M('money_log a')
+				->join('crm_user b on a.user_id=b.id')
+				->field('a.*,b.*,a.id')
+				->where(array('a.agree_id'=>$agree_id))
+				->order('period asc,addtime asc')
+				->select();  	
+		$all_plan_sum=0;
+		$moneylogtree = array();
+        foreach ($moneylog as $val) {         
+			$temp = $val;		
+			$temp['pay_time']=date('Y-m-d',$val['finish_time']);			
+			$temp['json'] = htmlspecialchars(json_encode($temp));
+			$all_plan_sum += $val['money'];
+			$moneylogtree[$val['period']] = $temp;
+          
         }
-        $all_no_sum = $all_plan_sum - $all_record_sum;
-        $all_no_sum = $all_no_sum<0?0:$all_no_sum;
         return array(
             'moneylogtree'  =>  $moneylogtree,
-            'all_plan_sum'  =>  $all_plan_sum,
-            'all_record_sum'  =>  $all_record_sum,
-            'all_invoice_sum'  =>  $all_invoice_sum,
-            'all_no_sum'  =>  $all_no_sum
-        );
+			 'all_plan_sum'  =>  $all_plan_sum
+		);
     }
 
     /**
@@ -247,50 +226,26 @@ class AgreetmentController extends CommonController {
             $this->ajaxReturn(array('code'=>-2,'msg'=>'要修改的记录不存在'), 'JSON');
         }
         $data = array();
-        if ($loginfo['type'] == 1) {
-            //回款计划
-            $data['money'] = $_POST['money'];
-            $data['plan_time'] = strtotime($_POST['plan_time']);
-            $data['status'] = $_POST['status'];
-            $data['remarks'] = trim($_POST['remarks']);
-            if (!is_numeric($data['money']) || !$data['plan_time'] || !is_numeric($data['status'])) {
-                $this->ajaxReturn(array('code'=>-3,'msg'=>'请填写完整的数据'), 'JSON');
-            }
-        }elseif ($loginfo['type'] == 2) {
-            //实际回款记录
-            $data['money'] = $_POST['money'];
-            $data['finish_time'] = strtotime($_POST['pay_time']);
-            $data['status'] = $_POST['status'];
-            $data['pay_type'] = $_POST['pay_type'];
-            $data['remarks'] = trim($_POST['remarks']);
-            if (!is_numeric($data['money']) || !$data['finish_time'] || !is_numeric($data['status']) || !$data['pay_type']) {
-                $this->ajaxReturn(array('code'=>-3,'msg'=>'请填写完整的数据'), 'JSON');
-            }
-            $return_money = $data['money'];
-        }elseif ($loginfo['type'] == 3) {
-            //开票记录
-            $data['money'] = $_POST['money'];
-            $data['finish_time'] = strtotime($_POST['invoice_time']);
-            $data['status'] = $_POST['status'];
-            $data['invoice_title'] = trim($_POST['invoice_title']);
-            $data['invoice_type'] = trim($_POST['invoice_type']);
-            $data['invoice_num'] = trim($_POST['invoice_num']);
-            $data['remarks'] = trim($_POST['remarks']);
-            if (!is_numeric($data['money'])
-                || !$data['finish_time']
-                || !is_numeric($data['status'])
-                || !$data['invoice_title']
-                || !$data['invoice_type']
-                || !$data['invoice_num']) {
-                $this->ajaxReturn(array('code'=>-3,'msg'=>'请填写完整的数据'), 'JSON');
-            }
-        }else {
-            $this->ajaxReturn(array('code'=>-4,'msg'=>'回款类型未知'), 'JSON');
-        }
+        
+		//实际回款记录
+		$data['money'] = $_POST['money'];
+		$data['finish_time'] = strtotime($_POST['pay_time']);	
+		$data['pay_type'] = $_POST['pay_type'];
+		$data['remarks'] = trim($_POST['remarks']);
+		if (!is_numeric($data['money']) || !$data['finish_time']) {
+			$this->ajaxReturn(array('code'=>-3,'msg'=>'请填写完整的数据'), 'JSON');
+		}
+		$return_money = $data['money'];
+		$agreeinfo = M('agreement')->where(array('id'=>$loginfo['agree_id']))->find();
+        if (($agreeinfo['total_money']-$agreeinfo['return_money'])<$return_money-$loginfo['money'] ) {
+            $this->ajaxReturn(array('code'=>-5,'msg'=>'超出了合同总金额'), 'JSON');
+        }			
+			
+			
         $rs = $money_log->where(array('id'=>$logid))->save($data);
         if (false === $rs) {
             $this->ajaxReturn(array('code'=>-500,'msg'=>'数据保存失败'), 'JSON');
-        }
+        }		
         if ($return_money) {
             //更新回款金额
             M('agreement')->where(array('id'=>$loginfo['agree_id']))->setDec('return_money', $loginfo['money'] - $return_money);
