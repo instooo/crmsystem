@@ -14,19 +14,19 @@ class RechargeController extends CommonController {
 	public function shoufei(){
 		//获取当前月份
 		if($_REQUEST['orderid']){
-			$smap['orderid'] = $_REQUEST['orderid'];
+			$smap['p.orderid'] = $_REQUEST['orderid'];
 			$this->assign('orderid',$_REQUEST['orderid']);
 		}
 		if($_REQUEST['partner_name']){
 			$smap['t.partner_name'] = array('like',"%".$_REQUEST['partner_name']."%");
 			$this->assign('partner_name',$_REQUEST['partner_name']);
-		}		
+		}	
+		$smap['p.type']=1;
 		$yearm = date('Ym',time());
-		$agreement = M('agreement p')
-		->where("type=1")
+		$agreement = M('agreement p')		
 		->where($smap)		
         ->join('left join crm_partner t on t.id=p.partner_id')		
-		->select();		
+		->select();			
 		foreach($agreement as $key=>$val){
 			//查找收费记录
 			$agreement[$key]['shoufeilog'] = M('money_log')->where("agree_id=".$val['id'])->select();
