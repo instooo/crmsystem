@@ -22,14 +22,36 @@ class WorkController extends CommonController {
      * 客户管理
      */
     public function partner() {
-		//查找自己拥有客户
-		$nowuid = $this->get_numuid();		
-        $partners = $this->getUserPartner($_SESSION['authId']);
-		$map['p.id'] = array('in', $partners);
-	
-        $fieldlist = $this->getFieldList('partner');
-        $klist = array_keys($fieldlist);
-
+		//查找当前账号的角色
+		$role = M('role_user')->where("user_id=".$_SESSION['authId'])->find();
+		if(in_array($role['role_id'],array(1,20))){
+			$this->assign('special',1);
+			if ($_REQUEST['owner']) {
+				$map['p.owner'] = trim($_REQUEST['owner']);
+				$this->assign('owner', $_REQUEST['owner']);
+			}
+			$userlist = M('user')->select();
+			$this->assign('userlist', $userlist);
+		}else{
+			//查找自己拥有客户
+			$nowuid = $this->get_numuid();		
+			$partners = $this->getUserPartner($_SESSION['authId']);
+			$map['p.id'] = array('in', $partners);
+		}
+		
+		if ($_REQUEST['partner_name']) {
+				$map['p.partner_name'] = array('like', "%".trim($_REQUEST['partner_name'])."%");
+				$this->assign('partner_name', $_REQUEST['partner_name']);
+			}
+        if ($_REQUEST['khtype']) {
+            $map['p.khtype'] = $_REQUEST['khtype'];
+            $this->assign('khtype', $_REQUEST['khtype']);
+        }
+		if ($_REQUEST['status']==2) {			
+            $map['p.status'] = 0;           
+        }else if($_REQUEST['status']==1){
+			 $map['p.status'] = 1;    
+		}	
         $count = M('partner p')
             ->field('p.*,u.id,u.nickname')
 			->where($map)
@@ -48,8 +70,8 @@ class WorkController extends CommonController {
             ->select();
       
         $this->assign('pagebar', $page->show());
-        $this->assign('list', $list);
-
+        $this->assign('count', $count);
+		$this->assign('list', $list);
         $this->display();
     }
 
@@ -527,11 +549,11 @@ class WorkController extends CommonController {
 				}
 				
 				//添加合同
-				if (!$_POST['w_id'] || !$_POST['agree_name']|| !$_POST['bltype']||!$_POST['partner_id'] || !$_POST['qydate']) {					
-					$return_data['code'] = -2;
-					$return_data['msg'] = '请输入完整数据';
-					break;
-				}
+				//if (!$_POST['w_id'] || !$_POST['agree_name']|| !$_POST['bltype']||!$_POST['partner_id'] || !$_POST['qydate']) {					
+				//	$return_data['code'] = -2;
+				//	$return_data['msg'] = '请输入完整数据';
+				//	break;
+				//}
 				
 				$adddata['owner'] = $this->get_numuid();
 				$adddata['addtime'] = time();

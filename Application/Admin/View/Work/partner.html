@@ -16,17 +16,42 @@
 
     <div class="rightinfo">
         <div class="tools">
-            <ul class="toolbar1">
+			 <div style="float:left">总共客户：<font color="blue">{$count}个</font></div>
+            <ul class="toolbar1">				
                 <li class="add_btn"><span><img src="{:C('STATIC_URL')}/images/t01.png"/></span>添加</li>
             </ul>
+        </div>
+		<div class="tools" style="line-height: 46px">
+            <form method="get" action="">
+            公司名称：<input name="partner_name" type="text" class="dfinput" value="{$partner_name}" style="width: 200px;">&nbsp;
+			 <if condition="$special eq 1">
+			 业务员：<select name="owner" class="dfinput" style="width: 100px;">
+                    <option value="">全部</option>                   
+                    <volist name="userlist" id="vo">
+					<option value="{$vo.user_number}" <if condition="$owner eq $vo['user_number']">selected</if>>{$vo.username}</option>
+					</volist>
+                </select>&nbsp;
+			</if>
+            客户类型：<select name="khtype" class="dfinput" style="width: 100px;">
+                    <option value="">全部类型</option>                   
+                    <option value="短期" <if condition="$khtype eq 短期">selected</if>>短期</option>
+					<option value="长期" <if condition="$khtype eq 长期">selected</if>>长期</option>
+                </select>&nbsp;
+			 客户状态：<select name="status" class="dfinput" style="width: 100px;">
+                    <option value="">全部状态</option>                   
+                    <option value="1">合作中</option>
+					<option value="2">未合作</option>
+                </select>&nbsp;
+            <input name="search" type="submit" class="btn" value="查询">
+            </form>
         </div>
         <div class="tablelist_w new_tablelist">
             <table class="tablelist">
                 <thead>
                 <tr>
-                    <th>客户名称</th>
+                    <th>公司名称</th>
                     <th>合作类型</th>
-                    <th>联系名称</th>
+                    <th>联系人</th>
 					<th>联系电话</th>
                     <th>微信</th>
                     <th>qq</th>
@@ -45,7 +70,13 @@
                             <td>{$vo.weixin}</td>
                             <td>{$vo.qq}</td>                            
 							<td>{$vo.address}</td>
-                            <td>{$vo.status}</td>                           
+                            <td>
+								<if condition="$vo['status'] eq 0">
+								未合作
+								<else/>
+								合作
+								</if>
+							</td>                           
                             <td><a href="javascript:;" class="tablelink edit">编辑</a> <a href="javascript:;" class="tablelink detail">查看</a> <a href="javascript:;" class="tablelink gx">共享</a></td>
                         </tr>
                     </volist>

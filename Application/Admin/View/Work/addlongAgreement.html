@@ -34,19 +34,17 @@
 		<form class="dataform" method="post" enctype="multipart/form-data" action="{:U('Work/addAgreement')}">
         <li><label>合同号</label><input name="orderid" type="text" class="dfinput input_title" readonly value="{$orderid}"/><i>不可修改</i></li>
 		 <li><label>合同名称</label><input name="agree_name" type="text" class="dfinput input_title"  value=""/><i></i></li>
-		<li><label>审批流程</label> 
-		
+		<li><label>审批流程</label> 		
 		<select class="dfinput input_partner_id" name="w_id" style="width: 300px">
                     <option value="">请选择</option>
                     <volist name="workflow" id="vo"><option value="{$vo.w_id}">{$vo.w_name}</option></volist>
         </select><i></i></li>
-		<li><label>合同类型</label><input name="bltype" type="text" class="dfinput multi_input input_name" placeholder="办理事项" readonly="" />
-		<dl class="multi_list" style="display: none;">
-			<volist name='banshitype' id="vo">
-			<dd><input type="checkbox" value="{$vo.name}">{$vo.name}</dd>
-			</volist>
-		 </dl></li>
-		<li><label>说明</label><input name="bltext" type="text" class="dfinput input_name" placeholder="办理事项说明" /><i></i></li>
+		<li><label>企业类型</label><select class="dfinput input_partner_id" name="qiyetype" style="width: 300px">
+                    <option value="">请选择</option>
+                    <option value="小规模">小规模</option>
+					<option value="一般纳税人">一般纳税人</option>
+        </select></li>
+		<li><label>服务内容</label><input name="fuwucontent" type="text" class="dfinput input_name" placeholder="服务内容" /><i></i></li>
         <li><label>客户名称</label>
 		<select class="dfinput input_partner_id" name="partner_id" style="width: 300px">
                     <option value="">请选择</option>
@@ -54,24 +52,21 @@
         </select>
 		
 		<i></i></li>
-		<li><label>业务资料清单</label><input type="text" class="dfinput multi_input input_field33" name="ywziliao" readonly="" value="">
-		 <dl class="multi_list" style="display: none;">
-			<volist name='zltype' id="vo">
-			<dd><input type="checkbox" value="{$vo.name}">{$vo.name}</dd>
-			</volist>
-		 </dl>		
-		 <li><label>后勤资料清单</label><input type="text" class="dfinput multi_input input_field33" name="hqziliao" readonly="" value="">
-		 <dl class="multi_list" style="display: none;">
-			<volist name='hqtype' id="vo">
-			<dd><input type="checkbox" value="{$vo.name}">{$vo.name}</dd>
-			</volist>
-		 </dl>
-		 </li>
-		 
+		<li><label>纳税识别号</label><input name="nashuisbh" type="text" class="dfinput input_name" placeholder="纳税识别号" /><i></i></li>
+		<li><label>国税编码</label><input name="guosuibm" type="text" class="dfinput input_name" placeholder="国税编码" /><i></i></li>
+		<li><label>国税密码</label><input name="guosuimm" type="text" class="dfinput input_name" placeholder="国税密码" /><i></i></li>
+		<li><label>地税编码</label><input name="disuibm" type="text" class="dfinput input_name" placeholder="地税编码" /><i></i></li>
+		<li><label>地税密码</label><input name="disuimm" type="text" class="dfinput input_name" placeholder="地税密码" /><i></i></li>
+		<li><label>地税绑定手机</label><input name="dsphone" type="text" class="dfinput input_name" placeholder="地税绑定手机" /><i></i></li>
 		<li><label>签约时间</label><input id="qydate" name="qydate" type="text" class="dfinput input_name" placeholder="签约时间" readonly/><i></i></li>
-        <li><label>总金额</label><input name="total_money" type="text" class="dfinput input_name" /><i></i></li>
-		 <li><label>具体金额说明</label><input name="moneydes" type="text" class="dfinput input_name" placeholder="金额明细"/><i></i></li>
-		 <li><label>客户情况说明</label><input name="khdes" type="text" class="dfinput input_name" placeholder="客户情况说明"/><i></i></li>
+
+		<li><label>收费方式</label><select class="dfinput input_partner_id" name="shoufeitype" style="width: 300px">
+                    <option value="月收">月收</option>
+                    <option value="季收">季收</option>
+					<option value="年收">年收</option>
+        </select></li>
+		<li><label>总金额</label><input name="total_money" type="text" class="dfinput input_name" /><i></i></li>
+
         <li><label>&nbsp;</label><input name="submit" type="button" class="btn" value="确认保存"/></li>
 		</form>
     </ul>

@@ -105,7 +105,7 @@
 
 
 
-
+	<if condition="$agreeinfo['type'] eq 0">
 	<div class="dynamic-detail-body tablist">
 		<div class="modify-detail-container">
 			<div class="modify-body">
@@ -152,6 +152,64 @@
 			</div>
 		</div>
     </div>
+	<else/>
+	<div class="dynamic-detail-body tablist">
+		<div class="modify-detail-container">
+			<div class="modify-body">
+				<div class="modify-base-info list" >
+					<span class="input-label">合同号:&nbsp;</span>
+					<span class="clientmodify-default-text">{$agreeinfo.orderid}</span>
+				</div>
+				<div class="modify-base-info list" >
+					<span class="input-label">合同名称:</span>
+					<span class="clientmodify-default-text">{$agreeinfo.agree_name}</span>
+				</div>                                     
+				<div class="modify-base-info list" >        
+					<span class="input-label">企业类型:</span>
+					<span class="clientmodify-default-text">{$agreeinfo.qiyetype}</span>
+				</div>                                    
+				<div class="modify-base-info list" >
+					<span class="input-label">服务内容:&nbsp;</span>
+					<span class="clientmodify-default-text">{$agreeinfo.fuwucontent}</span>
+				</div>
+				<div class="modify-base-info list" >
+					<span class="input-label">纳税识别号:</span>
+					<span class="clientmodify-default-text">{$agreeinfo.nashuisbh}</span>
+				</div>                                     
+				<div class="modify-base-info list" >        
+					<span class="input-label">国税编码:</span>
+					<span class="clientmodify-default-text">{$agreeinfo.guosuibm}</span>
+				</div>  
+				<div class="modify-base-info list" >
+					<span class="input-label">国税密码:&nbsp;</span>
+					<span class="clientmodify-default-text">{$agreeinfo.guosuimm}</span>
+				</div>
+				<div class="modify-base-info list" >
+					<span class="input-label">地税编码:</span>
+					<span class="clientmodify-default-text">{$agreeinfo.disuibm}</span>
+				</div>                                     
+				<div class="modify-base-info list" >        
+					<span class="input-label">地税密码:</span>
+					<span class="clientmodify-default-text">{$agreeinfo.disuimm}</span>
+				</div>  
+				<div class="modify-base-info list" >
+					<span class="input-label">地税绑定手机:&nbsp;</span>
+					<span class="clientmodify-default-text">{$agreeinfo.dsphone}</span>
+				</div>
+				<div class="modify-base-info list" >
+					<span class="input-label">签约时间:</span>
+					<span class="clientmodify-default-text">{$agreeinfo.qydate}</span>
+				</div>                                     
+				<div class="modify-base-info list" >        
+					<span class="input-label">收费方式:</span>
+					<span class="clientmodify-default-text">{$agreeinfo.shoufeitype}</span>
+				</div>  
+				
+			</div>
+		</div>
+    </div>
+	
+	</if>
 	<!-- 汇款记录start -->
 		<include file="Partner/ag_detail" />
 	<!-- 汇款记录end -->
