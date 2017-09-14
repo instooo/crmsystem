@@ -25,9 +25,11 @@
                     <th>客户名称</th>
                     <th>总金额</th>
 					<th>回款金额</th>
+					<th><div class="lefticon"></div></th>
 					<volist name="month_arr" id="vo">
 					<th data-year="{$vo.ym}">{$vo.m}月</th>
 					</volist>
+					<th><div class="righticon"></div></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -37,14 +39,15 @@
                          <td class="td_partner_id" data="{$vo.partner_id}">{$vo.partner_name}</td>
                          <td class="td_total_money">￥{$vo.total_money}</td>
 						 <td class="td_total_money">￥{$vo.return_money}</td>
-						 <volist name="month_arr" id="v">
-						
+						 <td class="td_total_money"></td>
+						 <volist name="month_arr" id="v">						
 							<in name="v.ym" value="$vo['monthar']">
 								<td><div class="minuson" data-year="{$v.ym}"></div></td>	
 							<else/>
 								<td><div class="pluson" data-year="{$v.ym}"></div></td>
 							</in>  
 						</volist>
+						<td class="td_total_money"></td>
                     </tr>
                 </volist>
                 </tbody>
@@ -100,7 +103,40 @@
 			lay_con.find("input[name='pay_time']").attr('readonly');
 			lay_con.find('.do_savelog_btn').click(doAddMoneylog);
         });      
-        
+        $(".lefticon").click(function(){		
+			var yearm = {$yearm};
+			yearm = yearm.toString();
+			var month = yearm.substr(-2,2);
+			var year = yearm.substr(0,4);
+			if((parseInt(month)-1)<1){
+				 var newmonth='12';
+				 year = parseInt(year)-1;
+			}else if((parseInt(month)-1)<10){
+				var newmonth='0'+(parseInt(month)-1).toString();
+			}else{
+				var newmonth=(parseInt(month)-1).toString();
+			}			
+			var newyearm = year+newmonth;
+			window.location.href="/Recharge/shoufei?yearm="+newyearm ;
+		
+		})
+		$(".righticon").click(function(){
+			var yearm = {$yearm};
+			yearm = yearm.toString();
+			var month = yearm.substr(-2,2);
+			var year = yearm.substr(0,4);
+			
+			if((parseInt(month)+1)>12){
+				 var newmonth='01';
+				 year = parseInt(year)+1;
+			}else if((parseInt(month)+1)<10){
+				var newmonth='0'+(parseInt(month)+1).toString();
+			}else{
+				var newmonth=(parseInt(month)+1).toString();
+			}	
+			var newyearm = year+newmonth;
+			window.location.href="/Recharge/shoufei?yearm="+newyearm ;
+		})
         function doAddMoneylog() {
             var load = layer.load(1);
             $('#layui-layer'+layer_index+' .add_log_form').ajaxSubmit({

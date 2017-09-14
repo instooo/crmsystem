@@ -204,7 +204,7 @@ class AgreetmentController extends CommonController {
 			if ($data['money']<=0) {
                 $this->ajaxReturn(array('code'=>-5,'msg'=>'金额不能为负数'), 'JSON');
             }
-			if (($agreeinfo['total_money']-$agreeinfo['return_money'])<$data['money']) {
+			if (($agreeinfo['total_money']-$agreeinfo['return_money'])<$data['money'] && $agreeinfo['type']==0) {
                 $this->ajaxReturn(array('code'=>-5,'msg'=>'超出了合同总金额'), 'JSON');
             }			
             $return_money = $data['money'];

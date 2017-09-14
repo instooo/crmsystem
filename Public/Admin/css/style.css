@@ -1205,3 +1205,26 @@ a:link {
 	height:40px;
 	background-size:20px 20px;	
 }
+
+.lefticon{
+	background: url(../images/bg/left.png) center no-repeat;
+	background-size:20px 20px;	
+	vertical-align:middle;
+	width:25px;
+	height:25px;
+}
+.righticon{
+	background: url(../images/bg/right.png) center no-repeat;
+	background-size:20px 20px;	
+	vertical-align:middle;
+	width:25px;
+	height:25px;
+}
+.lefticon:hover{
+	background: url(../images/bg/left.png) center no-repeat;
+	background-size:25px 25px;	
+}
+.righticon:hover{
+	background: url(../images/bg/right.png) center no-repeat;
+	background-size:25px 25px;	
+}

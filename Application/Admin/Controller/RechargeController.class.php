@@ -22,7 +22,13 @@ class RechargeController extends CommonController {
 			$this->assign('partner_name',$_REQUEST['partner_name']);
 		}	
 		$smap['p.type']=1;
-		$yearm = date('Ym',time());
+		if($_GET['yearm']){
+			$yearm=$_GET['yearm'];
+			
+		}else{
+			$yearm = date('Ym',time());	
+		}
+		
 		$agreement = M('agreement p')		
 		->where($smap)		
         ->join('left join crm_partner t on t.id=p.partner_id')		
@@ -40,9 +46,10 @@ class RechargeController extends CommonController {
 		}
 		$month_arr = array();
 		for($i=12;$i>0;$i--){
-			$month_arr[$i]['ym'] = date("Ym", strtotime("-".($i-1). "months", strtotime($yearm)));
-			$month_arr[$i]['m'] = date("m", strtotime("-".($i-1). "months", strtotime($yearm)));
+			$month_arr[$i]['ym'] = date("Ym", strtotime("-".($i-7). "months", strtotime($yearm."01")));
+			$month_arr[$i]['m'] = date("m", strtotime("-".($i-7). "months", strtotime($yearm."01")));
 		}
+		$this->assign('yearm',$yearm);
 		$this->assign('month_arr',$month_arr);	
 		$this->assign('agreement',$agreement);
 		$this->display();
