@@ -90,13 +90,13 @@ class RoleController extends CommonController {
 			unset($map);
 			//才看具体步骤表
 			$stepinfo = M('work_case_step')->where('c_id='.$cid." and step=".($caseresult['step']+1))->order('st_id desc')->find();
-			if($stepinfo['st_staus']!=-1){//没被审核不通过
+			if($stepinfo['st_status']!=-1){//没被审核不通过
 				$map['w_id'] = $caseresult['w_id'];
 				$map['step_id'] = $caseresult['step']+2;
 			}else{
 				$map['w_id'] = $caseresult['w_id'];
 				$map['step_id'] = $caseresult['step']+1;
-			}
+			}			
 			$result = M('workflow_extend')->where($map)->find();
 			$uidarr = explode('|',$result['uid']);
 			$map['user_number'] = array('in',$uidarr);

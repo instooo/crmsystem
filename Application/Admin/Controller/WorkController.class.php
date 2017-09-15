@@ -310,9 +310,9 @@ class WorkController extends CommonController {
         $nowuid = $this->get_numuid();
         $map['a.c_create_uid'] = $nowuid;
 
-        if ($_REQUEST['s_name']) {
-            $map['p.agree_name'] = array('like', "%".trim($_REQUEST['s_name'])."%");
-            $this->assign('s_name', $_REQUEST['s_name']);
+        if ($_REQUEST['orderid']) {
+            $map['p.orderid'] = array('like', "%".trim($_REQUEST['orderid'])."%");
+            $this->assign('orderid', $_REQUEST['orderid']);
         }
         if ($_REQUEST['s_partner_id']) {
             $map['p.partner_id'] = $_REQUEST['s_partner_id'];
@@ -320,7 +320,11 @@ class WorkController extends CommonController {
         }else {
             $map['p.partner_id'] = array('in', $partners);
         }
-
+		if ($_REQUEST['c_state']) {
+            $map['a.c_state'] = $_REQUEST['c_state'];
+            $this->assign('c_state', $_REQUEST['c_state']);
+        }
+		
         $count = M('agreement p')
             ->join('crm_work_case a on a.c_id = p.e_id')
             ->join('crm_work_case_log b on b.c_id=a.c_id and a.step=b.step')
