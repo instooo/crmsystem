@@ -605,7 +605,42 @@ class WorkController extends CommonController {
      * 编辑合同
      */
     public function editAgreement() {
-        $this->editData();
+        if(IS_POST){
+			$return_data = array('code'=>-1,'msg'=>'未知错误');
+			do{						
+				//添加实例
+				$upddata['id'] = $_POST['id'];
+				$upddata['hqziliao'] = $_POST['hqziliao'];				
+				$map['id'] =$_POST['id'];
+				$rs = M('agreement')->where($map)->save($upddata);
+				if ($rs===false) {
+					$return_data['code'] = -4;
+					$return_data['msg'] = '保存失败';
+					break;
+				}
+				$return_data['code'] = 1;
+				$return_data['msg'] = '保存成功';
+				break;
+			}while(0);
+			$this->ajaxReturn($return_data,'JSON');
+		}else{
+			$hqtypetmp = M('type')->where('typeid=3')->select();
+			
+			$id = $_REQUEST['id'];
+            $info = M('agreement')->where(array('id'=>$id))->find();
+			$hqziliaoarr=explode(",",$info['hqziliao']);
+			foreach($hqtypetmp as $key=>$val){
+				$hqtype[$key]=$val;
+				if(in_array($val['name'],$hqziliaoarr)){					
+					$hqtype[$key]['is_select']=1;
+				}else{
+					$hqtype[$key]['is_select']=0;
+				}
+			}
+			$this->assign('hqtype',$hqtype);			
+            $this->assign('info', $info);
+			$this->display();
+		}
     }
 
     /**

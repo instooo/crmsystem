@@ -41,7 +41,7 @@ class AgreetmentController extends CommonController {
 			$result = $workcase->get_act($data);			
 			$result['html']='';
 			foreach($result['data'] as $key=>$val){
-				$result['html'].="<input type='button' class='do' act='".$val['action']."' value='".$val['des']."'/>";
+				$result['html'].="<input type='button' class='do btn btn-primary' act='".$val['action']."' value='".$val['des']."'/>";
 			}
 			//查找当前登录用户拥有的实例	
 			$casedata['c_id'] =$cid;			
@@ -75,6 +75,7 @@ class AgreetmentController extends CommonController {
             $moneylog = $this->getMoneyLog($agree_id);			
 			$partdata = $this->get_form_info($agreeinfo['partner_id'],'partner');	
 			
+			//财务特殊账号
 			$special_role = array(25);
 			$usermap['user_id'] = $_SESSION['authId'];
 			$userinfo = M('role_user')->where($usermap)->find();
@@ -83,6 +84,14 @@ class AgreetmentController extends CommonController {
 			}else{
 				$is_caiwu = 0;
 			}
+			//后勤特殊账号
+			$hq_role = array(22);
+			if(in_array($userinfo['role_id'],$hq_role)){
+				$is_hq = 1;
+			}else{
+				$is_hq = 0;
+			}
+			$this->assign('is_hq',$is_hq);
 			$this->assign('is_caiwu',$is_caiwu);
 			$this->assign('partdata',$partdata);
 			$this->assign('detaidata',$detaidata);

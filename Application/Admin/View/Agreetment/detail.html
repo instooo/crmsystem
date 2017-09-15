@@ -17,8 +17,14 @@
 		<span class="sp-icon"></span>
 		<input type='hidden' name='work_case' value="{$work_case.info.c_id}">
 		<span class="detail_left_title">{$work_case.info.agree_name}</span>
-		<div class="caozuo">
+		<div class="caozuo">			
 			{$result.html}
+			<if condition="$result['html']">				
+				<!--$is_hq-->
+					<if condition="$is_hq eq 1 and $agreeinfo.type eq 0">
+					<input name="" type="button" id="edit_agree" onclick="edit_agre({$agreeinfo.id})" class="btn btn-primary" value="修改合同">
+					</if>
+			</if>
 		</div>
 	</div>
 	<div class="cus_simple_info">
@@ -235,6 +241,22 @@ $(document).on("click",'.do',function(){
 		}
 	});
 });
+
+function edit_agre(id){
+	layer_index = layer.open({
+		type: 2,
+		title: '合同详情',
+		skin: 'layui-layer-rim',
+		area: ['80%', '90%'],
+		shade: 0.1,
+		scrollbar: false,
+		content: '/Work/editAgreement/id/'+id,
+		end: function () {
+			location.reload()
+		}
+	});
+}
+
 
 $(document).on("click",'#message',function(){	
 	var comment = $("#comment").val();	
