@@ -86,15 +86,22 @@ class RoleController extends CommonController {
 		$cid=$_GET['cid'];
 		$map['c_id'] = $cid;
 		$caseresult = M('work_case')->where($map)->find();
-		if($caseresult['c_state']!=2){
+		if($caseresult['c_state']!=2){			
 			unset($map);
-			$map['w_id'] = $caseresult['w_id'];
-			$map['step_id'] = $caseresult['step']+2;
+			//才看具体步骤表
+			$stepinfo = M('work_case_step')->where('c_id='.$cid." and step=".($caseresult['step']+1))->order('st_id desc')->find();
+			if($stepinfo['st_staus']!=-1){//没被审核不通过
+				$map['w_id'] = $caseresult['w_id'];
+				$map['step_id'] = $caseresult['step']+2;
+			}else{
+				$map['w_id'] = $caseresult['w_id'];
+				$map['step_id'] = $caseresult['step']+1;
+			}
 			$result = M('workflow_extend')->where($map)->find();
 			$uidarr = explode('|',$result['uid']);
 			$map['user_number'] = array('in',$uidarr);
 			$user = M('user')->where($map)->select();		 
-		}		
+		}	
 		$this->assign('user',$user);
 		$this->display();
 	}
