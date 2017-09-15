@@ -585,12 +585,12 @@ class WorkController extends CommonController {
 			$this->assign('partnerlist', $partnerlist);
 			
 			//合同号
-			$orderid = date('YmdHi');
+			$orderid = date('YmdHis');
 			$chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';  
-			$str = '';  
-			for ( $i = 0; $i < 8; $i++ ){ 
+			$str = $this->get_numuid();  
+			for ( $i = 0; $i < 1; $i++ ){ 
 				$str .= $chars[ mt_rand(0, strlen($chars) - 1) ];  
-			} 
+			} 			
 			$orderid = $orderid.$str;
 			$this->assign('orderid',$orderid);			
 			//查询流程
