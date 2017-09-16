@@ -160,10 +160,11 @@ h2{font-weight:normal;}
 .page div span:last-child,.page div a:last-child{border-bottom-right-radius:5px;border-top-right-radius:5px;}
 .page div .current{background:#f5f5f5; cursor:default;color:#737373;}
 .page div span:hover,.page div a:hover{background:#f5f5f5;}
+/*
 .pagepre{background:url(../images/pre.gif) no-repeat center center; width:31px; height:28px;}
 .prev{background:url(../images/pre.gif) no-repeat center center; width:31px; height:28px;}
 .next{background:url(../images/next.gif) no-repeat center center; width:31px; height:28px;}
-
+*/
 /*index*/
 .mainindex{padding:20px; overflow:hidden;}
 .welinfo{height:32px; line-height:32px; padding-bottom:8px;}

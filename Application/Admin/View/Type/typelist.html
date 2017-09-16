@@ -1,0 +1,191 @@
+<include file="Index/header" />
+<div id="main" >
+    <style>
+        .toolbar li{text-align: center;padding: 0 !important;width: 50px;}
+        .toolbar li.current{color: #FFFFFF;background: #3EAFE0 !important;}
+        .toolbar1 li{cursor: pointer}
+    </style>
+    <div class="place">
+        <span>位置：</span>
+        <ul class="placeul">
+            <li><a href="#">首页</a></li>
+            <li><a href="#">工作管理</a></li>
+            <li><a href="#">类型管理</a></li>
+        </ul>
+    </div>
+
+    <div class="rightinfo">
+    </div>
+    <div class="tools">
+        <form method="get" action="">
+            类型：<select name="typeid" class="dfinput" style="width: 200px;">
+            <option value="">全部类型</option>
+            <volist name="typeConfig" id="vo">
+                <option value="{$key}" <if condition="$typeid eq $key">selected</if>>{$vo}</option>
+            </volist>
+            </select>&nbsp;
+            <input name="search" type="submit" class="btn" value="查询">
+        </form>
+        <ul class="toolbar1">
+            <li class="add_btn"><span><img src="{:C('STATIC_URL')}/images/t01.png"/></span>添加</li>
+        </ul>
+    </div>
+    <div class="tablelist_w new_tablelist">
+        <table class="tablelist">
+            <thead>
+            <tr>
+                <th>名称</th>
+                <th>分类</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="vo">
+                <tr data-id="{$vo.id}" data-name="{$vo.name}" data-typeid="{$vo.typeid}">
+                    <td>{$vo.name}</td>
+                    <td>{$typeConfig[$vo['typeid']]}</td>
+                    <td><a href="javascript:;" class="tablelink edit">编辑</a> <a href="javascript:;" class="tablelink">删除</a></td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+        <div class="page">{$pagebar}</div>
+    </div>
+</div>
+</div>
+
+<div id="add_temp" style="display: none">
+    <ul class="forminfo" style="padding: 20px;">
+        <form class="dataform" method="post" enctype="multipart/form-data" action="{:U('Type/addType')}">
+            <input type="hidden" class="input_id" name="id" value="">
+            <li>
+                <label>名称</label>
+                <input type="text" class="dfinput input_name" name="name" value="">
+            </li>
+            <li>
+                <label>类型</label>
+                <select class="dfinput input_typeid" name="typeid">
+                    <option value="">选择类型</option>
+                    <volist name="typeConfig" id="vo">
+                        <option value="{$key}">{$vo}</option>
+                    </volist>
+                </select>
+            </li>
+            <li><label>&nbsp;</label><input name="submit" type="button" class="btn do_save_btn" value="确认保存"/></li>
+        </form>
+    </ul>
+</div>
+
+<script>
+    var layer_index;
+    $(document).on('click', '.add_btn', function () {
+        layer_index = layer.open({
+            type: 1,
+            title: '添加类型',
+            skin: 'layui-layer-rim',
+            area: ['550px', '250px'],
+            scrollbar: false,
+            content: $('#add_temp').html()
+        });
+        var layer_con = $('#layui-layer'+layer_index);
+        layer_con.find('.do_save_btn').click(function () {
+            addData(layer_con.find('form'));
+        });
+    });
+
+    //添加
+    function addData(con) {
+        var load = layer.load(1);
+        con.ajaxSubmit({
+            type:'post',
+            dataType:'json',
+            url:"{:U('Type/addType')}",
+            error:function () {
+                layer.close(load);
+            },
+            success:function (response) {
+                layer.close(load);
+                if (response.code == 1) {
+                    layer.msg('保存成功', {icon: 1,time: 1000}, function(){
+                        location.reload();
+                    });
+                }else {
+                    layer.msg(response.msg, {icon: 2,time: 1000});
+                }
+            }
+        });
+    }
+
+    $(document).on('click', '.edit', function () {
+        var tr = $(this).parents('tr');
+        var id = tr.attr('data-id');
+        if (!id || id == '') return false;
+        layer_index = layer.open({
+            type: 1,
+            title: '编辑类型',
+            skin: 'layui-layer-rim',
+            area: ['550px', '450px'],
+            scrollbar: false,
+            content: $('#add_temp').html()
+        });
+        var layer_con = $('#layui-layer'+layer_index);
+        layer_con.find('.input_id').val(id);
+        layer_con.find('.input_typeid').val(tr.attr('data-typeid'));
+        layer_con.find('.input_name').val(tr.attr('data-name'));
+        $(document).on('click', '#layui-layer'+layer_index+' .btn', function () {
+            editData($(this).parents('.dataform'));
+        });
+    });
+
+    //编辑
+    function editData(con) {
+        var load = layer.load(1);
+        con.ajaxSubmit({
+            type:'post',
+            dataType:'json',
+            url:"{:U('Type/editType')}",
+            error:function () {
+                layer.close(load);
+            },
+            success:function (response) {
+                layer.close(load);
+                if (response.code == 1) {
+                    layer.msg('保存成功', {icon: 1,time: 1000}, function(){
+                        location.reload();
+                    });
+                }else {
+                    layer.msg(response.msg, {icon: 2,time: 1000});
+                }
+            }
+        });
+    }
+
+    $(document).on('click', '.dele', function () {
+        var tr = $(this).parents('tr');
+        var id = tr.attr('data-id');
+        layer_index = layer.confirm('删除后数据将无法恢复，确定要删除吗？', {btn: ['确定','取消']},function () {
+            layer.close(layer_index);
+            var load = layer.load(1);
+            $.ajax({
+                type:'post',
+                dataType:'json',
+                data:{id:id,fieldtype:'partner'},
+                url:"{:U('Type/deleType')}",
+                success:function (response) {
+                    layer.close(load);
+                    if (response.code == 1) {
+                        layer.msg('删除成功', {icon: 1,time: 1000}, function(){
+                            layer.close(layer_index);
+                            location.reload();
+                        });
+                    }else {
+                        layer.msg(response.msg, {icon: 2,time: 1000});
+                    }
+                }
+            });
+        });
+    });
+
+</script>
+
+<include file="Index/footer" />

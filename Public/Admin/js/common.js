@@ -27,10 +27,12 @@ $(function () {
 
 //监听关闭layer窗口
 function listenLayerClose(index, callback) {
+    $.removeCookie('layercloseflag', {path:'/'});
     var layercloseflag;
     var _t = setInterval(function () {
         layercloseflag = $.cookie('layercloseflag');
-        if (layercloseflag == 1 || $.layerClosed) {
+        if (layercloseflag == 1) {
+            clearInterval(_t);
             layer.close(index);
             $.removeCookie('layercloseflag', {path:'/'});
             if (callback) callback();
