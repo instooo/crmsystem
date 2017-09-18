@@ -352,8 +352,7 @@ class WorkController extends CommonController {
 		if ($_REQUEST['c_state']) {
             $map['a.c_state'] = $_REQUEST['c_state'];
             $this->assign('c_state', $_REQUEST['c_state']);
-        }
-		print_r($map);
+        }	
         $count = M('agreement p')
             ->join('crm_work_case a on a.c_id = p.e_id')
             ->join('crm_work_case_log b on b.c_id=a.c_id and a.step=b.step')
@@ -543,10 +542,9 @@ class WorkController extends CommonController {
 			
 			$model = M('');
 			$sql = "SELECT max(id) as max from `crm_agreement`";
-			$orderid = $model->query($sql);
-			
+			$orderid = $model->query($sql);			
 			//合同号
-			$orderid = "S".$orderid['max'];
+			$orderid = "S".$orderid[0]['max'];
 			$orderid = date('Ymd',time()).$orderid;
 			$this->assign('orderid',$orderid);			
 			//查询流程
@@ -620,13 +618,12 @@ class WorkController extends CommonController {
 			$this->assign('partnerlist', $partnerlist);
 			
 			//合同号
-			$orderid = date('YmdHis');
-			$chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';  
-			$str = $this->get_numuid();  
-			for ( $i = 0; $i < 1; $i++ ){ 
-				$str .= $chars[ mt_rand(0, strlen($chars) - 1) ];  
-			} 			
-			$orderid = $orderid.$str;
+			$model = M('');
+			$sql = "SELECT max(id) as max from `crm_agreement`";
+			$orderid = $model->query($sql);			
+			//合同号
+			$orderid = "S".$orderid[0]['max'];
+			$orderid = date('Ymd',time()).$orderid;
 			$this->assign('orderid',$orderid);			
 			//查询流程
 			$workflow = M('workflow')->select();			
