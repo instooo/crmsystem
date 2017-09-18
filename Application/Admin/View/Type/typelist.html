@@ -24,11 +24,9 @@
                 <option value="{$key}" <if condition="$typeid eq $key">selected</if>>{$vo}</option>
             </volist>
             </select>&nbsp;
-            <input name="search" type="submit" class="btn" value="查询">
-        </form>
-        <ul class="toolbar1">
-            <li class="add_btn"><span><img src="{:C('STATIC_URL')}/images/t01.png"/></span>添加</li>
-        </ul>
+            <input name="search" type="submit" class="btn" value="查询">			
+			 <input class="add_btn" type="button" class="btn add_btn" value="添加" style="float:right;">
+        </form>     
     </div>
     <div class="tablelist_w new_tablelist">
         <table class="tablelist">

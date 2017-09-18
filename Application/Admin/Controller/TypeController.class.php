@@ -15,6 +15,7 @@ class TypeController extends CommonController {
             1   =>  '办事类型',
             2   =>  '资料类型',
             3   =>  '后勤资料类型',
+			4   =>  '服务内容',
         );
     }
 

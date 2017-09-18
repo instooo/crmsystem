@@ -583,6 +583,9 @@ class WorkController extends CommonController {
 			$hqtype = M('type')->where('typeid=3')->select();
 			$this->assign('hqtype',$zltype);
 			
+			$fuwucontent = M('type')->where('typeid=4')->select();
+			$this->assign('fuwucontent',$fuwucontent);
+			
 			$partners = $this->getUserPartner($_SESSION['authId']);
 			$pmap['id'] = array('in', $partners);
 			$partnerlist = M('partner')->where($pmap)->select();

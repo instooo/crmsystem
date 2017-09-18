@@ -44,7 +44,14 @@
                     <option value="小规模">小规模</option>
 					<option value="一般纳税人">一般纳税人</option>
         </select></li>
-		<li><label>服务内容</label><input name="fuwucontent" type="text" class="dfinput input_name" placeholder="服务内容" /><i></i></li>
+		<li><label>服务内容</label>
+		<input type="text" class="dfinput multi_input input_field33" name="fuwucontent" readonly="" value="" placeholder="服务内容">
+		<dl class="multi_list" style="display: none;">
+		<volist name='fuwucontent' id="vo">
+		<dd><input type="checkbox" value="{$vo.name}">{$vo.name}</dd>
+		</volist>
+		</dl>
+		<i></i></li>
         <li><label>客户名称</label>
 		<select class="dfinput input_partner_id" name="partner_id" style="width: 300px">
                     <option value="">请选择</option>
