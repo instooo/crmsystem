@@ -32,6 +32,7 @@ class WorkController extends CommonController {
 			}
 			$userlist = M('user')->select();
 			$this->assign('userlist', $userlist);
+			$this->assign('member_list_json',json_encode($userlist));
 		}else{
 			//查找自己拥有客户
 			$nowuid = $this->get_numuid();		
@@ -207,7 +208,28 @@ class WorkController extends CommonController {
         $this->deleData();
     }
 
-
+	//批量转移客户
+	public function partner_plzy(){
+		if ($_POST) {
+			$return = array("state"=>-1,"msg"=>'',"data"=>"");
+            do{ 				
+				$uid = trim ( $_REQUEST ['zy_uid'] );	
+				$mid_str = trim(I('post.mid_str'),"|");
+				$mid_arr = explode('|',$mid_str);
+				//添加上
+				foreach($mid_arr as $key=>$val){
+					$map['id']=$val;
+					$data['owner'] = $uid;	
+					M('partner')->where($map)->save($data);						
+				}
+				$ret['code'] = 1;
+				$ret['msg'] = '转移成功';
+				break;
+				
+			}while(0);
+			exit(json_encode($ret));
+		}	
+	}
 
     /**
      * 联系人管理
@@ -314,6 +336,7 @@ class WorkController extends CommonController {
 		if(!in_array($role['role_id'],array(1,20,25))){
 			$map['a.c_create_uid'] = $nowuid;
 		}
+		
         if ($_REQUEST['orderid']) {
             $map['p.orderid'] = array('like', "%".trim($_REQUEST['orderid'])."%");
             $this->assign('orderid', $_REQUEST['orderid']);
@@ -322,13 +345,15 @@ class WorkController extends CommonController {
             $map['p.partner_id'] = $_REQUEST['s_partner_id'];
             $this->assign('s_partner_id', $_REQUEST['s_partner_id']);
         }else {
-            $map['p.partner_id'] = array('in', $partners);
+			if(!in_array($role['role_id'],array(1,20,25))){
+				$map['p.partner_id'] = array('in', $partners);
+			}
         }
 		if ($_REQUEST['c_state']) {
             $map['a.c_state'] = $_REQUEST['c_state'];
             $this->assign('c_state', $_REQUEST['c_state']);
         }
-		
+		print_r($map);
         $count = M('agreement p')
             ->join('crm_work_case a on a.c_id = p.e_id')
             ->join('crm_work_case_log b on b.c_id=a.c_id and a.step=b.step')
@@ -522,6 +547,7 @@ class WorkController extends CommonController {
 			
 			//合同号
 			$orderid = "S".$orderid['max'];
+			$orderid = date('Ymd',time()).$orderid;
 			$this->assign('orderid',$orderid);			
 			//查询流程
 			$workflow = M('workflow')->select();			

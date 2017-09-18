@@ -4,6 +4,24 @@
         .toolbar li{text-align: center;padding: 0 !important;width: 50px;}
         .toolbar li.current{color: #FFFFFF;background: #3EAFE0 !important;}
         .toolbar1 li{cursor: pointer}
+		.manager-btn, .common-btn {
+				margin-top: 20px;
+				display: inline-block;
+				padding: 0 20px!important;
+				height: 32px!important;
+				line-height: 32px!important;
+				background: #2086ee;
+				font-size: 14px!important;
+				color: #fff;
+				text-align: center;
+				cursor: pointer;
+				border: 0;
+				-webkit-transition: all .3s;
+				transition: all .3s;
+				font-weight: 400;
+				-webkit-appearance: none;
+				color:#fff!important;
+			}
     </style>
     <div class="place">
         <span>位置：</span>
@@ -28,7 +46,7 @@
 			 业务员：<select name="owner" class="dfinput" style="width: 100px;">
                     <option value="">全部</option>                   
                     <volist name="userlist" id="vo">
-					<option value="{$vo.user_number}" <if condition="$owner eq $vo['user_number']">selected</if>>{$vo.username}</option>
+					<option value="{$vo.user_number}" <if condition="$owner eq $vo['user_number']">selected</if>>{$vo.nickname}</option>
 					</volist>
                 </select>&nbsp;
 			</if>
@@ -49,6 +67,7 @@
             <table class="tablelist">
                 <thead>
                 <tr>
+					<th></th>
                     <th>公司名称</th>
                     <th>合作类型</th>
                     <th>联系人</th>
@@ -63,6 +82,7 @@
                 <tbody>
                     <volist name="list" id="vo">
                         <tr data-id="{$vo.id}">
+							<td><input type="checkbox" name="domsysid" value="{$vo.id}" title="{$vo.name}"></td>
                             <td class="td_partner_name">{$vo.partner_name}</td>
                             <td>{$vo.khtype}</td>
                             <td>{$vo.partner_name}</td>
@@ -82,6 +102,15 @@
                     </volist>
                 </tbody>
             </table>
+			 <if condition="$special eq 1">
+			<div class="piliang mt-10">
+				<label for="J_qxck"><input type="checkbox" onclick="selectall(this,'domsysid')" class="check-all" id="J_qxck">&nbsp;全选</label>
+				<a href="javascript:;" onclick="plzy(this,'domsysid')" class="ml-5 manager-btn s-btn mr-10">批量转移</a>
+				<!--<a href="javascript:;" onclick="batch('push')" class="manager-btn s-btn mr-10">批量PUSH</a>
+				<a href="javascript:;" onclick="batch('renew')" class="manager-btn s-btn mr-10">批量续费</a>		 
+				<a href="domainrenewtask.asp" class="manager-btn s-btn mr-10">离线续费日志</a>-->
+			</div>
+			</if>
             <div class="page">{$pagebar}</div>
         </div>
     </div>
@@ -187,6 +216,59 @@
 		});
     });
     
+	
+	function selectall(_this,name){		
+		var flag = $(_this).is(':checked');			
+		if(flag == true){				
+			$("input[name="+name+"]").prop('checked',true);
+		}else{
+			$("input[name="+name+"]").prop('checked',false);
+		}		
+	}
+	function plzy(_this,name){
+			var str="";
+			$("input[name="+name+"]").each(function(){
+				str+=$(this).val()+"|";
+			})				
+			var user = {$member_list_json};
+			var option='<select name="zy_uid" class="selectoption">';
+			option+='<option value="-1">选择用户</option>'
+			for(var o in user){  
+				option+='<option value="'+user[o].user_number+'">'+user[o].nickname+'</option>'
+			};
+			option+="</select>";
+			var html = "用户："+option;
+			layer.confirm(html, {
+				title:'选择用户',
+                btn: ['确定','取消']
+            }, function(){
+				var zy_uid = $("select[name='zy_uid']").val();
+				if(zy_uid == -1){
+					layer.msg('请选择用户', {icon:5,time:1000});
+					return false;
+				}	
+				$.ajax({
+					type:'post',
+					dataType:'json',
+					data:{zy_uid:zy_uid,mid_str:str},
+					url:'/work/partner_plzy',				
+					success:function (data) {
+						if(data.code==1){
+							var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+							layer.msg('转移成功', {icon:4,time:1000},function(){
+								parent.location.reload();
+								parent.layer.close(index);
+							});					
+							
+						}else{
+							layer.msg('转移失败', {icon:5,time:1000});
+						}					
+					}
+				
+				});
+			});
+	}
+	
 </script>
 
 <include file="Index/footer" />
