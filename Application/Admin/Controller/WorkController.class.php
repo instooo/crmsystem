@@ -308,8 +308,12 @@ class WorkController extends CommonController {
         $this->assign('partnerlist', $partnerlist);
 
         $nowuid = $this->get_numuid();
-        $map['a.c_create_uid'] = $nowuid;
-
+		
+		//查找当前账号的角色
+		$role = M('role_user')->where("user_id=".$_SESSION['authId'])->find();
+		if(!in_array($role['role_id'],array(1,20,25))){
+			$map['a.c_create_uid'] = $nowuid;
+		}
         if ($_REQUEST['orderid']) {
             $map['p.orderid'] = array('like', "%".trim($_REQUEST['orderid'])."%");
             $this->assign('orderid', $_REQUEST['orderid']);
@@ -512,14 +516,12 @@ class WorkController extends CommonController {
 			$partnerlist = M('partner')->where($pmap)->select();
 			$this->assign('partnerlist', $partnerlist);
 			
+			$model = M('');
+			$sql = "SELECT max(id) as max from `crm_agreement`";
+			$orderid = $model->query($sql);
+			
 			//合同号
-			$orderid = date('YmdHi');
-			$chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';  
-			$str = '';  
-			for ( $i = 0; $i < 8; $i++ ){ 
-				$str .= $chars[ mt_rand(0, strlen($chars) - 1) ];  
-			} 
-			$orderid = $orderid.$str;
+			$orderid = "S".$orderid['max'];
 			$this->assign('orderid',$orderid);			
 			//查询流程
 			$workflow = M('workflow')->select();			
