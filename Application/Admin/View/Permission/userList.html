@@ -165,7 +165,7 @@
             var _tr = $(this).parents('tr');
             var layer_obj = $('#layui-layer'+layer_index);
             layer_obj.find('.input_id').val(_tr.find('.td_id').html());
-            layer_obj.find('.input_username').val(_tr.find('.td_username').html()).attr('readonly', true);
+            layer_obj.find('.input_username').val(_tr.find('.td_username').html());
             layer_obj.find('.input_nickname').val(_tr.find('.td_nickname').html());
             layer_obj.find('.input_role_id').val(_tr.find('.td_role').attr('data-roleid'));
         });
@@ -175,6 +175,7 @@
             var id = layer_obj.find('.input_id').val();
             var password = layer_obj.find('.input_password').val();
             var nickname = layer_obj.find('.input_nickname').val();
+			var username = layer_obj.find('.input_username').val();
             var role_id = layer_obj.find('.input_role_id').val();
             if (id == '') {
                 layer.msg('参数错误', {icon: 2,time: 1000});
@@ -183,7 +184,7 @@
             $.ajax({
                 type:'post',
                 dataType:'json',
-                data:{id:id,password:password,nickname:nickname,role_id:role_id},
+                data:{id:id,password:password,nickname:nickname,username:username,role_id:role_id},
                 url:"{:U('Permission/editUser')}",
                 success:function (response) {
                     if (response.code == 1) {

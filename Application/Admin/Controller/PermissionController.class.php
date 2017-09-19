@@ -316,6 +316,7 @@ class PermissionController extends CommonController {
         $return_data = array('code'=>-1,'msg'=>'未知错误');
         do{
             $id = I('post.id', '', 'trim,intval');
+			$username = I('post.username', '', 'trim,htmlspecialchars');
             $password = I('post.password', '', 'trim,htmlspecialchars');
             $nickname = I('post.nickname', '', 'trim,htmlspecialchars');
             $role_id = I('post.role_id', '', 'trim,htmlspecialchars');
@@ -334,7 +335,9 @@ class PermissionController extends CommonController {
             $user_data = array();
             if ($password) $user_data['password'] = md5($password);
             if ($nickname) $user_data['nickname'] = $nickname;
+			if ($username) $user_data['username'] = $username;
             if ($user_data) $user_data['create_time'] = time();
+			print_r($user_data);die;
             if ($user_data) {
                 $rs = M('user')->where(array('id'=>$id))->save($user_data);
                 if (false === $rs) {
