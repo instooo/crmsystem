@@ -376,27 +376,20 @@ class WorkController extends CommonController {
             ->order('p.id desc')
             ->limit("{$page->firstRow},{$page->listRows}")
             ->select();	
-		$datalist = second_array_unique_bykey($datalist,'c_id');  
-		
-		//查找流程
-		$workflowlist = M('workflow_extend')->select();
-		$workinfo= array();
-		foreach($workflowlist as $key=>$val){
-			$workinfo[$val['w_id']][$val['step_id']]=$val;
-		}
+		$datalist = second_array_unique_bykey($datalist,'c_id'); 		
 		//查找用户
 		$userinfo =  M('user')->select();
 		$userinfolist= array();
 		foreach($userinfo as $key=>$val){
 			$userinfolist[$val['user_number']]=$val;
-		}
-		
+		}		
 		//重新组合数据
 		$datalistnew = array();
 		foreach($datalist as $key=>$val){
 			$datalistnew[$key]=$val;
-			$newuid = $workinfo[$val['w_id']][($val['step']+1)]['uid'];
-			$newuidarr = explode('|',$newuid);
+			$stepmapnew['c_id']=$val['c_id'];
+			$stepinfo = M('work_case_step')->where($stepmapnew)->order('st_id desc')->find();			
+			$newuidarr = explode('|',$stepinfo['uid']);
 			$str = '';
 			foreach($newuidarr as $k=>$v){
 				$str.=$userinfolist[$v]['nickname'].",";
@@ -443,25 +436,19 @@ class WorkController extends CommonController {
             ->limit("{$page->firstRow},{$page->listRows}")
             ->select();
 		$datalist = second_array_unique_bykey($datalist,'c_id');	
-		//查找流程
-		$workflowlist = M('workflow_extend')->select();
-		$workinfo= array();
-		foreach($workflowlist as $key=>$val){
-			$workinfo[$val['w_id']][$val['step_id']]=$val;
-		}
 		//查找用户
 		$userinfo =  M('user')->select();
 		$userinfolist= array();
 		foreach($userinfo as $key=>$val){
 			$userinfolist[$val['user_number']]=$val;
-		}
-		
+		}		
 		//重新组合数据
 		$datalistnew = array();
 		foreach($datalist as $key=>$val){
 			$datalistnew[$key]=$val;
-			$newuid = $workinfo[$val['w_id']][($val['step']+1)]['uid'];
-			$newuidarr = explode('|',$newuid);
+			$stepmapnew['c_id']=$val['c_id'];
+			$stepinfo = M('work_case_step')->where($stepmapnew)->order('st_id desc')->find();			
+			$newuidarr = explode('|',$stepinfo['uid']);
 			$str = '';
 			foreach($newuidarr as $k=>$v){
 				$str.=$userinfolist[$v]['nickname'].",";
@@ -526,25 +513,19 @@ class WorkController extends CommonController {
 			$datalist = second_array_unique_bykey($datalist,'c_id');
         }	
 
-		//查找流程
-		$workflowlist = M('workflow_extend')->select();
-		$workinfo= array();
-		foreach($workflowlist as $key=>$val){
-			$workinfo[$val['w_id']][$val['step_id']]=$val;
-		}
 		//查找用户
 		$userinfo =  M('user')->select();
 		$userinfolist= array();
 		foreach($userinfo as $key=>$val){
 			$userinfolist[$val['user_number']]=$val;
-		}
-		
+		}		
 		//重新组合数据
 		$datalistnew = array();
 		foreach($datalist as $key=>$val){
 			$datalistnew[$key]=$val;
-			$newuid = $workinfo[$val['w_id']][($val['step']+1)]['uid'];
-			$newuidarr = explode('|',$newuid);
+			$stepmapnew['c_id']=$val['c_id'];
+			$stepinfo = M('work_case_step')->where($stepmapnew)->order('st_id desc')->find();			
+			$newuidarr = explode('|',$stepinfo['uid']);
 			$str = '';
 			foreach($newuidarr as $k=>$v){
 				$str.=$userinfolist[$v]['nickname'].",";
