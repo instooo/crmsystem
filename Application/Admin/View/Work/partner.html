@@ -110,6 +110,51 @@
 				<a href="javascript:;" onclick="batch('renew')" class="manager-btn s-btn mr-10">批量续费</a>		 
 				<a href="domainrenewtask.asp" class="manager-btn s-btn mr-10">离线续费日志</a>-->
 			</div>
+			<script>
+				function plzy(_this,name){
+						var str="";
+						$("input[name="+name+"]").each(function(){
+							str+=$(this).val()+"|";
+						})				
+						var user = {$member_list_json};
+						var option='<select name="zy_uid" class="selectoption">';
+						option+='<option value="-1">选择用户</option>'
+						for(var o in user){  
+							option+='<option value="'+user[o].user_number+'">'+user[o].nickname+'</option>'
+						};
+						option+="</select>";
+						var html = "用户："+option;
+						layer.confirm(html, {
+							title:'选择用户',
+							btn: ['确定','取消']
+						}, function(){
+							var zy_uid = $("select[name='zy_uid']").val();
+							if(zy_uid == -1){
+								layer.msg('请选择用户', {icon:5,time:1000});
+								return false;
+							}	
+							$.ajax({
+								type:'post',
+								dataType:'json',
+								data:{zy_uid:zy_uid,mid_str:str},
+								url:'/work/partner_plzy',				
+								success:function (data) {
+									if(data.code==1){
+										var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+										layer.msg('转移成功', {icon:4,time:1000},function(){
+											parent.location.reload();
+											parent.layer.close(index);
+										});					
+										
+									}else{
+										layer.msg('转移失败', {icon:5,time:1000});
+									}					
+								}
+							
+							});
+						});
+				}
+			</script>
 			</if>
             <div class="page">{$pagebar}</div>
         </div>
@@ -225,49 +270,7 @@
 			$("input[name="+name+"]").prop('checked',false);
 		}		
 	}
-	function plzy(_this,name){
-			var str="";
-			$("input[name="+name+"]").each(function(){
-				str+=$(this).val()+"|";
-			})				
-			var user = {$member_list_json};
-			var option='<select name="zy_uid" class="selectoption">';
-			option+='<option value="-1">选择用户</option>'
-			for(var o in user){  
-				option+='<option value="'+user[o].user_number+'">'+user[o].nickname+'</option>'
-			};
-			option+="</select>";
-			var html = "用户："+option;
-			layer.confirm(html, {
-				title:'选择用户',
-                btn: ['确定','取消']
-            }, function(){
-				var zy_uid = $("select[name='zy_uid']").val();
-				if(zy_uid == -1){
-					layer.msg('请选择用户', {icon:5,time:1000});
-					return false;
-				}	
-				$.ajax({
-					type:'post',
-					dataType:'json',
-					data:{zy_uid:zy_uid,mid_str:str},
-					url:'/work/partner_plzy',				
-					success:function (data) {
-						if(data.code==1){
-							var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
-							layer.msg('转移成功', {icon:4,time:1000},function(){
-								parent.location.reload();
-								parent.layer.close(index);
-							});					
-							
-						}else{
-							layer.msg('转移失败', {icon:5,time:1000});
-						}					
-					}
-				
-				});
-			});
-	}
+	
 	
 </script>
 
