@@ -507,9 +507,9 @@ class CommonController extends Controller {
      * @return array
      */
     public function getUserPartner($user_id) {
-        $user_partner = M('user_partner')->where(array('userid'=>$user_id))->select();
-        
-        $result = array_column($user_partner,'userid');
+        $user_partner = M('user_partner')->where(array('userid'=>$user_id))->select();        
+        $result = array_column($user_partner,'partners');
+		
 		$result = $result?$result:array(0);
         $userinfo = M('user')->where(array('id'=>$user_id))->find();
         $partners = M('partner')->where(array('owner'=>$userinfo['user_number']))->select();
