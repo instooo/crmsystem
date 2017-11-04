@@ -29,10 +29,11 @@ class RechargeController extends CommonController {
 			$yearm = date('Ym',time());	
 		}
 		
-		$agreement = M('agreement p')		
+		$agreement = M('agreement p')
+            ->field('p.*,t.partner_name')
 		->where($smap)		
         ->join('left join crm_partner t on t.id=p.partner_id')		
-		->select();			
+		->select();
 		foreach($agreement as $key=>$val){
 			//查找收费记录
 			$agreement[$key]['shoufeilog'] = M('money_log')->where("agree_id=".$val['id'])->select();

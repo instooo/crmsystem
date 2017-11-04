@@ -27,7 +27,7 @@
 					<th>回款金额</th>
 					<th><div class="lefticon"></div></th>
 					<volist name="month_arr" id="vo">
-					<th data-year="{$vo.ym}">{$vo.m}月</th>
+					<th data-year="{$vo.ym}">{$vo.ym}</th>
 					</volist>
 					<th><div class="righticon"></div></th>
                 </tr>
@@ -71,9 +71,18 @@
         <li class="special record"><label>回款日期&nbsp;</label><input name="pay_time" type="text" class="dfinput dfinput_datetime input_pay_time" style="width: 230px" readonly /></li>
 		<else/>
 		 <li class="special record"><label>回款日期&nbsp;</label><input name="pay_time" type="text" class="dfinput dfinput_datetime_mon input_pay_time" style="width: 230px" readonly /></li>
-		</if>	
+		</if>
+        <li class="start_time_li" style="display: none">
+            <label>开始日期&nbsp;</label>
+            <input name="pay_time_start" type="text" class="dfinput input_pay_time_start" style="width: 230px" onclick="laydate({format: 'YYYYMM',istime:false})" readonly>
+        </li>
         <li class="special record"><label>付款方式&nbsp;</label>
-		<input name="pay_type" type="text" class="dfinput input_money" style="width: 230px; background:#e1e1e1" value="月结" readonly/>	      
+            <select class="dfinput input_pay_type" name="pay_type" style="width: 200px;">
+                <option value="月结">月结</option>
+                <option value="长期结算">长期结算</option>
+            </select>
+            <!--<input name="pay_type" type="text" class="dfinput input_money" style="width: 230px; background:#e1e1e1" value="月结" readonly/>-->
+        </li>
         <li><label>备注&nbsp;</label><textarea name="remarks" class="dfinput input_remarks" style="width: 230px;height: 50px;"></textarea></li>
         <li><label>&nbsp;</label><input name="submit" type="button" class="btn do_savelog_btn" value="保存"/></li>
     </ul>
@@ -92,7 +101,7 @@
                 type: 1,
                 title: '添加回款详情',
                 skin: 'layui-layer-rim', //加上边框
-                area: ['600px', '500'], //宽高
+                area: ['600px', '400px'], //宽高
                 content: $('#add_moneylog_temp').html()
             });
 			var lay_con = $('#layui-layer'+layer_index);
@@ -161,6 +170,15 @@
             });
         }
 	
+        $(document).on('change', '.input_pay_type', function () {
+            var start = $(this).parents('.add_log_form').find('.start_time_li');
+            if ($(this).val() == '长期结算') {
+                start.show();
+            }else {
+                start.hide();
+            }
+        });
+
 	})
 </script>
 

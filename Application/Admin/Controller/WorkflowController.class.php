@@ -139,9 +139,7 @@ class WorkflowController extends CommonController {
 	public function detail(){
 		$data['wid'] = I('get.wid'); 			
 		if (!$data['wid']) {
-			$ret['code'] = -2;
-			$ret['msg'] = '参数不全';
-			break;
+            echo "参数不全";die;
 		}
 		$map['w_id']=$data['wid'];			
 		$result = M('workflow')->where($map)->find(); 
@@ -238,9 +236,7 @@ class WorkflowController extends CommonController {
 		}else{
 			$data['wid'] = I('get.wid'); 			
 			if (!$data['wid']) {
-				$ret['code'] = -2;
-				$ret['msg'] = '参数不全';
-				break;
+                echo "参数不全";die;
 			}
 			$map['w_id']=$data['wid'];			
 			$result = M('workflow')->where($map)->find(); 

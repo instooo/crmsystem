@@ -337,7 +337,6 @@ class PermissionController extends CommonController {
             if ($nickname) $user_data['nickname'] = $nickname;
 			if ($username) $user_data['username'] = $username;
             if ($user_data) $user_data['create_time'] = time();
-			print_r($user_data);die;
             if ($user_data) {
                 $rs = M('user')->where(array('id'=>$id))->save($user_data);
                 if (false === $rs) {

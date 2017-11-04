@@ -220,10 +220,31 @@ class AgreetmentController extends CommonController {
         }else {
             $this->ajaxReturn(array('code'=>-6,'msg'=>'回款类型未知'), 'JSON');
         }
-        $rs = $money_log->add($data);
+        // 长期结算批量回款
+        $dataAll = array();
+        if ($data['pay_type'] == '长期结算') {
+            $pay_time_start = $_POST['pay_time_start'];
+            if (!$pay_time_start) {
+                $this->ajaxReturn(array('code'=>-7,'msg'=>'请输入开始月份'), 'JSON');
+            }
+            $start = strtotime($pay_time_start.'01');
+            $t = $start;
+            while ($t <= $data['finish_time']) {
+                $temp = $data;
+                $temp['money'] = 0;
+                $temp['month'] = date('Ym', $t);
+                if ($temp['month'] == $data['month']) break;
+                $dataAll[] = $temp;
+                $t = strtotime('+1 month', $t);
+            }
+        }
+        $dataAll[] = $data;
+        //$rs = $money_log->add($data);
+        $rs = $money_log->addAll($dataAll);
         if (!$rs) {
             $this->ajaxReturn(array('code'=>-500,'msg'=>'数据保存失败'), 'JSON');
         }
+
         if ($return_money) {
             //更新回款金额
             M('agreement')->where(array('id'=>$agree_id))->setInc('return_money', $return_money);
