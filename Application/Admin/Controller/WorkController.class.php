@@ -148,6 +148,14 @@ class WorkController extends CommonController {
                     $return_data['msg'] = '参数缺失';
                     break;
                 }
+
+                $info = M('partner')->where(array('id'=>$id))->find();
+                if ($info['owner'] != $this->get_numuid()) {
+                    $return_data['code'] = -1;
+                    $return_data['msg'] = '您不是该客户的所有者，没有权限修改';
+                    break;
+                }
+
                 //添加实例
                 $adddata =$_POST;
                 $adddata['owner'] = $this->get_numuid();
@@ -390,10 +398,13 @@ class WorkController extends CommonController {
 			$stepmapnew['c_id']=$val['c_id'];
 			$stepinfo = M('work_case_step')->where($stepmapnew)->order('st_id desc')->find();			
 			$newuidarr = explode('|',$stepinfo['uid']);
+			/*
 			$str = '';
 			foreach($newuidarr as $k=>$v){
 				$str.=$userinfolist[$v]['nickname'].",";
 			}
+			*/
+            $str = $userinfolist[$newuidarr[0]]['nickname'];
 			$datalistnew[$key]['desnew']=$str;
 		}
 		

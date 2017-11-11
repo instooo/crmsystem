@@ -76,4 +76,26 @@ class PublicController extends Controller {
         }while(0);
         $this->ajaxReturn($return_data,'JSON');
     }
+
+    /**
+     * 获取用户信息
+     */
+    public function getUserlist() {
+        $uidstr = trim(htmlspecialchars($_REQUEST['uidstr']));
+        if (!$uidstr) {
+            $this->ajaxReturn(array('code'=>-1,'msg'=>'参数错误'), 'JSON');
+        }
+        $uidlist = explode('|', $uidstr);
+        if (!$uidlist) {
+            $this->ajaxReturn(array('code'=>-2,'msg'=>'参数非法'), 'JSON');
+        }
+        $map = array(
+            'id'    =>  array('in', $uidlist)
+        );
+        $userlist = M('user')->field('id,user_number,username,nickname')->where($map)->select();
+        if (!$userlist) {
+            $this->ajaxReturn(array('code'=>-3,'msg'=>'用户信息为空'), 'JSON');
+        }
+        $this->ajaxReturn(array('code'=>1,'msg'=>'success', 'data'=>$userlist), 'JSON');
+    }
 }

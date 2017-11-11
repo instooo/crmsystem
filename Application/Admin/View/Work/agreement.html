@@ -50,12 +50,13 @@
                     <th>所有者</th>                   
 					<th>进度</th>
                     <th>签约时间</th>
+                    <th>操作</th>
                 </tr>
                 </thead>
                 <tbody>
                 <volist name="list" id="vo">
                     <tr data-id="{$vo.id}">
-						 <td class="td_agree_name" data-cid="{$vo.c_id}">{$vo.orderid}</td>
+                        <td class="td_agree_name" data-cid="{$vo.c_id}">{$vo.orderid}</td>
                         <td><if condition="$vo['type'] eq 0">短期合同<else/>长期合同</if></td>
                         <td class="td_partner_id" data="{$vo.partner_id}">{$vo.partner_name}</td>
                         <td class="td_total_money">￥{$vo.total_money}</td>
@@ -70,7 +71,7 @@
 						<td>待{$vo.desnew}(审核)</td>
 						</if>
 						<td>{$vo.addtime|date='Y-m-d H:i:s',###}</td>
-
+                        <td><a data-id="{$vo.id}" href="javascript:;" class="tablelink dele">删除</a></td>
                     </tr>
                 </volist>
                 </tbody>
@@ -197,7 +198,7 @@
             $.ajax({
                 type:'post',
                 dataType:'json',
-                data:{id:id,fieldtype:'partner'},
+                data:{id:id,fieldtype:'agreement'},
                 url:"{:U('Work/deleAgreement')}",
                 success:function (response) {
                     layer.close(load);

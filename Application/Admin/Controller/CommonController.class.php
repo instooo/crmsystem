@@ -24,7 +24,26 @@ class CommonController extends Controller {
             }
         }
         //验证权限
-        if(!Rbac::AccessDecision()){
+        $allow = false;
+        if (strtolower(CONTROLLER_NAME.'/'.ACTION_NAME) == 'work/deleagreement') {
+            // 合同所有者有权删除
+            $idstr = trim($_REQUEST['id']);
+            if ($idstr) {
+                $agreelist = M('agreement')->where(array('id'=>$idstr,'c_create_uid'=>$this->get_numuid()))->select();
+                if ($agreelist) {
+                    // 默认都可以删除
+                    $allow = true;
+                    foreach ($agreelist as $val) {
+                        if ($val['c_state'] != 0) {
+                            // 只要有一个合同不是待审，则不能删除
+                            $allow = false;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        if(!Rbac::AccessDecision() && !$allow){
             if(IS_AJAX){
                 $this->ajaxReturn(array("code"=>403,"msg"=>'没有权限',"data"=>""));
             }else

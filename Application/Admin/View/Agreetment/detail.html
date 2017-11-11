@@ -46,7 +46,9 @@
 	<div class="customer_tabs fn-clear">
 		<ul class="detail_main_nav">
 			<li class='slide_nav_hover'><a class="slide-panel-tab" data-index="0" href="#">动态</a></li>
-			<li><a class="slide-panel-tab" data-index="1" href="#">回款</a></li>
+			<if condition="$agreeinfo['type'] eq 0">
+				<li><a class="slide-panel-tab" data-index="1" href="#">回款</a></li>
+			</if>
 			<li><a class="slide-panel-tab" data-index="2" href="#">信息</a></li>
 			<li><a class="slide-panel-tab" data-index="3" href="#">客户信息</a></li>
 			<li><a class="slide-panel-tab" data-index="4" href="#">文档</a></li>

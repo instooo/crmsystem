@@ -36,7 +36,8 @@
          </div> 
 		<div id="treeDemo" class="ztree" style="display:none;"></div>	
 		</div>		
-	</div>		
+	</div>
+	<div id="user_list" style="position:fixed; bottom:100px;padding: 20px 20px 5px 20px;"></div>
 	<div style="position:fixed; bottom:20px;padding: 20px 20px 5px 20px;"><input name="" type="button" class="btn" id="bumenbtn" value="共享"></div>	
 	<script>
 		$(function(){
@@ -120,13 +121,33 @@
 			var cityObj = $(".pulldown-default-show");
 			cityObj.attr('data-uid',vuid);
 			cityObj.html(v);
+            check_userlist(vuid);
 		}
 		function showIconForTree(treeId, treeNode) {
 			return !treeNode.isParent;
 		};
 		function showMenu() {		
 			$(".ztree").toggle();
-		}	
+		}
+		// 查询部门员工信息
+		function check_userlist(uidstr) {
+            $('#user_list').html('');
+			$.ajax({
+				type:'get',
+				dataType:'json',
+				data:{uidstr:uidstr},
+				url:'/Public/getUserlist',
+				success:function (response) {
+					if (response.code == 1) {
+					    var str = '';
+					    for (var i in response.data) {
+                            str += ((i>0)?'，':'')+response.data[i].nickname;
+						}
+                        $('#user_list').html('合同共享给：'+str);
+					}
+                }
+			});
+        }
 	</script>
 </body>
 </html>
